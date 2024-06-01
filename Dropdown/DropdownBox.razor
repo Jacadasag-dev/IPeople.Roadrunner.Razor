@@ -1,0 +1,126 @@
+﻿
+<div class="btn-group p-1">
+    <button class="btn btn-outline-secondary dropdown-toggle @(Dropdown.IsBlinking ? "fade-red" : "")" type="button" @onclick="ToggleDropDown">
+        @if (string.IsNullOrEmpty(DropdownService.GetDropdownSelectionValue(Dropdown)))
+        {
+            <text>@Dropdown.PlaceHolder</text>
+        }
+        else
+        {
+            if (DropdownService != null)
+            {
+                <text>@DropdownService.GetDropdownSelectionValue(Dropdown)</text>
+            }
+        }
+    </button>
+    @if (Dropdown.IsOpen)
+    {
+        <div class="custom-dropdown-menu">
+            @if (Dropdown.Selections.Any())
+            {
+                foreach (var selection in Dropdown.Selections)
+                {
+                    <button class="dropdown-item" @onclick="() => SelectionClicked(selection)">
+                        @selection
+                    </button>
+                }
+            }
+            else
+            {
+                <button class="dropdown-item">
+                    None
+                </button>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public EventCallback<string> OnNewSelection { get; set; }
+    [Parameter] public RrCommon.DropdownBase Dropdown { get; set; }
+    protected override void OnInitialized()
+    {
+        try
+        {
+            DropdownService.RegisterDropdown(this.Dropdown);
+            DropdownService.OnDropdownSelectionClearRequested += HandleClearRequest;
+            DropdownService.OnDropdownSelectionChangeRequested += HandleSelectionChangeRequest;
+            DropdownService.OnClickOutOf += HandleClickOutOf;
+        }
+        catch (Exception ex)
+        {
+            _ = ErrorService.LogError(Common.Log.LogEventLevel.Error, ex, "Error during component initialization.");
+        }
+    }
+
+    private void HandleClickOutOf()
+    {
+        try
+        {
+            Dropdown.IsOpen = DropdownService.GetDropdownOpenStatus(Dropdown);
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            _ = ErrorService.LogError(Common.Log.LogEventLevel.Error, ex, "Error handling click out of.");
+        }
+    }
+
+    private void HandleSelectionChangeRequest()
+    {
+        try
+        {
+            this.Dropdown.SelectedValue = DropdownService.GetDropdownSelectionValue(this.Dropdown);
+            DropdownService.SetDropdownBlinkingStateBasedOnSelection(this.Dropdown);
+            StateHasChanged(); // Re-render the component with the updated value
+        }
+        catch (Exception ex)
+        {
+            _ = ErrorService.LogError(Common.Log.LogEventLevel.Error, ex, "Error handling selection change request.");
+        }
+    }
+
+    private void HandleClearRequest(RrCommon.DropdownBase dropdown)
+    {
+        try
+        {
+            if (dropdown == null || dropdown.Identifier == this.Dropdown.Identifier) // Clear if null (all dropdowns) or if this specific key is targeted
+            {
+                Dropdown.SelectedValue = null;
+                StateHasChanged(); // Re-render the component with the updated value
+            }
+        }
+        catch (Exception ex)
+        {
+            _ = ErrorService.LogError(Common.Log.LogEventLevel.Error, ex, "Error handling clear request.");
+        }
+    }
+
+    private void ToggleDropDown()
+    {
+        try
+        {
+            DropdownService.ClickOutOfException(this.Dropdown);
+        }
+        catch (Exception ex)
+        {
+            _ = ErrorService.LogError(Common.Log.LogEventLevel.Error, ex, "Error toggling dropdown.");
+        }
+    }
+
+    private async void SelectionClicked(string selection)
+    {
+        try
+        {
+            DropdownService.SetDropdownSelectedValue(this.Dropdown, selection);
+            this.Dropdown.SelectedValue = selection;
+            DropdownService.UpdateDropdowns();
+            await OnNewSelection.InvokeAsync(selection);
+        }
+        catch (Exception ex)
+        {
+            await ErrorService.LogError(Common.Log.LogEventLevel.Error, ex, "Error handling selection click.");
+        }
+    }
+}
+ 
