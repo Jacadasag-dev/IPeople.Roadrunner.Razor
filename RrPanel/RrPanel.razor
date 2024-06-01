@@ -1,0 +1,21 @@
+﻿<div class="rr-panel-container" style="display: @(RrPanelInstance.Visible ? "block" : "none");">
+    <div class="rr-panel-header">
+        <div class="nav nav-tabs">
+            @foreach (var tab in RrPanelInstance.Tabs)
+            {
+                <a class="nav-item nav-link @(tab.Visible ? "" : "d-none") @(tab.Disabled ? "disabled" : "")" href="#@tab.Id">@tab.Name</a>
+            }
+        </div>
+    </div>
+    <div class="rr-panel-content">
+        @ChildContent
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public RrCommon.RrPanel RrPanelInstance { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+}

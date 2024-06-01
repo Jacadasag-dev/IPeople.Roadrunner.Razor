@@ -1,0 +1,20 @@
+﻿.rr-panel-container {
+    height: 300px; /* Set a fixed height for all panels */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.rr-panel-header {
+    background-color: #f8f9fa;
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.rr-panel-content {
+    flex: 1;
+    overflow: auto;
+    padding: 1rem;
+}
