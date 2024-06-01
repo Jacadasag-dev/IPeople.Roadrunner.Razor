@@ -1,0 +1,29 @@
+﻿@* Ensure the Apps collection is initialized and contains items *@
+@if (Apps == null) throw new Exception("Could not initialize schema Apps. Something went wrong with using the HCIS to get the SCHEMA or something went wrong with loading the environment");
+@if (!Apps.Any()) throw new Exception("There are no Apps in this schema to display. Therefore nothing is displayed");
+
+@* Loop through each application node in Apps *@
+@foreach (var appNode in Apps)
+{
+    if (!appNode.Visible) continue;  // Skip nodes that are not visible
+
+    atLeastOneNode = true;  // Indicate that at least one node is visible
+    appNode.IsLast = Apps.Last(app => app.Visible) == appNode;  // Check if the current node is the last visible node
+
+    @* Render the Node component for each visible application node *@
+    <Node ItemDetailsLookup="@ItemDetailsLookup" MeditechObject="@appNode"></Node>
+}
+
+@* If no nodes are visible, handle the no nodes scenario *@
+@if (atLeastOneNode) HandleNoNodes();
+
+@code {
+    [Parameter] public MeditechSchemas.MeditechSchemaApps Apps { get; set; } = new();
+    [Parameter] public SortedList<ulong, RrCommon.TableIconStatuses> ItemDetailsLookup { get; set; } = new();
+    private bool atLeastOneNode = false;
+
+    private void HandleNoNodes()
+    {
+
+    }
+}

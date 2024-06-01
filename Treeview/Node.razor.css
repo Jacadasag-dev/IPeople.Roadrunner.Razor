@@ -1,0 +1,124 @@
+﻿.node-list {
+    position: relative;
+    margin-left: 23px;
+    list-style: none;
+    cursor: default;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    white-space: nowrap;
+}
+
+.node-status-icon {
+    margin-left: 5px;
+}
+
+.node-expandcollapse-icon {
+    width: 2rem;
+    height: 2rem;
+    padding-left: 5px;
+    padding-right: 6px;
+    font-weight: bold;
+}
+
+.selected-node {
+    color: #FFFFFF;
+    background: linear-gradient(#0078D7, #0078D7) top left, linear-gradient(#664E95, #664E95) top right, linear-gradient(#664E95, #664E95) bottom left, linear-gradient(#664E95, #664E95) bottom right, linear-gradient(to bottom, #000, #000);
+    background-repeat: no-repeat;
+    background-clip: content-box, padding-box;
+    padding: 1px;
+    border: dotted 1px black;
+}
+
+.is-regular-nochild {
+    margin-left: 14px;
+}
+
+    .is-regular-nochild::after {
+        content: "";
+        position: absolute;
+        top: 13px;
+        left: -2px; /* Adjust the value as needed */
+        width: 17px;
+        height: 1px;
+        background-color: transparent; /* Change the color as desired */
+        border-top: 1px dotted black; /* Change the color as desired */
+    }
+
+.is-regular-child::after {
+    content: "";
+    position: absolute;
+    top: 13px;
+    left: -11px; /* Adjust the value as needed */
+    width: 10px;
+    height: 1px;
+    background-color: transparent; /* Change the color as desired */
+    border-top: 1px dotted black; /* Change the color as desired */
+}
+
+.is-regular-child::before {
+    content: "";
+    position: absolute;
+    top: 13px;
+    left: -12px; /* Adjust the value as needed */
+    width: 1px;
+    height: calc(100%);
+    background-color: transparent; /* Change the color as desired */
+    border-left: 1px dotted black; /* Change the color as desired */
+}
+
+.is-first-child::after {
+    content: "";
+    position: absolute;
+    top: 13px;
+    left: -11px; /* Adjust the value as needed */
+    width: 10px;
+    height: 1px;
+    background-color: transparent; /* Change the color as desired */
+    border-top: 1px dotted black; /* Change the color as desired */
+}
+
+.is-first-child::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -12px; /* Adjust the value as needed */
+    width: 1px;
+    height: calc(100% + 13px);
+    background-color: transparent; /* Change the color as desired */
+    border-left: 1px dotted black; /* Change the color as desired */
+}
+
+.is-last-child::after {
+    content: "";
+    position: absolute;
+    top: 13px;
+    left: -11px; /* Adjust the value as needed */
+    width: 10px;
+    height: 1px;
+    background-color: transparent; /* Change the color as desired */
+    border-top: 1px dotted black; /* Change the color as desired */
+}
+
+.is-only-child::after {
+    content: "";
+    position: absolute;
+    top: 13px;
+    left: -11px; /* Adjust the value as needed */
+    width: 10px;
+    height: 1px;
+    background-color: transparent; /* Change the color as desired */
+    border-top: 1px dotted black; /* Change the color as desired */
+}
+
+.is-only-child::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -12px; /* Adjust the value as needed */
+    width: 1px;
+    height: 13px;
+    background-color: transparent; /* Change the color as desired */
+    border-left: 1px dotted black; /* Change the color as desired */
+}

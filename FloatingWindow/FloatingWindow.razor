@@ -1,0 +1,170 @@
+﻿@using System.Reflection
+@inject IJSRuntime JSRuntime
+
+<div id="@Data.WindowKey"
+     class="@(Data.IsVisible ? (!Data.IsMinimized ? "floating-window" : "floating-window collapsed") : (!Data.IsMinimized ? "floating-window hide" : "floating-window hide collapsed"))">
+    <div id="@Data.WindowKey-header" class="floating-window-header" @ondblclick="ToggleWindowState">
+        <span class="header-text">@Data.GetTableName() - Downloads</span>
+        <button class="minimizeandexpand-button" @onclick="ToggleWindow">@(!Data.IsMinimized ? "─" : "")</button>
+        <button class="close-button" @onclick="CloseWindowAsync">X</button>
+    </div>
+
+    @if (!Data.IsMinimized)
+    {
+        <div class="popupwindow-tabs">
+            @foreach (var downloadDetails in Data.StatusesOfEachDownload)
+            {
+                var tabName = "";
+                string[] tableNameParts = downloadDetails.Name.Split(" to ")[1].Split("]");
+                @if (tableNameParts.Length > 2)
+                {
+                    tabName = $@"{tableNameParts[0]}{tableNameParts[1]}]";
+                }
+                else
+                {
+                    tabName = downloadDetails.Name.Split(" to ")[1].Split("]")[0];
+                }
+                <button class="@(Data.SelectedDownload.Name == downloadDetails.Name ? "popupwindow-nav-link-selected" : "popupwindow-nav-link")" @onclick="() => HandleShowDownloadTab(downloadDetails.Name)">@tabName</button>
+            }
+        </div>
+
+        <div class="download-details list-group mt-3">
+            @{
+                var properties = ViewService.ViewArgsInstance.ListOfTableDownloads.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .OrderBy(p => p.Name != "Name");
+
+                foreach (var property in properties)
+                {
+                    var value = property.GetValue(Data.SelectedDownload)?.ToString();
+                    <li class="list-group-item">
+                        <strong>@property.Name:</strong> @value
+                    </li>
+                }
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public EventCallback<ulong> OnClose { get; set; }
+    [Parameter] public RrCommon.DetailedStatusPopupWindow Data { get; set; }
+    [Parameter] public ulong WindowKey { get; set; }
+    private bool IsClicked = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            if (firstRender)
+            {
+                await JSRuntime.InvokeVoidAsync("makeDraggable", WindowKey);
+            }
+        }
+        catch (Exception ex)
+        {
+            await ErrorService.LogError(Common.Log.LogEventLevel.Error, ex, "Error during first render.");
+        }
+    }
+
+    private MarkupString RenderProperty(string label, string value)
+    {
+        if (!string.IsNullOrEmpty(value))
+        {
+            return new MarkupString($"<p><strong>{label}:</strong> {value}</p>");
+        }
+        else
+        {
+            return new MarkupString();
+        }
+    }
+
+    private void HandleShowDownloadTab(string downloadName)
+    {
+        try
+        {
+            Data.SelectedDownload = Data.StatusesOfEachDownload.FirstOrDefault(s => s.Name == downloadName);
+        }
+        catch (Exception ex)
+        {
+            _ = ErrorService.LogError(Common.Log.LogEventLevel.Error, ex, "Error handling show download tab.");
+        }
+    }
+
+    private async Task CloseWindowAsync()
+    {
+        try
+        {
+            Data.IsVisible = false;
+            await Task.Delay(300); // Delay should be equal to or slightly more than the transition duration in your CSS
+            await OnClose.InvokeAsync(WindowKey);
+        }
+        catch (Exception ex)
+        {
+            await ErrorService.LogError(Common.Log.LogEventLevel.Error, ex, "Error closing the window.");
+        }
+    }
+
+    private async Task ToggleWindow()
+    {
+        try
+        {
+            if (!Data.IsMinimized)
+            {
+                await MinimizeWindow();
+            }
+            else
+            {
+                ExpandWindow();
+            }
+        }
+        catch (Exception ex)
+        {
+            await ErrorService.LogError(Common.Log.LogEventLevel.Error, ex, "Error toggling window.");
+        }
+    }
+
+    private void ToggleWindowState()
+    {
+        try
+        {
+            if (Data.IsVisible)
+            {
+                Data.IsMinimized = !Data.IsMinimized;
+            }
+        }
+        catch (Exception ex)
+        {
+            _ = ErrorService.LogError(Common.Log.LogEventLevel.Error, ex, "Error toggling window state.");
+        }
+    }
+
+    private void ExpandWindow()
+    {
+        try
+        {
+            if (Data.IsVisible)
+            {
+                Data.IsMinimized = false;
+            }
+        }
+        catch (Exception ex)
+        {
+            _ = ErrorService.LogError(Common.Log.LogEventLevel.Error, ex, "Error expanding window.");
+        }
+    }
+
+    private async Task MinimizeWindow()
+    {
+        try
+        {
+            if (Data.IsVisible)
+            {
+                Data.IsMinimized = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            await ErrorService.LogError(Common.Log.LogEventLevel.Error, ex, "Error minimizing window.");
+        }
+    }
+}

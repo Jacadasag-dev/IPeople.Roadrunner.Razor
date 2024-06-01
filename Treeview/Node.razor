@@ -1,0 +1,166 @@
+﻿@* Check if the MeditechObject is not null *@
+@if (MeditechObject != null)
+{
+    MeditechSchemas.MeditechSchemaTable? Table = MeditechObject as MeditechSchemas.MeditechSchemaTable;
+    MeditechSchemas.MeditechSchemaApp? App = MeditechObject as MeditechSchemas.MeditechSchemaApp;
+
+    <li class="node-list">
+        @* Render the expand/collapse icon based on the node's children *@
+        @if ((Table?.Children?.Any(tc => tc.Visible) == true) || (App?.Tables.Count > 0))
+        {
+            <span id="@($"node-{MeditechObject.Name}")" class="node-expandcollapse-icon" @onclick="ToggleExpand">
+                @(MeditechObject.IsExpanded ? "─" : "+")
+            </span>
+        }
+        else
+        {
+            <span id="@($"node-{MeditechObject.Name}")" class="node-expandcollapse-icon is-regular-nochild"> </span>
+        }
+
+        @* Render the node text and type icon *@
+        <span @onclick="HandleOnNodeClick">
+            <img src="@(MeditechObject is MeditechSchemas.MeditechSchemaApp ? iconPaths.AppIcon : iconPaths.TableIcon)" alt="Icon">
+            <span class="@GetCssClassesForNode(MeditechObject)">@MeditechObject.Name</span>
+        </span>
+
+        @* Render the node details/status icons if applicable *@
+        @if (Table != null && ItemDetailsLookup != null && ItemDetailsLookup.TryGetValue(Table.Key, out RrCommon.TableIconStatuses? tableStatuses))
+        {
+            if (tableStatuses.DownloadCount > 0)
+            {
+                var stage = tableStatuses.TableStage;
+                var (stageIcon, stageTitle) = stage switch
+                {
+                    RrOptions.DownloadStageType.Initialize => (iconPaths.BuildingIcon, "Setup"),
+                    RrOptions.DownloadStageType.Live => (iconPaths.LiveIcon, "Live"),
+                    RrOptions.DownloadStageType.Recovery => (iconPaths.ErrorIcon, "Recovery"),
+                    _ => (iconPaths.UnknownIcon, "Unknown")
+                };
+
+                <span class="nodestatusicons" @onclick="HandleOnNodeStatusIconsClick">
+                    <img class="status-icon-custom" src="@(tableStatuses.DownloadStatus == RrOptions.DownloadStatusType.RUNNING ? iconPaths.OkayIcon : iconPaths.ErrorIcon)" alt="Icon" title="@(tableStatuses.DownloadStatus == RrOptions.DownloadStatusType.RUNNING ? "Okay" : "Error")">
+                    <img class="status-icon-custom" src="@stageIcon" alt="Icon" title="@stageTitle">
+                    <span class="status-icon-custom" title="Download Count">@tableStatuses.TableDownloadCount</span>
+                </span>
+            }
+        }
+
+        @* Render nested nodes if the current node is expanded *@
+        @if (MeditechObject.IsExpanded)
+        {
+            var tables = MeditechObject switch
+            {
+                MeditechSchemas.MeditechSchemaApp app => app.Tables,
+                MeditechSchemas.MeditechSchemaTable table when table.Children != null => table.Children,
+                _ => null
+            };
+
+            if (tables != null)
+            {
+                foreach (var table in tables.Where(t => t.Visible))
+                {
+                    table.IsFirst = tables.First(t => t.Visible) == table;
+                    table.IsLast = tables.Last(t => t.Visible) == table;
+                    <Node ItemDetailsLookup="ItemDetailsLookup" MeditechObject="table"></Node>
+                }
+            }
+        }
+    </li>
+}
+
+@code {
+    [Parameter] public MeditechSchemas.MeditechSchemaObjectBase? MeditechObject { get; set; }
+    [Parameter] public SortedList<ulong, RrCommon.TableIconStatuses>? ItemDetailsLookup { get; set; }
+    private TreeViewIconPaths iconPaths = new();
+
+    private void ToggleExpand()
+    {
+        if (MeditechObject != default)
+        {
+            MeditechObject.IsExpanded = !MeditechObject.IsExpanded;
+        }
+    }
+
+    private string GetCssClassesForNode(IPeople.Roadrunner.Shared.MeditechSchemas.MeditechSchemaObjectBase node)
+    {
+        var classes = new List<string>();
+        if (node.IsSelected) classes.Add("selected-node");
+        if (node is IPeople.Roadrunner.Shared.MeditechSchemas.MeditechSchemaApp) return string.Join(" ", classes);
+        classes.Add(node.IsFirst && node.IsLast ? "is-only-child" :
+                    node.IsLast ? "is-last-child" :
+                    node.IsFirst ? "is-first-child" : "is-regular-child");
+        return string.Join(" ", classes);
+    }
+
+    private async Task HandleOnNodeClick()
+    {
+        if (MeditechObject == null) return;
+        var clickedNode = MeditechObject;
+        clickedNode.IsSelected = !clickedNode.IsSelected;
+        if (clickedNode.IsSelected)
+        {
+            if (ViewService.ViewArgsInstance.LastClickedNode != null)
+            {
+                ViewService.ViewArgsInstance.LastClickedNode.IsSelected = false;
+            }
+            ViewService.ViewArgsInstance.LastClickedNode = clickedNode;
+        }
+        else
+        {
+            ViewService.ViewArgsInstance.LastClickedNode = null;
+        }
+        if (clickedNode is MeditechSchemas.MeditechSchemaTable tableNode)
+        {
+            ViewService.SetCommonArgs(tableNode);
+        }
+    }
+
+    private async void HandleOnNodeStatusIconsClick(MouseEventArgs e)
+    {
+        if (MeditechObject is MeditechSchemas.MeditechSchemaTable table)
+        {
+            var tableLookUps = RrCommon.GetTablesStatusesWithLookups(table, ViewService.ViewArgsInstance.SelectedSystem, ViewService.ViewArgsInstance.SelectedUNV, ViewService.ViewArgsInstance.SelectedHCIS);
+            var tableDetailedStatusesList = tableLookUps.TableDownloadStatuses;
+            ViewService.ViewArgsInstance.AppSchemaLookup = tableLookUps.AppSchemaLookup;
+            var newPopupWindow = new RrCommon.DetailedStatusPopupWindow
+            {
+                WindowKey = table.Key
+            };
+
+            // Create a dictionary to keep track of the counts of each name
+            var nameCounts = new Dictionary<string, int>();
+
+            foreach (var statuses in tableDetailedStatusesList)
+            {
+                // Check if the name already exists in the dictionary
+                if (nameCounts.ContainsKey(statuses.Name))
+                {
+                    // Increment the count for this name
+                    nameCounts[statuses.Name]++;
+
+                    // Rename the current status's name by appending the count
+                    statuses.Name = $"{statuses.Name}[{nameCounts[statuses.Name]}]";
+                }
+                else
+                {
+                    // If it's the first time this name is encountered, add it to the dictionary with a count of 1
+                    // The first instance doesn't get renamed (i.e., doesn't get an index)
+                    nameCounts.Add(statuses.Name, 1);
+                }
+            }
+
+            foreach (var statuses in tableDetailedStatusesList)
+            {
+                newPopupWindow.StatusesOfEachDownload.Add(statuses);
+            }
+
+            // Check if the key already exists
+            if (!ViewService.ViewArgsInstance.popupWindows.ContainsKey(table.Key))
+            {
+                // Key does not exist, add the newPopupWindow to the dictionary
+                ViewService.ViewArgsInstance.popupWindows[table.Key] = newPopupWindow;
+            }
+            ViewService.UpdateViews();
+        }
+    }
+}

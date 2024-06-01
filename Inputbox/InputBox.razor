@@ -1,0 +1,128 @@
+﻿@using System.Threading
+
+<input type="text" class="form-control" placeholder="@ThisInputBox.PlaceHolder"
+       style="margin-left: 5px; margin-right: 5px; max-width:@(ThisInputBox.MaxWidth > 0 ? $"{ThisInputBox.MaxWidth}px" : "none");"
+       value="@ThisInputBox.Text" @oninput="OnInputEntered" @onclick="HandleInputOnClick"
+       @onkeydown="HandleOnKeyDown" spellcheck="false">
+
+@code {
+    [Parameter] public EventCallback OnNewInput { get; set; }
+    [Parameter] public EventCallback<KeyboardEventArgs> OnKeyDown { get; set; }
+    [Parameter] public RrCommon.InputBoxBase ThisInputBox { get; set; }
+    private string inputText;
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            InputService.RegisterInput(ThisInputBox);
+            InputService.OnInputChangeRequested += HandleInputChangeRequest;
+        }
+        catch (Exception ex)
+        {
+            _ = ErrorService.LogError(Common.Log.LogEventLevel.Error, ex, "Error during component initialization.");
+        }
+    }
+
+    private void HandleInputChangeRequest()
+    {
+        try
+        {
+            ThisInputBox.Text = InputService.GetInputValue(ThisInputBox);
+            StateHasChanged(); // Re-render the component with the updated value
+        }
+        catch (Exception ex)
+        {
+            _ = ErrorService.LogError(Common.Log.LogEventLevel.Error, ex, "Error handling input change request.");
+        }
+    }
+
+    private CancellationTokenSource debounceCts = new CancellationTokenSource();
+    private async void HandleOnKeyDown(KeyboardEventArgs e)
+    {
+        try
+        {
+            if (e.Key == "Enter")
+            {
+                if (ThisInputBox.Identifier == RrOptions.InputIds.TableSearchInput || ThisInputBox.Identifier == RrOptions.InputIds.ColumnSearchInput)
+                {
+                    debounceCts.Cancel();
+                    debounceCts = new CancellationTokenSource();
+                    if (inputText == null) return;
+                    InputService.SetInputValueById(ThisInputBox.Identifier, inputText);
+                    await OnNewInput.InvokeAsync();
+                }
+                else if (ThisInputBox.Identifier == RrOptions.InputIds.SQLStatementInput)
+                {
+                    await OnKeyDown.InvokeAsync();
+                }
+            }
+            else if (e.Key == "ArrowDown")
+            {
+                //Future select search results row with down arrow
+            }
+        }
+        catch (Exception ex)
+        {
+            _ = ErrorService.LogError(Common.Log.LogEventLevel.Error, ex, "Error handling key down event.");
+        }
+    }
+
+    private async void OnInputEntered(ChangeEventArgs e)
+    {
+        inputText = e.Value.ToString();
+        if (ThisInputBox.DoDeBounce)
+        {
+            debounceCts.Cancel();
+            debounceCts = new CancellationTokenSource();
+            try
+            {
+                await Task.Delay(1000, debounceCts.Token);
+            }
+            catch (TaskCanceledException)
+            {
+                return;
+            }
+            try
+            {
+                if (inputText == null) return;
+                InputService.SetInputValueById(ThisInputBox.Identifier, inputText);
+                await OnNewInput.InvokeAsync();
+            }
+            catch (Exception ex)
+            {
+                _ = ErrorService.LogError(Common.Log.LogEventLevel.Error, ex, "Error handling input entered event with debounce.");
+            }
+        }
+        else
+        {
+            try
+            {
+                if (inputText == null) return;
+                InputService.SetInputValueById(ThisInputBox.Identifier, inputText);
+                await OnNewInput.InvokeAsync();
+            }
+            catch (Exception ex)
+            {
+                _ = ErrorService.LogError(Common.Log.LogEventLevel.Error, ex, "Error handling input entered event.");
+            }
+        }
+    }
+
+    private async void HandleInputOnClick()
+    {
+        try
+        {
+            ViewService.ClickOutOfException();
+            if (InputService.SearchInputsHaveText && ThisInputBox.Identifier != RrOptions.InputIds.SQLStatementInput)
+            {
+                ViewService.ViewArgsInstance.ShowResultsView = true;
+                ViewService.UpdateResultsViewUI();
+                await OnNewInput.InvokeAsync(InputService.GetInputValue(ThisInputBox));
+            }
+        }
+        catch (Exception ex)
+        {
+            _ = ErrorService.LogError(Common.Log.LogEventLevel.Error, ex, "Error handling input click event.");
+        }
+    }
+}
