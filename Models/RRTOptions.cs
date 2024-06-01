@@ -16,5 +16,4 @@
         public string UnknownIcon { get; set; } = "_content/IPeople.Roadrunner.Razor/images/StatusIcons/question-mark-16.png";
         // Add other icon paths as needed
     }
-
 }
