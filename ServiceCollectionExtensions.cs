@@ -13,6 +13,7 @@ namespace IPeople.Roadrunner.Razor
             services.AddSingleton<Shared.RrServices.ViewStateService>();
             services.AddSingleton<Shared.RrServices.InputStateService>();
             services.AddSingleton<Shared.RrServices.DropdownStateService>();
+            services.AddSingleton<Shared.RrServices.PanelStateService>();
             services.AddSingleton<Shared.RrServices.ErrorLoggingService>();
             return services;
         }

@@ -1,14 +1,15 @@
-﻿<div class="rr-panel-container" style="display: @(RrPanelInstance.Visible ? "block" : "none");">
+﻿
+<div class="rr-panel-container" style="display: @(PanelService.GetVisible(RrPanelInstance) ? "block" : "none");">
     <div class="rr-panel-header">
         <div class="nav nav-tabs">
             @foreach (var tab in RrPanelInstance.Tabs)
             {
-                <a class="nav-item nav-link @(tab.Visible ? "" : "d-none") @(tab.Disabled ? "disabled" : "")" href="#@tab.Id">@tab.Name</a>
+                <a class="nav-item nav-link @(tab.Visible ? "" : "d-none") @(tab.Disabled ? "disabled" : "") @(tab.IsSelected ? "active" : "") href="#" @onclick="() => SelectTab(tab)">@tab.Name</a>
             }
         </div>
     </div>
     <div class="rr-panel-content">
-        @ChildContent
+        @PanelService.GetSelectedTab(RrPanelInstance)?.Content
     </div>
 </div>
 
@@ -16,6 +17,19 @@
     [Parameter]
     public RrCommon.RrPanel RrPanelInstance { get; set; }
 
-    [Parameter]
-    public RenderFragment ChildContent { get; set; }
+    protected override void OnInitialized()
+    {
+        PanelService.RegisterPanel(RrPanelInstance);
+        PanelService.OnPanelChangeRequested += StateHasChanged;
+    }
+
+    private void SelectTab(RrCommon.RrPanelTab tab)
+    {
+        PanelService.SetSelectedTab(RrPanelInstance, tab);
+    }
+
+    public void Dispose()
+    {
+        PanelService.OnPanelChangeRequested -= StateHasChanged;
+    }
 }
