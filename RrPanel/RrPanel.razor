@@ -1,12 +1,23 @@
-﻿
+﻿@page "/rrpanel"
+
 <div class="rr-panel-container" style="display: @(PanelService.GetVisible(RrPanelInstance) ? "block" : "none");">
     <div class="rr-panel-header">
-        <div class="nav nav-tabs">
-            @foreach (var tab in RrPanelInstance.Tabs)
-            {
-                <a class="nav-item nav-link @(tab.Visible ? "" : "d-none") @(tab.Disabled ? "disabled" : "") @(tab.IsSelected ? "active" : "") href="#" @onclick="() => SelectTab(tab)">@tab.Name</a>
-            }
-        </div>
+        @if (RrPanelInstance.Tabs.Any())
+        {
+            <div class="rr-panel-tabs-container">
+                @foreach (var tab in RrPanelInstance.Tabs)
+                {
+                    <a @onclick="() => SelectTab(tab)" class="rr-panel-tabs @(tab.Visible ? "" : "d-none") @(tab.Disabled ? "disabled" : "") @(tab.IsSelected ? "active" : "")">@tab.Name</a>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="rr-panel-header-text-container">
+                <span class="rr-panel-header-text">@RrPanelInstance.Header</span>
+            </div>
+        }
+
     </div>
     <div class="rr-panel-content">
         @PanelService.GetSelectedTab(RrPanelInstance)?.Content
@@ -21,6 +32,12 @@
     {
         PanelService.RegisterPanel(RrPanelInstance);
         PanelService.OnPanelChangeRequested += StateHasChanged;
+
+        // Ensure a default tab is selected
+        if (RrPanelInstance.Tabs.Any() && RrPanelInstance.SelectedTab == null)
+        {
+            PanelService.SetSelectedTab(RrPanelInstance, RrPanelInstance.Tabs.First());
+        }
     }
 
     private void SelectTab(RrCommon.RrPanelTab tab)
