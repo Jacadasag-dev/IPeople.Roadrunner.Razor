@@ -1,0 +1,65 @@
+﻿@keyframes growAndShrink {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(.97); /* Adjust the scale value as needed */
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.Rr-button {
+    position: relative;
+    height: 42px;
+    border-radius: 7px; /* Adjust radius as needed */
+    background: #E8E8E8;
+    font-size: 14px;
+    font-family: 'Roboto', sans-serif; /* Substitute with your chosen font */
+    color: #333; /* This is a dark gray, visible against a light background */
+    text-transform: uppercase; /* Considering your acronyms are in uppercase */
+    letter-spacing: 1px; /* To give a little breathing room for the uppercase letters */
+    padding-left: 12px;
+    padding-right: 12px;
+    margin-left: 4px;
+    border: thin solid #c8c6c6;
+    transition: transform 0.5s ease-in-out; /* Smooth transition */
+    z-index: 1;
+}
+
+
+
+    .Rr-button:hover {
+        background: linear-gradient(90deg, #26A98F, #10707f, #26A98F); /* Diagonal gradient background for the tabs container */
+        background-size: 200% 100%; /* Required for shimmer effect */
+        color: #FFFFFF; /* This is a dark gray, visible against a light background */
+    }
+
+        .Rr-button:hover::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: inherit;
+            animation: shimmer 10s infinite linear; /* Always apply shimmer animation */
+            z-index: -1;
+            border-radius: 7px; /* Adjust radius as needed */
+        }
+
+
+    .Rr-button.selected {
+        animation: growAndShrink 0.5s ease-in-out;
+    }
+
+@keyframes shimmer {
+    100% {
+        background-position: -200% 0;
+    }
+
+    0% {
+        background-position: 200% 0;
+    }
+}

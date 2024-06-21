@@ -1,0 +1,9 @@
+﻿
+<a @onclick="HandleTabSelected"
+    class="rr-panel-tabs
+    @(Tab.IsSelected ? "selected" : "")
+    @(Tab.Visible ? "" : "d-none")
+    @(Tab.Disabled ? "disabled" : "")
+    @(Tab.IsSelected ? "active" : "")">
+    @Tab.Name
+</a>

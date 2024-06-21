@@ -1,0 +1,44 @@
+﻿<div class="rr-panel-container">
+    <div id="rr-panel-header-@Header" class="rr-panel-header">
+        @if (!RrStateService.AppGlobalVariables.Loading.IsLoading)
+        {
+            @if (PanelTabs is not null)
+            {
+                <div class="rr-panel-tabs-container">
+                    @PanelTabs
+                </div>
+            } else
+            {
+                <div class="rr-panel-header-text-container">
+                    <span id="rr-panel-header-text" class="rr-panel-header-text">@(Header ?? "")</span>
+                </div>
+            }
+            @if (PanelSettings is not null)
+            {
+                <div class="rr-panel-settings-container">
+                    @PanelSettings
+                </div>
+            }
+        }
+    </div>
+    <div class="@(EnableScroll ? "rr-panel-content" : "rr-panel-content-noscroll")">
+        @if (RrStateService.AppGlobalVariables.Loading.IsLoading)
+        {
+            @switch (RrStateService.AppGlobalVariables.Loading.Type)
+            {
+                case Models.RrLoadingType.Loading:
+                case Models.RrLoadingType.Authenticating:
+                    <RrLoading Message="@RrStateService.AppGlobalVariables.Loading.Message"></RrLoading>
+                    break;
+
+                case Models.RrLoadingType.Awaiting:
+                    <p>@RrStateService.AppGlobalVariables.Loading.Message</p>
+                    break;
+            }
+        }
+        else
+        {
+            @PanelContent
+        }
+    </div>
+</div>

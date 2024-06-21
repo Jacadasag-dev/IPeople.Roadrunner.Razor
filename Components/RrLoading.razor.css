@@ -1,0 +1,69 @@
+﻿/* Container styles */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 90%; /* Set width to 90% of the parent container */
+    height: 90%; /* Set height to 90% of the parent container */
+    flex-direction: column;
+    text-align: center;
+}
+
+/* Spinner container */
+.spinner {
+    position: relative;
+    width: 50px;
+    height: 50px;
+}
+
+/* Brush styles */
+.brush {
+    position: absolute;
+    left: -3px;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+    transform-origin: center;
+}
+
+.brush1 {
+    animation: spin-pulse 2s infinite linear;
+}
+
+.brush2 {
+    animation: spin-pulse-reverse 2s infinite linear;
+}
+
+/* Keyframes for spinner rotation, pulsing, and color swapping */
+@keyframes spin-pulse {
+    0%, 100% {
+        transform: rotate(0deg) scale(1);
+        background-color: #10707f;
+    }
+
+    50% {
+        transform: rotate(260deg) scale(1.1);
+        background-color: #26A98F;
+    }
+}
+
+@keyframes spin-pulse-reverse {
+    0%, 100% {
+        transform: rotate(0deg) scale(1.1);
+        background-color: #26A98F;
+    }
+
+    50% {
+        transform: rotate(-260deg) scale(1);
+        background-color: #10707f;
+    }
+}
+
+/* Message styles */
+.message {
+    margin-top: 20px;
+    font-size: 1.25rem;
+    color: #333;
+    font-family: 'Roboto', sans-serif;
+}

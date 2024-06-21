@@ -5,8 +5,6 @@ VisualStudioVersion = 17.9.34607.119
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IPeople.Roadrunner.Razor", "IPeople.Roadrunner.Razor.csproj", "{8CE41070-9CCC-4724-881C-EFDC76C3A222}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IPeople.Roadrunner.Shared", "..\IPeople.Roadrunner.Server\IPeople.Roadrunner.Shared\IPeople.Roadrunner.Shared.csproj", "{EE5C4E19-455D-42A8-B6F8-3B78F3BCB13B}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,10 +15,6 @@ Global
 		{8CE41070-9CCC-4724-881C-EFDC76C3A222}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8CE41070-9CCC-4724-881C-EFDC76C3A222}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8CE41070-9CCC-4724-881C-EFDC76C3A222}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EE5C4E19-455D-42A8-B6F8-3B78F3BCB13B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EE5C4E19-455D-42A8-B6F8-3B78F3BCB13B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EE5C4E19-455D-42A8-B6F8-3B78F3BCB13B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EE5C4E19-455D-42A8-B6F8-3B78F3BCB13B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

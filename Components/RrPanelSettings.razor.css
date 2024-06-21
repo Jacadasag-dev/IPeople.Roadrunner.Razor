@@ -1,0 +1,222 @@
+﻿
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-1px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.Rr-sidebar {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    height: 35px;
+    width: 40px;
+    background: #E8E8E8;
+    cursor: default;
+    margin: 0;
+    padding: 0;
+    border-radius: 10px; /* Adjust radius as needed */
+    z-index: 1;
+    overflow: hidden; /* Hide content during transition */
+    text-align: end;
+    animation: fadeIn 0.2s ease-in-out; /* Apply fadeIn animation */
+}
+
+    .Rr-sidebar.minimized {
+        animation: collapse 0.2s forwards;
+    }
+
+    .Rr-sidebar.expanded {
+        animation: expand 0.2s forwards;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border: thin solid #c8c6c6;
+        z-index: 1000;
+    }
+
+.Rr-sidebar-header {
+    position: absolute;
+    top: 10px;
+    left: 7px;
+    display: inline-block;
+    font-size: 14px;
+    font-family: 'Roboto', sans-serif; /* Substitute with your chosen font */
+    color: #333; /* This is a dark gray, visible against a light background */
+    text-transform: uppercase; /* Considering your acronyms are in uppercase */
+    letter-spacing: 1px; /* To give a little breathing room for the uppercase letters */
+}
+
+
+
+@keyframes expand {
+    from {
+        height: 35px;
+        width: 40px;
+    }
+
+    to {
+        height: 130px;
+        width: 200px;
+    }
+}
+
+@keyframes collapse {
+    from {
+        height: 130px;
+        width: 200px;
+    }
+
+    to {
+        height: 35px;
+        width: 40px;
+    }
+}
+
+.Rr-sidebar-content {
+    opacity: 0;
+    transition: opacity 0.2s linear;
+}
+
+.Rr-sidebar.expanded .Rr-sidebar-content {
+    opacity: 1;
+}
+
+.Rr-sidebar-bottom-content {
+    display: inline-block;
+    position: relative;
+    padding-top: 11px;
+    padding-bottom: 8px;
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+.Rr-sidebar-button-dots {
+    display: inline-block;
+    font-size: 16px;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    position: relative;
+}
+
+    .Rr-sidebar-button-dots:hover {
+        background-color: #cecdcd;
+    }
+
+.RRdots {
+    display: inline-block;
+    position: relative;
+    padding: 5px;
+}
+
+.RRdot {
+    vertical-align: middle;
+    display: inline-block;
+    width: 3px; /* Increased width for better visibility */
+    height: 3px; /* Increased height for better visibility */
+    background-color: #333;
+    border-radius: 50%;
+    margin-right: .5px; /* Added margin for spacing */
+    padding: 0px;
+}
+
+.Rr-sidebar-button-dots:hover .RRdot:nth-child(1) {
+    animation: bounce 4s infinite ease-in-out;
+    animation-delay: 0s;
+}
+
+.Rr-sidebar-button-dots:hover .RRdot:nth-child(2) {
+    animation: bounce 4s infinite ease-in-out;
+    animation-delay: 0.2s;
+}
+
+.Rr-sidebar-button-dots:hover .RRdot:nth-child(3) {
+    animation: bounce 4s infinite ease-in-out;
+    animation-delay: 0.4s;
+}
+
+ul.settings-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+
+    ul.settings-list li {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 5px;
+        width: 100%;
+        box-sizing: border-box;
+        border-bottom: 1px solid #ddd;
+    }
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 34px;
+    height: 20px;
+}
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 20px;
+}
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 14px;
+        width: 14px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+
+input:checked + .slider {
+    background-color: #26A98F;
+}
+
+    input:checked + .slider:before {
+        transform: translateX(14px);
+    }
+
+.Rr-option-label {
+    padding-left: 4px;
+    font-size: 9px;
+    font-family: 'Roboto', sans-serif; /* Substitute with your chosen font */
+    color: #333; /* This is a dark gray, visible against a light background */
+    text-transform: uppercase; /* Considering your acronyms are in uppercase */
+    letter-spacing: 1px; /* To give a little breathing room for the uppercase letters */
+}
+
+@keyframes bounce {
+    0%, 30%, 100% {
+        transform: translateY(0);
+    }
+
+    15% {
+        transform: translateY(-3px);
+    }
+}

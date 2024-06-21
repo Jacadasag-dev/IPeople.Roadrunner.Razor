@@ -1,9 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Components.Web
-@using IPeople.Roadrunner.Shared
 @using IPeople.Roadrunner.Razor.Models
 @using Microsoft.JSInterop
-@inject IPeople.Roadrunner.Shared.RrServices.ViewStateService ViewService
-@inject IPeople.Roadrunner.Shared.RrServices.InputStateService InputService
-@inject IPeople.Roadrunner.Shared.RrServices.DropdownStateService DropdownService
-@inject IPeople.Roadrunner.Shared.RrServices.ErrorLoggingService ErrorService
-@inject IPeople.Roadrunner.Shared.RrServices.PanelStateService PanelService
+@using Radzen
+@using Radzen.Blazor
+@inject IPeople.Roadrunner.Razor.Services.RrStateService RrStateService
+@inject IJSRuntime JS

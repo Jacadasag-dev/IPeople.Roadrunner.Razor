@@ -1,0 +1,41 @@
+﻿.rr-panel-tabs {
+    height: 100%;
+    min-width: 150px;
+    text-align: center;
+    cursor: pointer; /* Change cursor to pointer on hover */
+    padding: 0.4rem 1rem; /* Padding for the tabs */
+    font-size: 20px;
+    font-family: 'Roboto', sans-serif; /* Substitute with your chosen font */
+    color: #FFFFFF; /* This is a dark gray, visible against a light background */
+    background: linear-gradient(90deg, #26A98F, #10707f, #26A98F); /* Diagonal gradient background for the tabs container */
+    background-size: 200% 100%; /* Required for shimmer effect */
+    text-transform: uppercase; /* Considering your acronyms are in uppercase */
+    letter-spacing: 1px; /* To give a little breathing room for the uppercase letters */
+    text-decoration: none; /* Remove underline from tabs */
+    transition: color 0.3s ease; /* Smooth transition for color change */
+    border-top-left-radius: 10px; /* Rounding the top-left corner */
+    border-top-right-radius: 10px; /* Rounding the top-right corner */
+}
+
+
+    .rr-panel-tabs.selected {
+        border-bottom: 2px solid orange; /* Orange border to indicate selection */
+        animation: scale 0.5s ease-in-out, shimmer 10s infinite linear;
+    }
+
+    /* Hover effect for individual tabs */
+    .rr-panel-tabs:hover {
+        color: #C7E8E3; /* Darker blue color on hover */
+        background: linear-gradient(to right, #0279AD, #0279AD); /* Gradient background for the tabs container */
+    }
+
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+
+    100% {
+        background-position: 200% 0;
+    }
+}

@@ -1,0 +1,7 @@
+﻿@using System.Threading
+
+<input type="text" class="Rr-input" placeholder="@Input.PlaceHolder"
+       style="margin-left: 5px; margin-right: 5px; max-width:@(Input.MaxWidth > 0 ? $"{Input.MaxWidth}px" : "none");"
+       value="@Input.Text" @oninput="OnInputEntered" @onclick="@OnInputClick"
+       @onkeydown="HandleOnKeyDown" spellcheck="false">
+

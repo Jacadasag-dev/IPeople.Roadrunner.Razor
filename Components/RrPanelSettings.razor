@@ -1,0 +1,58 @@
+﻿
+@if (Tab is not null && Tab.Settings is not null && Tab.Settings.Any())
+{
+    var tabInstance = (RrStateService.GetComponent<Models.RrPanel>(Tab.Panel) as Models.RrPanel).Tabs.FirstOrDefault(t => t.Name == Tab.Name);
+    string sideBarCssClass = "";
+    if (tabInstance.SettingsUIState == Models.SettingUIStates.Expanded)
+    {
+        sideBarCssClass = "expanded";
+    }
+    else if (tabInstance.SettingsUIState == Models.SettingUIStates.Collapsed)
+    {
+        sideBarCssClass = "minimized";
+    }
+    else if (tabInstance.SettingsUIState == Models.SettingUIStates.Neutral)
+    {
+        sideBarCssClass = "";
+    }
+    <div class="Rr-sidebar @sideBarCssClass">
+        @if (tabInstance.SettingsUIState == Models.SettingUIStates.Expanded)
+        {
+            if (!string.IsNullOrEmpty(Header))
+            {
+                <span class="Rr-sidebar-header">@Header</span>
+            }
+            else if (Tab is not null)
+            {
+                <span class="Rr-sidebar-header">@Tab.Name</span>
+            }
+        }
+        <button class="Rr-sidebar-button-dots" @onclick="ToggleSidebar">
+            <div class="RRdots">
+                <div class="RRdot"></div>
+                <div class="RRdot"></div>
+                <div class="RRdot"></div>
+            </div>
+        </button>
+
+
+        <div class="Rr-sidebar-content">
+            <ul class="settings-list">
+                @foreach (var setting in Settings == null ? Tab.Settings : Settings)
+                {
+                    <li>
+                        @if (setting.Type == Models.RrPanelSettingTypes.Slider)
+                        {
+                            var settingActive = tabInstance.Settings.FirstOrDefault(s => s.Name == setting.Name).Active;
+                            <span class="Rr-option-label">@setting.Name</span>
+                            <label class="switch">
+                                <input type="checkbox" @bind="@settingActive" @onclick="() => HandleOnSliderClick(setting.Name)">
+                                <span class="slider"></span>
+                            </label>
+                        }
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+}

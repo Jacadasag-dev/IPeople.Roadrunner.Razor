@@ -1,0 +1,162 @@
+﻿@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+
+@keyframes jiggle {
+    0%, 100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(2px);
+    }
+
+    50% {
+        transform: translateX(0px);
+    }
+
+    75% {
+        transform: translateX(2px);
+    }
+}
+
+@keyframes scale {
+    0%, 100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.03);
+    }
+}
+
+
+
+
+.rr-panel-container {
+    height: calc(100vh - 150px);
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+    border: 1px solid rgba(0,0,0,.125);
+    border-top: none; /* Remove the top border */
+    margin: 1rem;
+    width: calc(100% - 30px);
+    min-width: 250px;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    white-space: nowrap;
+}
+
+
+.rr-panel-header {
+    display: flex; /* Change display to flex to align children elements */
+    align-items: center;
+    justify-content: space-between; /* Ensure space between header text and checkbox */
+    /*background: linear-gradient(to right, #E8E8E8 10%, #10707f 100%);*/
+    background: linear-gradient(to right, #FFFFFF 20%, #E8E8E8 30%);
+    background-size: 200% 100%; /* Required for shimmer effect */
+    border-bottom: 1px solid #dee2e6;
+    height: 45px;
+    border-top-left-radius: 10px; /* Rounding the top-left corner */
+    border-top-right-radius: 10px; /* Rounding the top-right corner */
+}
+
+
+.rr-panel-header-text {
+    padding-left: 20px;
+    background-color: transparent;
+    cursor: default;
+    font-size: 20px;
+    font-family: 'Roboto', sans-serif; /* Substitute with your chosen font */
+    color: #333; /* This is a dark gray, visible against a light background */
+    text-transform: uppercase; /* Considering your acronyms are in uppercase */
+    letter-spacing: 1px; /* To give a little breathing room for the uppercase letters */
+}
+
+/* Container for the panel tabs */
+.rr-panel-tabs-container {
+    height: 100%;
+    display: flex;
+    justify-content: left; /* Adjust the space between tabs */
+    align-items: center; /* Center the tabs vertically */
+    background-color: transparent; /* Light gray background for the tabs container */
+    border-top-left-radius: 10px; /* Rounding the top-left corner */
+    border-top-right-radius: 10px; /* Rounding the top-right corner */
+}
+
+/* Individual tabs within the panel */
+.rr-panel-tabs {
+    height: 100%;
+    min-width: 150px;
+    text-align: center;
+    cursor: pointer; /* Change cursor to pointer on hover */
+    padding: 0.4rem 1rem; /* Padding for the tabs */
+    font-size: 20px;
+    font-family: 'Roboto', sans-serif; /* Substitute with your chosen font */
+    color: #FFFFFF; /* This is a dark gray, visible against a light background */
+    background: linear-gradient(90deg, #26A98F, #10707f, #26A98F); /* Diagonal gradient background for the tabs container */
+    background-size: 200% 100%; /* Required for shimmer effect */
+    text-transform: uppercase; /* Considering your acronyms are in uppercase */
+    letter-spacing: 1px; /* To give a little breathing room for the uppercase letters */
+    text-decoration: none; /* Remove underline from tabs */
+    transition: color 0.3s ease; /* Smooth transition for color change */
+    border-top-left-radius: 10px; /* Rounding the top-left corner */
+    border-top-right-radius: 10px; /* Rounding the top-right corner */
+}
+
+    .rr-panel-tabs.selected {
+        border-bottom: 2px solid #000000; /* Orange border to indicate selection */
+        animation: scale 0.5s ease-in-out, shimmer 10s infinite linear;
+    }
+
+    .rr-panel-tabs.selected {
+        border-bottom: 2px solid orange; /* Orange border to indicate selection */
+        animation: scale 0.5s ease-in-out, shimmer 10s infinite linear;
+    }
+
+
+/* Hover effect for individual tabs */
+.rr-panel-tabs:hover {
+    color: #C7E8E3; /* Darker blue color on hover */
+    background: linear-gradient(to right, #0279AD, #0279AD); /* Gradient background for the tabs container */
+}
+
+.rr-panel-content {
+    height: 610px; /* Set a fixed height for all panels */
+    flex: 1 1 auto;
+    padding: 1rem 1rem;
+    overflow: auto;
+}
+
+.rr-panel-content-noscroll {
+    height: 610px; /* Set a fixed height for all panels */
+    flex: 1 1 auto;
+    padding: 1rem 1rem;
+}
+
+.rr-panel-header-text-container {
+    padding: 7px;
+}
+
+.rr-panel-header-narrow {
+    background: #E8E8E8;
+}
+
+.rr-panel-header-long {
+    background: linear-gradient(to right, #FFFFFF 1%, #E8E8E8 100%);
+}

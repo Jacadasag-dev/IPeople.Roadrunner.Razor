@@ -1,0 +1,18 @@
+﻿
+
+@if (Popup.Visible)
+{
+    <div id="@Popup.Identifier" class="Rr-popup">
+        <div class="Rr-popup-header">
+            <span class="Rr-popup-headertext">@Popup.Text</span>
+            <span class="Rr-popup-headerclose" @onclick="HandlePopupClose"></span>
+        </div>
+
+        <div class="Rr-popup-content">
+            @ChildContent
+        </div>
+    </div>
+}
+
+
+
