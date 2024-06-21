@@ -22,13 +22,7 @@ namespace IPeople.Roadrunner.Razor.Components
         private void HandleOnSliderClick(string settingName)
         {
             RrStateService.ToggleTabSetting(Tab.Panel, Tab, settingName);
-            var updatedTab = (RrStateService.GetComponent<Models.RrPanel>(Tab.Panel) as Models.RrPanel).Tabs.FirstOrDefault(t => t.Name == Tab.Name);
-            if (updatedTab is not null)
-            {
-                var panelPreference = new PanelSettingsPreferences();
-                panelPreference.TabSettings.Add(updatedTab.Name, updatedTab.Settings);
-                //PreferencesService.SavePanelPreferences(panelPreference);
-            }
+            RrStateService.UpdatePreference(Tab.Panel);
             RrStateService.RefreshComponents();
         }
     }

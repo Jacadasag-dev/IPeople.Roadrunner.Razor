@@ -20,6 +20,7 @@ namespace IPeople.Roadrunner.Razor.Services
 
         public GlobalVariables AppGlobalVariables = new();
         public ComponentInstances Components = new();
+        public event Action<IRrComponentBase> OnUpdatePreference;
         public event Action OnComponentChange;
         public event Action OnClickOutOf;
         private CancellationTokenSource _cts = new CancellationTokenSource();
@@ -109,6 +110,11 @@ namespace IPeople.Roadrunner.Razor.Services
             {
                 componentList.Remove(existingComponent);
             }
+        }
+
+        public void UpdatePreference(IRrComponentBase rrComponent)
+        {
+            OnUpdatePreference?.Invoke(rrComponent);
         }
         public void ClickOutOfException(object objectToMakeExceptionFor = null)
         {
