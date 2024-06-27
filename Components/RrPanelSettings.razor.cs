@@ -6,6 +6,8 @@ namespace IPeople.Roadrunner.Razor.Components
     public partial class RrPanelSettings
     {
         [Parameter]
+        public string Style { get; set; } = "";
+        [Parameter]
         public Models.RrPanelTab Tab { get; set; }
 
         [Parameter]

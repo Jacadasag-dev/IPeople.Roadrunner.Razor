@@ -6,6 +6,9 @@ namespace IPeople.Roadrunner.Razor.Components
     public partial class RrButton
     {
         [Parameter]
+        public string Style { get; set; } = "";
+
+        [Parameter]
         public EventCallback OnClick { get; set; }
 
         [Parameter]

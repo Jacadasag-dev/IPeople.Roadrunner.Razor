@@ -5,6 +5,8 @@ namespace IPeople.Roadrunner.Razor.Components
 {
     public partial class RrInput
     {
+        [Parameter]
+        public string Style { get; set; } = "";
         [Parameter] public EventCallback OnNewInput { get; set; }
         [Parameter] public EventCallback<KeyboardEventArgs> OnKeyDown { get; set; }
         [Parameter] public EventCallback OnInputClick { get; set; }

@@ -6,6 +6,8 @@ namespace IPeople.Roadrunner.Razor.Components
     public partial class RrPopup
     {
         [Parameter]
+        public string Style { get; set; } = "";
+        [Parameter]
         public Models.RrPopup Popup { get; set; }
 
         [Parameter]

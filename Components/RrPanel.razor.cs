@@ -6,6 +6,8 @@ namespace IPeople.Roadrunner.Razor.Components
     public partial class RrPanel
     {
         [Parameter]
+        public string Style { get; set; } = "";
+        [Parameter]
         public RenderFragment PanelTabs { get; set; }
         [Parameter]
         public RenderFragment PanelContent { get; set; }

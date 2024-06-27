@@ -9,6 +9,9 @@ namespace IPeople.Roadrunner.Razor.Components
 {
     public partial class RrLoading
     {
-        [Parameter] public string Message { get; set; } = "Loading...";
+        [Parameter]
+        public string Style { get; set; } = "";
+        [Parameter]
+        public string Message { get; set; } = "Loading...";
     }
 }

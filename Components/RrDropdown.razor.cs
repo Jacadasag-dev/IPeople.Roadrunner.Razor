@@ -4,6 +4,8 @@ namespace IPeople.Roadrunner.Razor.Components
 {
     public partial class RrDropdown
     {
+        [Parameter]
+        public string Style { get; set; } = "";
         [Parameter] public EventCallback<string> OnNewSelection { get; set; }
         [Parameter] public Models.RrDropdown Dropdown { get; set; }
         protected override void OnInitialized()
