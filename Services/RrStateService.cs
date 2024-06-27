@@ -3,7 +3,7 @@ using IPeople.Roadrunner.Razor.Models;
 
 namespace IPeople.Roadrunner.Razor.Services
 {
-    public class RrStateService
+    public class RrStateService : IRrStateService
     {
         public class GlobalVariables
         {
@@ -18,8 +18,8 @@ namespace IPeople.Roadrunner.Razor.Services
             public List<RrPopup> RrPopups { get; set; } = [];
         }
 
-        public GlobalVariables AppGlobalVariables = new();
-        public ComponentInstances Components = new();
+        public GlobalVariables AppGlobalVariables { get; set; } = new();
+        public ComponentInstances Components { get; set; } = new();
         public event Action<IRrComponentBase> OnUpdatePreference;
         public event Action OnComponentChange;
         public event Action OnClickOutOf;
