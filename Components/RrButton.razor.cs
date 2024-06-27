@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using IPeople.Roadrunner.Razor.Models;
+using Microsoft.AspNetCore.Components;
 
 namespace IPeople.Roadrunner.Razor.Components
 {
@@ -6,6 +7,9 @@ namespace IPeople.Roadrunner.Razor.Components
     {
         [Parameter]
         public EventCallback OnClick { get; set; }
+
+        [Parameter]
+        public ButtonSizes Size { get; set; } = ButtonSizes.Medium;
 
         [Parameter]
         public RenderFragment ChildContent { get; set; }

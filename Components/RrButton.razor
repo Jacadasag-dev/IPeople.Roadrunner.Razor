@@ -1,3 +1,13 @@
 ﻿
 
-<button class="Rr-button @(selected ? "selected" : "")" type="button" @onclick="HandleOnClick">@ChildContent</button>
+<button
+    class="Rr-button
+    @(selected ? "selected" : "")
+    @(Size == ButtonSizes.Small ? "small" :
+    (Size == ButtonSizes.Medium ? "medium" :
+    (Size == ButtonSizes.Large ? "large" :
+    "Rr-button-default")))"
+    type="button"
+    @onclick="HandleOnClick">
+        @ChildContent
+</button>

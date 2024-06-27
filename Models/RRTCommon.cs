@@ -3,6 +3,13 @@ using Microsoft.AspNetCore.Components;
 
 namespace IPeople.Roadrunner.Razor.Models
 {
+    public enum ButtonSizes
+    {
+        Small,
+        Medium,
+        Large
+    }
+
     public class RrLoading
     {
         public RrLoadingType Type { get; set; } = RrLoadingType.Authenticating;

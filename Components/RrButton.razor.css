@@ -28,6 +28,24 @@
     z-index: 1;
 }
 
+    .Rr-button.small {
+        height: 24px;
+        font-size: 10px;
+        letter-spacing: .5px; /* To give a little breathing room for the uppercase letters */
+        border-radius: 4px; /* Adjust radius as needed */
+        padding-left: 6px;
+        padding-right: 7px;
+    }
+
+    .Rr-button.medium {
+        height: 42px;
+        font-size: 14px;
+    }
+
+    .Rr-button.large {
+        height: 62px;
+        font-size: 20px;
+    }
 
 
     .Rr-button:hover {
