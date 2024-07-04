@@ -6,7 +6,7 @@
     <div id="@Id" class="Rr-dropdown @dropdownCssClass @(string.IsNullOrEmpty(Dropdown.Text) ? "fade-red" : "")"
          style="@($"--dropdown-width: {calculatedWidth}; min-width: {MinWidth}; --max-height: {MaxHeight};") @Style"
          @onclick="HandleDropdownClicked">
-        <span class="Rr-dropdown-selectiontext">@(string.IsNullOrEmpty(dropdownInstance.Text) ? dropdownInstance.PlaceHolder : dropdownInstance.Text)</span>
+        <span class="Rr-dropdown-selectiontext">@(string.IsNullOrEmpty(dropdownInstance?.Text) ? dropdownInstance?.PlaceHolder : dropdownInstance.Text)</span>
         <span class="Rr-dropdown-arrow"></span>
         <div class="Rr-dropdown-content">
             <ul class="item-list">

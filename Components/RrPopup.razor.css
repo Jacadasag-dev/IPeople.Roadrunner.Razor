@@ -101,7 +101,7 @@
     }
 
     .Rr-popup-headerclose:hover::after {
-        background: linear-gradient(to right, black 0%, black 20%, white 45%, white 55%, black 80%, black 100%);
+        /*background: linear-gradient(to right, black 0%, black 20%, white 45%, white 55%, black 80%, black 100%);*/
         transform: translate(-50%, -50%) rotate(135deg); /* For example, you can change the rotation */
     }
 
