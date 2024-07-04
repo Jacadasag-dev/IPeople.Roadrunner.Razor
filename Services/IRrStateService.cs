@@ -8,18 +8,22 @@ namespace IPeople.Roadrunner.Razor.Services
         RrStateService.GlobalVariables AppGlobalVariables { get; set; }
         RrStateService.ComponentInstances Components { get; set; }
         event Action<IRrComponentBase> OnUpdatePreference;
-        event Action OnComponentChange;
+        event Action RefreshAllComponents;
+        event Action<List<string>> RefreshSpecificComponentsById;
         void RefreshComponents();
+        void RefreshComponentsById(List<string> componentIds);
+        void RefreshComponentsById(string componentId);
         void RegisterComponent(IRrComponentBase rrComponent);
         void RegisterComponentById<T>(string id);
         void RemoveComponent(IRrComponentBase rrComponent);
         void RegisterOrReplaceComponent(IRrComponentBase rrComponent);
         void SynchronizeComponent<T>(IRrComponentBase? rrComponent) where T : IRrComponentBase;
+        void SynchronizeComponentById<T>(string? componentId) where T : IRrComponentBase;
         void UpdatePreference(IRrComponentBase rrComponent);
-        IRrComponentBase GetComponent<T>(IRrComponentBase rrComponent) where T : IRrComponentBase;
-        IRrComponentBase GetComponentById<T>(string id) where T : IRrComponentBase;
-        void SetComponentProperty<T, TProperty>(IRrComponentBase rrComponent, Expression<Func<T, TProperty>> propertySelector, TProperty newValue) where T : class, IRrComponentBase;
-        void SetComponentPropertyById<T, TProperty>(string componentId, Expression<Func<T, TProperty>> propertySelector, TProperty newValue) where T : class, IRrComponentBase;
+        IRrComponentBase? GetComponent<T>(IRrComponentBase rrComponent) where T : IRrComponentBase;
+        IRrComponentBase? GetComponentById<T>(string id) where T : IRrComponentBase;
+        void SetComponentProperty<T, TProperty>(IRrComponentBase rrComponent, Expression<Func<T, TProperty?>> propertySelector, TProperty? newValue) where T : class, IRrComponentBase;
+        void SetComponentPropertyById<T, TProperty>(string componentId, Expression<Func<T, TProperty?>> propertySelector, TProperty? newValue) where T : class, IRrComponentBase;
         void SetSelectedTab(RrPanelTab tab);
         void ToggleTabSettingsExpand(RrPanelTab tab);
         void SetTabSettingsExpandState(RrPanelTab tab, UIStates state);

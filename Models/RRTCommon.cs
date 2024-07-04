@@ -33,7 +33,7 @@ namespace IPeople.Roadrunner.Razor.Models
         public string Identifier { get; set; }
         public bool Visible { get; set; }
         public string Text { get; set; }
-
+        public string Flag { get; set; }
     }
 
     public interface IRrComponentWithData<T>
@@ -51,6 +51,7 @@ namespace IPeople.Roadrunner.Razor.Models
         public string Identifier { set; get; }
         public bool Visible { set; get; }
         public string Text { set; get; }
+        public string Flag { set; get; }
         public string PlaceHolder { get; set; } = "Start typing...";
         public int MaxWidth { get; set; } = 620;
         public bool DoDeBounce { get; set; } = true;
@@ -68,13 +69,19 @@ namespace IPeople.Roadrunner.Razor.Models
     {
         public string Identifier { set; get; }
         public bool Visible { set; get; }
-        public string Text { set; get; }
-        public object SelectedItem { get; set; }
+        public string? Text { set; get; }
+        public string? Flag { set; get; }
+        public object? SelectedItem { get; set; }
         public IEnumerable<object> Items { get; set; } = [];
         public string PlaceHolder { get; set; } = "Select";
         public RrDropdown(string id)
         {
             Identifier = id;
+        }
+        public RrDropdown(string id, string flag)
+        {
+            Identifier = id;
+            Flag = flag;
         }
     }
 
@@ -83,6 +90,7 @@ namespace IPeople.Roadrunner.Razor.Models
         public string Identifier { set; get; }
         public bool Visible { set; get; }
         public string Text { set; get; }
+        public string Flag { set; get; }
         public object StoredDataToDisplay { get; set; }
         public List<dynamic> Items { get; set; } = [];
         public RrPopup(string id)
@@ -99,6 +107,7 @@ namespace IPeople.Roadrunner.Razor.Models
         public string Identifier { set; get; }
         public bool Visible { set; get; }
         public string Text { set; get; }
+        public string Flag { set; get; }
         public List<RrPanelTab> Tabs { get; set; } = [];
         public RrPanelTab SelectedTab { get; set; }
         public RrCheckBox CheckBox { get; set; }

@@ -33,6 +33,12 @@ namespace IPeople.Roadrunner.Razor.Components
         public bool Flashing { get; set; } = false;
 
         [Parameter]
+        public List<string>? Effects { get; set; }
+
+        [Parameter]
+        public bool EffectsAll { get; set; } = false;
+
+        [Parameter]
         public EventCallback<T> OnSelectionChanged { get; set; }
 
         [Parameter]
@@ -71,7 +77,7 @@ namespace IPeople.Roadrunner.Razor.Components
                 if (!string.IsNullOrEmpty(Id))
                 {
                     RrStateService.RegisterComponentById<Models.RrDropdown>(Id);
-                    RrStateService.OnComponentChange += StateHasChanged;
+                    RrStateService.RefreshAllComponents += StateHasChanged;
                     dropdownFromService = RrStateService.GetComponentById<Models.RrDropdown>(Id) as Models.RrDropdown;
                 } else
                 {
@@ -98,7 +104,15 @@ namespace IPeople.Roadrunner.Razor.Components
             visible = notNull ? dropdownFromService?.Visible ?? Visible : Visible;
             selectedItem = notNull ? (dropdownFromService?.SelectedItem is T item ? item : default) : default;
             placeholder = notNull ? dropdownFromService?.PlaceHolder ?? Placeholder : Placeholder;
-            processedItems = GetProcessedItems(items)?.ToList() ?? (items is IEnumerable<T> typedItems ? typedItems.ToList() : new List<T>());
+            processedItems = GetProcessedItems(items)?.ToList() ?? new List<T>();
+            if (processedItems is null || !processedItems.Any())
+            {
+                processedItems = items?.Cast<T>().ToList() ?? new List<T>();
+            }
+
+
+
+
             dropdownCssClass = GetDropdownCssClassAndWidth(dropdownUIState);
 
             if (notNull) RrStateService.SynchronizeComponent<Models.RrDropdown>(dropdownFromService);
@@ -133,6 +147,15 @@ namespace IPeople.Roadrunner.Razor.Components
             
             SetSelectedWidth();
             StateHasChanged();
+            if (Effects is not null && Effects.Any())
+            {
+                RrStateService.RefreshComponentsById(Effects);
+            }
+            else if (EffectsAll)
+            {
+                RrStateService.RefreshComponents();
+            }
+            
             await OnSelectionChanged.InvokeAsync(selectedItem);
         }
 

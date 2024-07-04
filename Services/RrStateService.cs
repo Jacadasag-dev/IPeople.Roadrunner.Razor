@@ -1,4 +1,6 @@
-﻿using System.Linq.Expressions;
+﻿using System.ComponentModel;
+using System.Linq.Expressions;
+using System.Reflection;
 using IPeople.Roadrunner.Razor.Models;
 
 namespace IPeople.Roadrunner.Razor.Services
@@ -20,9 +22,21 @@ namespace IPeople.Roadrunner.Razor.Services
 
         public GlobalVariables AppGlobalVariables { get; set; } = new();
         public ComponentInstances Components { get; set; } = new();
-        public event Action<IRrComponentBase> OnUpdatePreference;
-        public event Action OnComponentChange;
-        public void RefreshComponents() { OnComponentChange?.Invoke(); }
+        public event Action<IRrComponentBase>? OnUpdatePreference;
+        public event Action? RefreshAllComponents;
+        public event Action<List<string>>? RefreshSpecificComponentsById;
+        public void RefreshComponents() { RefreshAllComponents?.Invoke(); }
+
+        public void RefreshComponentsById(List<string> componentIds)
+        {
+            RefreshSpecificComponentsById?.Invoke(componentIds);
+        }
+
+        public void RefreshComponentsById(string componentId)
+        {
+            RefreshComponentsById(new List<string> { componentId });
+        }
+
         public void RegisterComponent(IRrComponentBase rrComponent)
         {
             if (rrComponent == null)
@@ -156,6 +170,32 @@ namespace IPeople.Roadrunner.Razor.Services
             {
                 throw new Exception("Component or component type invalid...");
             }
+            RefreshComponentsById(rrComponent.Identifier);
+        }
+
+        public void SynchronizeComponentById<T>(string? componentId) where T : IRrComponentBase
+        {
+            if (string.IsNullOrEmpty(componentId))
+                return;
+
+            var rrComponent = GetComponentById<T>(componentId);
+            if (typeof(T) == typeof(RrInput))
+            {
+                SyncComponent((RrInput)rrComponent, Components.RrInputs);
+            }
+            else if (typeof(T) == typeof(RrDropdown))
+            {
+                SyncComponent((RrDropdown)rrComponent, Components.RrDropdowns);
+            }
+            else if (typeof(T) == typeof(RrPanel))
+            {
+                SyncComponent((RrPanel)rrComponent, Components.RrPanels);
+            }
+            else
+            {
+                throw new Exception("Component or component type invalid...");
+            }
+            RefreshComponentsById(rrComponent.Identifier);
         }
 
         private void SyncComponent<TComponent>(TComponent newComponent, List<TComponent> componentList) where TComponent : IRrComponentBase
@@ -174,7 +214,7 @@ namespace IPeople.Roadrunner.Razor.Services
             OnUpdatePreference?.Invoke(rrComponent);
         }
        
-        public IRrComponentBase GetComponent<T>(IRrComponentBase rrComponent) where T : IRrComponentBase
+        public IRrComponentBase? GetComponent<T>(IRrComponentBase rrComponent) where T : IRrComponentBase
         {
             if (typeof(T) == typeof(RrInput))
             {
@@ -193,7 +233,7 @@ namespace IPeople.Roadrunner.Razor.Services
                 throw new Exception("Component or component type invalid...");
             }
         }
-        public IRrComponentBase GetComponentById<T>(string id) where T : IRrComponentBase
+        public IRrComponentBase? GetComponentById<T>(string id) where T : IRrComponentBase
         {
             if (typeof(T) == typeof(RrInput))
             {
@@ -212,30 +252,30 @@ namespace IPeople.Roadrunner.Razor.Services
                 throw new Exception("Component or component type invalid...");
             }
         }
-        public void SetComponentProperty<T, TProperty>(IRrComponentBase rrComponent, Expression<Func<T, TProperty>> propertySelector, TProperty newValue) where T : class, IRrComponentBase
+        public void SetComponentProperty<T, TProperty>(IRrComponentBase rrComponent, Expression<Func<T, TProperty?>> propertySelector, TProperty? newValue) where T : class, IRrComponentBase
         {
             var component = GetComponent<T>(rrComponent) as T;
-            if (component != null)
+            if (component is not null && propertySelector is not null)
             {
                 // Get the property path from the expression
                 var propertyPath = GetPropertyPath(propertySelector.Body);
 
                 // Get the actual property to set the value
-                var targetObject = component as object;
+                object? targetObject = component as object;
                 for (int i = 0; i < propertyPath.Count - 1; i++)
                 {
-                    var propertyInfo = targetObject.GetType().GetProperty(propertyPath[i]);
-                    targetObject = propertyInfo.GetValue(targetObject);
+                    PropertyInfo? propertyInfo = targetObject?.GetType().GetProperty(propertyPath[i]);
+                    targetObject = propertyInfo?.GetValue(targetObject);
                 }
 
-                var finalPropertyInfo = targetObject.GetType().GetProperty(propertyPath.Last());
+                var finalPropertyInfo = targetObject?.GetType().GetProperty(propertyPath.Last());
                 if (finalPropertyInfo != null && finalPropertyInfo.CanWrite)
                 {
                     finalPropertyInfo.SetValue(targetObject, newValue);
                 }
             }
         }
-        public void SetComponentPropertyById<T, TProperty>(string componentId, Expression<Func<T, TProperty>> propertySelector, TProperty newValue) where T : class, IRrComponentBase
+        public void SetComponentPropertyById<T, TProperty>(string componentId, Expression<Func<T, TProperty?>> propertySelector, TProperty? newValue) where T : class, IRrComponentBase
         {
             var component = GetComponentById<T>(componentId) as T;
             if (component != null)
@@ -247,11 +287,11 @@ namespace IPeople.Roadrunner.Razor.Services
                 var targetObject = component as object;
                 for (int i = 0; i < propertyPath.Count - 1; i++)
                 {
-                    var propertyInfo = targetObject.GetType().GetProperty(propertyPath[i]);
-                    targetObject = propertyInfo.GetValue(targetObject);
+                    var propertyInfo = targetObject?.GetType().GetProperty(propertyPath[i]);
+                    targetObject = propertyInfo?.GetValue(targetObject);
                 }
 
-                var finalPropertyInfo = targetObject.GetType().GetProperty(propertyPath.Last());
+                var finalPropertyInfo = targetObject?.GetType().GetProperty(propertyPath.Last());
                 if (finalPropertyInfo != null && finalPropertyInfo.CanWrite)
                 {
                     finalPropertyInfo.SetValue(targetObject, newValue);
@@ -332,38 +372,69 @@ namespace IPeople.Roadrunner.Razor.Services
 
         public string? GetDisplayValue(object? item)
         {
-            if (item is not null)
+            if (item == null)
             {
-                if (item is string strItem)
-                {
-                    return strItem;
-                }
-
-                var nameProperty = item.GetType().GetProperty("Name");
-                if (nameProperty != null && nameProperty.PropertyType == typeof(string))
-                {
-                    return nameProperty.GetValue(item) as string;
-                }
-
-                var textProperty = item.GetType().GetProperty("Text");
-                if (textProperty != null && textProperty.PropertyType == typeof(string))
-                {
-                    return textProperty.GetValue(item) as string;
-                }
-
-                var stringProperty = item.GetType().GetProperties()
-                    .FirstOrDefault(p => p.PropertyType == typeof(string));
-                if (stringProperty != null)
-                {
-                    return stringProperty.GetValue(item) as string;
-                }
-
-                return item.GetType().Name;
+                return "null";
             }
-            else
+
+            switch (item)
             {
-               return "null";
-            }       
+                case string strItem:
+                    return strItem;
+                case Enum enumItem:
+                    return enumItem.ToString();
+            }
+
+            var type = item.GetType();
+
+            // Check for property or field named "Name"
+            var nameMember = type.GetMember("Name").FirstOrDefault();
+            if (nameMember != null && (nameMember.MemberType == MemberTypes.Property || nameMember.MemberType == MemberTypes.Field))
+            {
+                var value = GetMemberValue(item, nameMember);
+                if (value is string nameValue)
+                {
+                    return nameValue;
+                }
+            }
+
+            // Check for property or field named "Text"
+            var textMember = type.GetMember("Text").FirstOrDefault();
+            if (textMember != null && (textMember.MemberType == MemberTypes.Property || textMember.MemberType == MemberTypes.Field))
+            {
+                var value = GetMemberValue(item, textMember);
+                if (value is string textValue)
+                {
+                    return textValue;
+                }
+            }
+
+            // Check for any string properties
+            var stringProperty = type.GetProperties().FirstOrDefault(p => p.PropertyType == typeof(string));
+            if (stringProperty != null)
+            {
+                return stringProperty.GetValue(item) as string;
+            }
+
+            // Check for any string fields
+            var stringField = type.GetFields().FirstOrDefault(f => f.FieldType == typeof(string));
+            if (stringField != null)
+            {
+                return stringField.GetValue(item) as string;
+            }
+
+            return type.Name;
         }
+
+        private object? GetMemberValue(object obj, MemberInfo member)
+        {
+            return member switch
+            {
+                PropertyInfo property => property.GetValue(obj),
+                FieldInfo field => field.GetValue(obj),
+                _ => null
+            };
+        }
+
     }
 }

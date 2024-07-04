@@ -6,6 +6,9 @@ namespace IPeople.Roadrunner.Razor.Components
     public partial class RrPanel
     {
         [Parameter]
+        public string? Id { get; set; }
+
+        [Parameter]
         public string Style { get; set; } = "";
         [Parameter]
         public RenderFragment PanelTabs { get; set; }
@@ -19,7 +22,16 @@ namespace IPeople.Roadrunner.Razor.Components
         public bool EnableScroll { get; set; } = true;
         protected override void OnInitialized()
         {
-            RrStateService.OnComponentChange += StateHasChanged;
+            RrStateService.RefreshAllComponents += StateHasChanged;
+            RrStateService.RefreshSpecificComponentsById += RefreshComponentsById;
+        }
+
+        private void RefreshComponentsById(List<string> Ids)
+        {
+            if (!string.IsNullOrEmpty(Id) && Ids.Contains(Id))
+            {
+                StateHasChanged();
+            }
         }
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {

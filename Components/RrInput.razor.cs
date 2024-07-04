@@ -18,7 +18,7 @@ namespace IPeople.Roadrunner.Razor.Components
         protected override async Task OnInitializedAsync()
         {
             RrStateService.RegisterComponent(Input);
-            RrStateService.OnComponentChange += HandleInputChangeRequest;
+            RrStateService.RefreshAllComponents += HandleInputChangeRequest;
         }
         private void HandleInputChangeRequest()
         {
