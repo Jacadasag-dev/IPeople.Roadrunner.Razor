@@ -9,14 +9,11 @@ namespace IPeople.Roadrunner.Razor.Services
         RrStateService.ComponentInstances Components { get; set; }
         event Action<IRrComponentBase> OnUpdatePreference;
         event Action OnComponentChange;
-        event Action OnClickOutOf;
         void RefreshComponents();
         void RegisterComponent(IRrComponentBase rrComponent);
         void RemoveComponent(IRrComponentBase rrComponent);
         void RegisterOrReplaceComponent(IRrComponentBase rrComponent);
         void UpdatePreference(IRrComponentBase rrComponent);
-        void ClickOutOfException(object objectToMakeExceptionFor = null);
-        void ClickOutOf();
         IRrComponentBase GetComponent<T>(IRrComponentBase rrComponent) where T : IRrComponentBase;
         IRrComponentBase GetComponentById<T>(string id) where T : IRrComponentBase;
         void SetComponentProperty<T, TProperty>(IRrComponentBase rrComponent, Expression<Func<T, TProperty>> propertySelector, TProperty newValue) where T : class, IRrComponentBase;

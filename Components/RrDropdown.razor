@@ -1,24 +1,11 @@
 ﻿
 @if (Dropdown is not null)
 {
-    var dropdownInstance = RrStateService.GetComponent<Models.RrDropdown>(Dropdown) as Models.RrDropdown;
-    var filteredItems = dropdownInstance?.Items?.Where(item => item != dropdownInstance.Text).ToList() ?? new List<string>();
-    string dropdownCssClass = "";
-    if (dropdownInstance.UIState == Models.SettingUIStates.Expanded)
-    {
-        dropdownCssClass = "expanded";
-    }
-    else if (dropdownInstance.UIState == Models.SettingUIStates.Collapsed)
-    {
-        dropdownCssClass = "minimized";
-    }
-    else if (dropdownInstance.UIState == Models.SettingUIStates.Neutral)
-    {
-        dropdownCssClass = "";
-    }
+    InitializeDropdownState();
 
-
-    <div class="Rr-dropdown @dropdownCssClass @(string.IsNullOrEmpty(Dropdown.Text) ? "fade-red" : "")" @onclick="HandleDropdownClicked">
+    <div id="@Id" class="Rr-dropdown @dropdownCssClass @(string.IsNullOrEmpty(Dropdown.Text) ? "fade-red" : "")"
+         style="@($"--dropdown-width: {calculatedWidth}; min-width: {MinWidth}; --max-height: {MaxHeight};") @Style"
+         @onclick="HandleDropdownClicked">
         <span class="Rr-dropdown-selectiontext">@(string.IsNullOrEmpty(dropdownInstance.Text) ? dropdownInstance.PlaceHolder : dropdownInstance.Text)</span>
         <span class="Rr-dropdown-arrow"></span>
         <div class="Rr-dropdown-content">
@@ -41,5 +28,4 @@
             </ul>
         </div>
     </div>
-
 }

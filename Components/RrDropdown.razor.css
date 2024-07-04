@@ -1,7 +1,8 @@
-﻿.Rr-dropdown {
+﻿
+.Rr-dropdown {
     position: relative;
     height: 35px;
-    width: 140px;
+    width: var(--dropdown-width);
     background: #E8E8E8;
     cursor: default;
     margin: 0;
@@ -9,74 +10,81 @@
     border-radius: 7px; /* Adjust radius as needed */
     overflow: hidden; /* Hide content during transition */
     text-align: start;
-    cursor: default;
     user-select: none; /* Prevents text from being highlighted */
     border: thin solid #c8c6c6;
-    min-width: 140px;
-    z-index: 1;
+    z-index: 5;
+    transition: width 0.3s ease; /* Smooth transition for width */
+    flex: 0 0 auto; /* Prevents shrinking and growing */
 }
 
-    .Rr-dropdown:hover {
-        background: linear-gradient(90deg, #26A98F, #10707f, #26A98F); /* Diagonal gradient background for the tabs container */
-        background-size: 200% 100%; /* Required for shimmer effect */
+.Rr-dropdown-content {
+    opacity: 0;
+    transition: opacity 0.2s linear, width 0.3s ease;
+    position: absolute;
+    top: 36px;
+    width: var(--dropdown-width);
+    height: calc(var(--max-height, 230px) - 38px);
+    background-color: #FFFF;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.Rr-dropdown:hover {
+    background: linear-gradient(90deg, #036E80, #02424D, #036E80); /* Diagonal gradient background for the tabs container */
+    background-size: 200% 100%; /* Required for shimmer effect */
+}
+
+    .Rr-dropdown:hover::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: inherit;
+        animation: shimmer 10s infinite linear; /* Always apply shimmer animation */
+        z-index: -1;
     }
 
-        .Rr-dropdown:hover::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: inherit;
-            animation: shimmer 10s infinite linear; /* Always apply shimmer animation */
-            z-index: -1;
-        }
+.Rr-dropdown.minimized {
+    animation: collapse 0.2s forwards; /* Add collapse animation */
+}
 
-    .Rr-dropdown.minimized {
-        animation: collapse 0.2s forwards; /* Add collapse animation */
-    }
-
-    .Rr-dropdown.expanded {
-        animation: expand 0.2s forwards; /* Add expand animation */
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        z-index: 1000;
-    }
+.Rr-dropdown.expanded {
+    animation: expand 0.2s forwards; /* Add expand animation */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
 
 @keyframes shimmer {
-    100% {
-        background-position: -200% 0;
-    }
-
     0% {
         background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
     }
 }
 
 @keyframes expand {
     from {
         height: 35px;
-        width: 140px;
     }
 
     to {
-        height: 130px;
-        width: 140px;
+        height: var(--max-height, 230px);
     }
 }
 
 @keyframes collapse {
     from {
-        height: 130px;
-        width: 140px;
+        height: var(--max-height, 230px);
     }
 
     to {
         height: 35px;
-        width: 140px;
     }
 }
-
 
 .Rr-dropdown-selectiontext {
     position: absolute;
@@ -89,12 +97,7 @@
     text-transform: uppercase; /* Considering your acronyms are in uppercase */
 }
 
-.Rr-dropdown:hover .Rr-dropdown-selectiontext {
-    color: #FFFFFF; /* White color */
-}
-
-
-    .Rr-dropdown-arrow {
+.Rr-dropdown-arrow {
     position: absolute;
     top: 15px;
     right: 10px;
@@ -107,20 +110,19 @@
     transition: transform 0.4s ease-in-out; /* Increased duration and added easing */
 }
 
+.Rr-dropdown:hover .Rr-dropdown-arrow {
+    border-top: 5px solid #FFFFFF; /* White color */
+}
+
+.Rr-dropdown:hover .Rr-dropdown-selectiontext {
+    color: #FFFFFF; /* White color */
+}
+
 .Rr-dropdown.expanded .Rr-dropdown-arrow {
     transform: rotate(180deg);
 }
 
-.Rr-dropdown-content {
-    opacity: 0;
-    transition: opacity 0.2s linear;
-    position: absolute;
-    top: 36px;
-    width: 100%;
-    height: 92px;
-    background-color: #FFFF;
-    overflow-y: auto;
-}
+
 
 .Rr-dropdown.expanded .Rr-dropdown-content {
     opacity: 1;
@@ -171,7 +173,7 @@ ul.item-list {
     }
 
     100% {
-        opacity: .0;
+        opacity: 0;
     }
 }
 

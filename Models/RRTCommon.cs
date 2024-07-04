@@ -69,7 +69,6 @@ namespace IPeople.Roadrunner.Razor.Models
         public string Identifier { set; get; }
         public bool Visible { set; get; }
         public string Text { set; get; }
-        public SettingUIStates UIState { get; set; } = SettingUIStates.Neutral;
         public IEnumerable<string> Items { get; set; } = [];
         public string PlaceHolder { get; set; } = "Select";
         public RrDropdown(string id)

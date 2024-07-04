@@ -22,9 +22,6 @@ namespace IPeople.Roadrunner.Razor.Services
         public ComponentInstances Components { get; set; } = new();
         public event Action<IRrComponentBase> OnUpdatePreference;
         public event Action OnComponentChange;
-        public event Action OnClickOutOf;
-        private CancellationTokenSource _cts = new CancellationTokenSource();
-        private readonly object _lock = new object();
         public void RefreshComponents() { OnComponentChange?.Invoke(); }
         public void RegisterComponent(IRrComponentBase rrComponent)
         {
@@ -116,57 +113,7 @@ namespace IPeople.Roadrunner.Razor.Services
         {
             OnUpdatePreference?.Invoke(rrComponent);
         }
-        public void ClickOutOfException(object objectToMakeExceptionFor = null)
-        {
-            lock (_lock)
-            {
-                _cts.Cancel(); // Cancel the ongoing delay
-            }
-            if (objectToMakeExceptionFor is RrDropdown clickedDropdown)
-            {
-                if (clickedDropdown != null)
-                {
-                    // Toggle the UI state of the clicked dropdown
-                    var dropdownInstance = GetComponentById<RrDropdown>(clickedDropdown.Identifier) as RrDropdown;
-                    if (dropdownInstance != null)
-                    {
-                        dropdownInstance.UIState = dropdownInstance.UIState == SettingUIStates.Expanded ? SettingUIStates.Collapsed : SettingUIStates.Expanded;
-                    }
-                    // Set the UI state of other dropdowns
-                    foreach (var dropdown in Components.RrDropdowns.Where(d => d.Identifier != clickedDropdown.Identifier))
-                    {
-                        dropdown.UIState = dropdown.UIState == SettingUIStates.Expanded ? SettingUIStates.Collapsed : SettingUIStates.Neutral;
-                    }
-                }
-            }
-            else
-            {
-                foreach (var expandedDropdown in Components.RrDropdowns.Where(d => d.UIState == SettingUIStates.Expanded))
-                {
-                    expandedDropdown.UIState = SettingUIStates.Collapsed;
-                }
-                OnClickOutOf?.Invoke();
-            }
-        }
-        public async void ClickOutOf()
-        {
-            CancellationToken token;
-            lock (_lock)
-            {
-                token = _cts.Token;
-                _cts = new CancellationTokenSource(); // Reset for future use
-            }
-            try
-            {
-                await Task.Delay(50, token); // Wait for split second or until cancellation
-                Components.RrDropdowns.ForEach(d => d.UIState = d.UIState == SettingUIStates.Expanded ? SettingUIStates.Collapsed : SettingUIStates.Neutral);
-                OnClickOutOf?.Invoke();
-            }
-            catch (TaskCanceledException)
-            {
-                // Handle cancellation if necessary
-            }
-        }
+       
         public IRrComponentBase GetComponent<T>(IRrComponentBase rrComponent) where T : IRrComponentBase
         {
             if (typeof(T) == typeof(RrInput))
