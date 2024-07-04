@@ -25,6 +25,9 @@ namespace IPeople.Roadrunner.Razor.Services
         public void RefreshComponents() { OnComponentChange?.Invoke(); }
         public void RegisterComponent(IRrComponentBase rrComponent)
         {
+            if (rrComponent == null)
+                return;
+
             switch (rrComponent)
             {
                 case RrInput rrInput:
@@ -41,6 +44,29 @@ namespace IPeople.Roadrunner.Razor.Services
                     break;
                 default:
                     throw new ArgumentException("Unsupported component type", nameof(rrComponent));
+            }
+        }
+
+        public void RegisterComponentById<T>(string id)
+        {
+            if (typeof(T) == typeof(RrInput))
+            {
+                var rrInput = new RrInput(id);
+                RegisterOrAddComponent(Components.RrInputs, rrInput);
+            }
+            else if (typeof(T) == typeof(RrDropdown))
+            {
+                var rrDropdown = new RrDropdown(id);
+                RegisterOrAddComponent(Components.RrDropdowns, rrDropdown);
+            }
+            else if (typeof(T) == typeof(RrPanel))
+            {
+                var rrPanel = new RrPanel(id);
+                RegisterOrAddComponent(Components.RrPanels, rrPanel);
+            }
+            else
+            {
+                throw new Exception("Component or component type invalid...");
             }
         }
         public void RemoveComponent(IRrComponentBase rrComponent)
@@ -108,6 +134,40 @@ namespace IPeople.Roadrunner.Razor.Services
                 componentList.Remove(existingComponent);
             }
         }
+
+        public void SynchronizeComponent<T>(IRrComponentBase? rrComponent) where T : IRrComponentBase
+        {
+            if (rrComponent is null)
+                return;
+
+            if (typeof(T) == typeof(RrInput))
+            {
+                SyncComponent((RrInput)rrComponent, Components.RrInputs);
+            }
+            else if (typeof(T) == typeof(RrDropdown))
+            {
+                SyncComponent((RrDropdown)rrComponent, Components.RrDropdowns);
+            }
+            else if (typeof(T) == typeof(RrPanel))
+            {
+                SyncComponent((RrPanel)rrComponent, Components.RrPanels);
+            }
+            else
+            {
+                throw new Exception("Component or component type invalid...");
+            }
+        }
+
+        private void SyncComponent<TComponent>(TComponent newComponent, List<TComponent> componentList) where TComponent : IRrComponentBase
+        {
+            var existingComponent = componentList.FirstOrDefault(c => c.Identifier == newComponent.Identifier);
+            if (existingComponent != null)
+            {
+                var index = componentList.IndexOf(existingComponent);
+                componentList[index] = newComponent;
+            }
+        }
+
 
         public void UpdatePreference(IRrComponentBase rrComponent)
         {
@@ -228,21 +288,21 @@ namespace IPeople.Roadrunner.Razor.Services
             var tabInstance = (GetComponentById<RrPanel>(tab.Panel.Identifier) as RrPanel)?.Tabs.FirstOrDefault(t => t.Name == tab.Name);
             if (tabInstance != null)
             {
-                if (tabInstance.SettingsUIState == SettingUIStates.Collapsed)
+                if (tabInstance.SettingsUIState == UIStates.Collapsed)
                 {
-                    tabInstance.SettingsUIState = SettingUIStates.Expanded;
+                    tabInstance.SettingsUIState = UIStates.Expanded;
                 }
-                else if (tabInstance.SettingsUIState == SettingUIStates.Neutral)
+                else if (tabInstance.SettingsUIState == UIStates.Neutral)
                 {
-                    tabInstance.SettingsUIState = SettingUIStates.Expanded;
+                    tabInstance.SettingsUIState = UIStates.Expanded;
                 }
                 else
                 {
-                    tabInstance.SettingsUIState = SettingUIStates.Collapsed;
+                    tabInstance.SettingsUIState = UIStates.Collapsed;
                 }
             }
         }
-        public void SetTabSettingsExpandState(RrPanelTab tab, SettingUIStates state)
+        public void SetTabSettingsExpandState(RrPanelTab tab, UIStates state)
         {
             var tabInstance = (GetComponentById<RrPanel>(tab.Panel.Identifier) as RrPanel)?.Tabs.FirstOrDefault(t => t.Name == tab.Name);
             if (tabInstance != null)
@@ -268,6 +328,42 @@ namespace IPeople.Roadrunner.Razor.Services
                     }
                 }
             }
+        }
+
+        public string? GetDisplayValue(object? item)
+        {
+            if (item is not null)
+            {
+                if (item is string strItem)
+                {
+                    return strItem;
+                }
+
+                var nameProperty = item.GetType().GetProperty("Name");
+                if (nameProperty != null && nameProperty.PropertyType == typeof(string))
+                {
+                    return nameProperty.GetValue(item) as string;
+                }
+
+                var textProperty = item.GetType().GetProperty("Text");
+                if (textProperty != null && textProperty.PropertyType == typeof(string))
+                {
+                    return textProperty.GetValue(item) as string;
+                }
+
+                var stringProperty = item.GetType().GetProperties()
+                    .FirstOrDefault(p => p.PropertyType == typeof(string));
+                if (stringProperty != null)
+                {
+                    return stringProperty.GetValue(item) as string;
+                }
+
+                return item.GetType().Name;
+            }
+            else
+            {
+               return "null";
+            }       
         }
     }
 }

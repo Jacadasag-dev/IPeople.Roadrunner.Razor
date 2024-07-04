@@ -12,7 +12,7 @@ namespace IPeople.Roadrunner.Razor.Components
         private void HandleTabSelected()
         {
             RrStateService.SetSelectedTab(Tab);
-            RrStateService.SetTabSettingsExpandState(Tab, Models.SettingUIStates.Neutral);
+            RrStateService.SetTabSettingsExpandState(Tab, Models.UIStates.Neutral);
             RrStateService.RefreshComponents();
         }
     }

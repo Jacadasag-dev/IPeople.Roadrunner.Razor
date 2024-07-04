@@ -69,7 +69,8 @@ namespace IPeople.Roadrunner.Razor.Models
         public string Identifier { set; get; }
         public bool Visible { set; get; }
         public string Text { set; get; }
-        public IEnumerable<string> Items { get; set; } = [];
+        public object SelectedItem { get; set; }
+        public IEnumerable<object> Items { get; set; } = [];
         public string PlaceHolder { get; set; } = "Select";
         public RrDropdown(string id)
         {
@@ -156,7 +157,7 @@ namespace IPeople.Roadrunner.Razor.Models
         public string Name { get; set; }
         public RenderFragment Content { get; set; }
         public Type ComponentType { get; set; }
-        public SettingUIStates SettingsUIState { get; set; } = SettingUIStates.Neutral;
+        public UIStates SettingsUIState { get; set; } = UIStates.Neutral;
         public List<RrPanelSetting> Settings { get; set; }
         public object? Data { get; set; }
         public bool IsSelected { get; set; } = false;
@@ -165,12 +166,10 @@ namespace IPeople.Roadrunner.Razor.Models
         public RrPanel Panel { get; set; }
     }
 
-    public enum SettingUIStates
+    public enum UIStates
     {
         Expanded,
         Collapsed,
         Neutral
     }
-
-
 }

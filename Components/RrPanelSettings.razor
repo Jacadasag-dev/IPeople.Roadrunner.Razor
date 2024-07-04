@@ -3,20 +3,20 @@
 {
     var tabInstance = (RrStateService.GetComponent<Models.RrPanel>(Tab.Panel) as Models.RrPanel).Tabs.FirstOrDefault(t => t.Name == Tab.Name);
     string sideBarCssClass = "";
-    if (tabInstance.SettingsUIState == Models.SettingUIStates.Expanded)
+    if (tabInstance.SettingsUIState == Models.UIStates.Expanded)
     {
         sideBarCssClass = "expanded";
     }
-    else if (tabInstance.SettingsUIState == Models.SettingUIStates.Collapsed)
+    else if (tabInstance.SettingsUIState == Models.UIStates.Collapsed)
     {
         sideBarCssClass = "minimized";
     }
-    else if (tabInstance.SettingsUIState == Models.SettingUIStates.Neutral)
+    else if (tabInstance.SettingsUIState == Models.UIStates.Neutral)
     {
         sideBarCssClass = "";
     }
     <div class="Rr-sidebar @sideBarCssClass">
-        @if (tabInstance.SettingsUIState == Models.SettingUIStates.Expanded)
+        @if (tabInstance.SettingsUIState == Models.UIStates.Expanded)
         {
             if (!string.IsNullOrEmpty(Header))
             {

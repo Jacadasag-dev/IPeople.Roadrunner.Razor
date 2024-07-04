@@ -1,29 +1,40 @@
-﻿
-@if (Dropdown is not null)
-{
-    InitializeDropdownState();
+﻿@typeparam T
 
-    <div id="@Id" class="Rr-dropdown @dropdownCssClass @(string.IsNullOrEmpty(Dropdown.Text) ? "fade-red" : "")"
+@if (Visible)
+{
+    InitializeDropdown();
+    <div id="@Id" class="Rr-dropdown @dropdownCssClass @(selectedItem is null && Flashing ? "fade-red" : "")"
          style="@($"--dropdown-width: {calculatedWidth}; min-width: {MinWidth}; --max-height: {MaxHeight};") @Style"
          @onclick="HandleDropdownClicked">
-        <span class="Rr-dropdown-selectiontext">@(string.IsNullOrEmpty(dropdownInstance?.Text) ? dropdownInstance?.PlaceHolder : dropdownInstance.Text)</span>
+        <span class="Rr-dropdown-selectiontext">
+            @(selectedItem is null ? placeholder : RrStateService.GetDisplayValue(selectedItem))
+        </span>
         <span class="Rr-dropdown-arrow"></span>
         <div class="Rr-dropdown-content">
             <ul class="item-list">
-                @if (filteredItems is not null && filteredItems.Any())
+                @if (processedItems is not null && processedItems.Any() && exceptionMessage is null)
                 {
-                    @foreach (var item in filteredItems)
+                    @foreach (var item in processedItems)
                     {
                         <li @onclick="() => HandleItemSelected(item)">
-                            <span>@item</span>
+                            <span>@RrStateService.GetDisplayValue(item)</span>
                         </li>
                     }
                 }
                 else
                 {
-                    <li class="no-items">
-                        <span>empty</span>
-                    </li>
+                    if (exceptionMessage is not null)
+                    {
+                        <li class="no-items">
+                            <span>@exceptionMessage</span>
+                        </li>
+                    }
+                    else if (processedItems is null || !processedItems.Any())
+                    {
+                        <li class="no-items">
+                            <span>empty</span>
+                        </li>
+                    }
                 }
             </ul>
         </div>

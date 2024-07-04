@@ -1,13 +1,18 @@
-﻿using IPeople.Roadrunner.Razor.Models;
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
 namespace IPeople.Roadrunner.Razor.Components
 {
-    public partial class RrDropdown
+    public partial class RrDropdown<T> : ComponentBase
     {
         [Parameter]
-        public string Id { get; set; } = Guid.NewGuid().ToString();
+        public string? Id { get; set; }
+
+        [Parameter]
+        public bool Disabled { get; set; } = false;
+
+        [Parameter]
+        public bool Visible { get; set; } = true;
 
         [Parameter]
         public string MinWidth { get; set; } = "50px"; // Default value
@@ -19,32 +24,121 @@ namespace IPeople.Roadrunner.Razor.Components
         public string Placeholder { get; set; } = "Select";
 
         [Parameter]
-        public IEnumerable<object> Items { get; set; }
+        public IEnumerable<object>? Items { get; set; }
 
         [Parameter]
         public string Style { get; set; } = "";
 
-        [Parameter] public EventCallback<string> OnNewSelection { get; set; }
+        [Parameter]
+        public bool Flashing { get; set; } = false;
 
-        [Parameter] public Models.RrDropdown Dropdown { get; set; }
+        [Parameter]
+        public EventCallback<T> OnSelectionChanged { get; set; }
 
+        [Parameter]
+        public Models.RrDropdown? Dropdown { get; set; }
+
+        private Models.RrDropdown? dropdownFromService;
+        private IEnumerable<object> items = [];
+        private bool visible;
+        private List<T> processedItems = [];
+        private T? selectedItem;
+        private Models.UIStates dropdownUIState = Models.UIStates.Neutral;
+        private string placeholder = "Select";
+        private string? dropdownCssClass;
         private string? calculatedWidth;
-        string? dropdownCssClass;
-        private Models.RrDropdown? dropdownInstance;
-        private List<string> filteredItems = new List<string>();
-        private SettingUIStates dropdownUIState = SettingUIStates.Neutral;
+        private string? exceptionMessage;
 
+        /// <summary>
+        /// Initializes the dropdown component whenever it is rendered.
+        /// </summary>
+        private void InitializeDropdown()
+        {
+            if (!string.IsNullOrEmpty(Id))
+            {
+                dropdownFromService = RrStateService.GetComponentById<Models.RrDropdown>(Id) as Models.RrDropdown;
+            } 
+            else if (Dropdown is not null)
+            {
+                dropdownFromService = RrStateService.GetComponent<Models.RrDropdown>(Dropdown) as Models.RrDropdown;
+                if (dropdownFromService is not null)
+                {
+                    Id = dropdownFromService.Identifier;
+                }
+            }
+            if (dropdownFromService is null)
+            {
+                if (!string.IsNullOrEmpty(Id))
+                {
+                    RrStateService.RegisterComponentById<Models.RrDropdown>(Id);
+                    RrStateService.OnComponentChange += StateHasChanged;
+                    dropdownFromService = RrStateService.GetComponentById<Models.RrDropdown>(Id) as Models.RrDropdown;
+                } else
+                {
+                    exceptionMessage = "ERROR:id_is_required";
+                }
+            } 
+            bool notNull = dropdownFromService is not null;
+
+            if (notNull)
+            {
+                if (dropdownFromService?.Items is not null && dropdownFromService.Items.Any())
+                {
+                    items = dropdownFromService.Items;
+                }
+                else if (Items is not null && Items.Any())
+                {
+                    items = Items;
+                }
+                else
+                {
+                    items = new List<object>();
+                }
+            }
+            visible = notNull ? dropdownFromService?.Visible ?? Visible : Visible;
+            selectedItem = notNull ? (dropdownFromService?.SelectedItem is T item ? item : default) : default;
+            placeholder = notNull ? dropdownFromService?.PlaceHolder ?? Placeholder : Placeholder;
+            processedItems = GetProcessedItems(items)?.ToList() ?? (items is IEnumerable<T> typedItems ? typedItems.ToList() : new List<T>());
+            dropdownCssClass = GetDropdownCssClassAndWidth(dropdownUIState);
+
+            if (notNull) RrStateService.SynchronizeComponent<Models.RrDropdown>(dropdownFromService);
+        }
+
+        /// <summary>
+        /// Registers the dropdown with the JS function to handle the click outside of the dropdown.
+        /// </summary>
+        /// <param name="firstRender"></param>
+        /// <returns></returns>
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
             {
                 // Register the dropdown with the JS function to handle the click outside of the dropdown
                 await JS.InvokeVoidAsync("registerDropdown", Id, DotNetObjectReference.Create(this));
-                RrStateService.RegisterComponent(Dropdown);
-                RrStateService.OnComponentChange += StateHasChanged;
             }
         }
 
+        /// <summary>
+        /// Handles the selected item and invokes the OnSelectionChanged event passing the item.
+        /// </summary>
+        /// <param name="item"></param>
+        private async void HandleItemSelected(T? item)
+        {
+            selectedItem = item;
+            string selectedItemString = RrStateService.GetDisplayValue(selectedItem) ?? "Null";
+            if (dropdownFromService is not null && selectedItem is not null)
+            {
+                RrStateService.SetComponentProperty<Models.RrDropdown, object>(dropdownFromService, c => c.SelectedItem, selectedItem);
+            }
+            
+            SetSelectedWidth();
+            StateHasChanged();
+            await OnSelectionChanged.InvokeAsync(selectedItem);
+        }
+
+        /// <summary>
+        /// Called when the dropdown is clicked to handle the dropdown state and invoke the JS function to handle the dropdown click.
+        /// </summary>
         private async void HandleDropdownClicked()
         {
             // Invoke the JS function to handle the dropdown click so that it doesn't get closed when clicking on the dropdown itself
@@ -57,58 +151,90 @@ namespace IPeople.Roadrunner.Razor.Components
         /// </summary>
         private void ToggleDropdownState()
         {
-            if (dropdownUIState == SettingUIStates.Neutral)
+            if (dropdownUIState == Models.UIStates.Neutral)
             {
-                dropdownUIState = SettingUIStates.Expanded;
+                dropdownUIState = Models.UIStates.Expanded;
             }
-            else if (dropdownUIState == SettingUIStates.Expanded)
+            else if (dropdownUIState == Models.UIStates.Expanded)
             {
-                dropdownUIState = SettingUIStates.Collapsed;
+                dropdownUIState = Models.UIStates.Collapsed;
             }
-            else if (dropdownUIState == SettingUIStates.Collapsed)
+            else if (dropdownUIState == Models.UIStates.Collapsed)
             {
-                dropdownUIState = SettingUIStates.Expanded;
+                dropdownUIState = Models.UIStates.Expanded;
             }
             StateHasChanged();
         }
 
-        private async void HandleItemSelected(string selectedItem)
-        {
-            RrStateService.SetComponentProperty<Models.RrDropdown, string>(Dropdown, c => c.Text, selectedItem);
-            RrStateService.RefreshComponents();
-            await OnNewSelection.InvokeAsync(selectedItem);
-            SetSelectedWidth();
-        }
-
+        /// <summary>
+        /// Sets the width of the dropdown based on the maximum width of the items in the dropdown.
+        /// </summary>
         private void SetMaxWidth()
         {
-            Models.RrDropdown? dropdown = RrStateService.GetComponent<Models.RrDropdown>(Dropdown ?? RrStateService.GetComponentById<Models.RrDropdown>(Id)) as Models.RrDropdown;
-            if (dropdown is not null)
+            if (RrStateService != null)
             {
-                bool somethingIsSelected = !string.IsNullOrEmpty(dropdown.Text);
-
-                string placeHolder = Placeholder ?? dropdown.PlaceHolder;
-                double placeholderWidth = CalculateWidth(placeHolder.Length);
-
-                var items = dropdown.Items?
-                    .Where(item => item != null)
-                    .Select(item => new { Item = item, Width = CalculateWidth(item.ToString().Length) })
-                    .ToList();
-
-                string maxItem = items?
-                    .OrderByDescending(i => i.Width)
-                    .FirstOrDefault()?.Item.ToString() ?? placeHolder;
-
-                string theMaxItem = maxItem;
-                if (!somethingIsSelected)
+                if (items is not null)
                 {
-                    theMaxItem = maxItem.Length > placeHolder.Length ? maxItem : placeHolder;
+                    bool somethingIsSelected = selectedItem is not null;
+
+                    double placeholderWidth = CalculateWidth(placeholder.Length);
+
+                    double? exceptionMessageWidth = null;
+                    if (!string.IsNullOrEmpty(exceptionMessage))
+                        exceptionMessageWidth = CalculateWidth(exceptionMessage.Length);
+
+                    var myItems = items
+                        .Where(item => item != null)
+                        .Select(item => new
+                        {
+                            Item = RrStateService.GetDisplayValue(item),
+                            Width = CalculateWidth((RrStateService.GetDisplayValue(item) ?? placeholder).Length)
+                        })
+                        .ToList();
+
+                    string maxItem = myItems
+                        .OrderByDescending(i => i.Width)
+                        .FirstOrDefault()?.Item ?? placeholder;
+
+                    string theMaxItem = maxItem;
+                    if (!somethingIsSelected)
+                    {
+                        if (exceptionMessageWidth is not null)
+                        {
+                            theMaxItem = exceptionMessage ?? placeholder;
+                        }
+                        else
+                        {
+                            theMaxItem = maxItem.Length > placeholder.Length ? maxItem : placeholder;
+                        }
+                    }
+
+                    calculatedWidth = $"{Math.Round(ModifyWidthBasedOnWord(theMaxItem), 1)}px";
                 }
-                
-                calculatedWidth = $"{Math.Round(ModifyWidthBasedOnWord(theMaxItem), 1)}px";
             }
         }
 
+        /// <summary>
+        /// Sets the width of the dropdown based on the selected item.
+        /// Accounts for words with no 'i's being longer than words with 'i's like SUMMARY
+        /// </summary>
+        private void SetSelectedWidth()
+        {
+            if (RrStateService != null)
+            {
+                string? word = RrStateService.GetDisplayValue(selectedItem);
+                if (!string.IsNullOrEmpty(word))
+                {
+                    calculatedWidth = $"{Math.Round(ModifyWidthBasedOnWord(word), 1)}px";
+                }
+            }
+        }
+
+        /// <summary>
+        /// Modifies the width of the dropdown based on the word selected.
+        /// </summary>
+        /// <param name="word"></param>
+        /// <returns></returns>
         private double ModifyWidthBasedOnWord(string word)
         {
             double width = CalculateWidth(word.Length);
@@ -124,19 +250,10 @@ namespace IPeople.Roadrunner.Razor.Components
         }
 
         /// <summary>
-        /// Sets the width of the dropdown based on the selected item.
-        /// Accounts for words with no 'i's being longer than words with 'i's like SUMMARY
+        /// Calculates the width of the dropdown based on the number of characters in the string and a scaling factor.
         /// </summary>
-        private void SetSelectedWidth()
-        {
-            var dropdown = RrStateService.GetComponent<Models.RrDropdown>(Dropdown ?? RrStateService.GetComponentById<Models.RrDropdown>(Id)) as Models.RrDropdown;
-            string? word = string.IsNullOrEmpty(dropdown?.Text) ? dropdown?.PlaceHolder : dropdown?.Text ?? dropdown?.PlaceHolder;
-            if (!string.IsNullOrEmpty(word))
-            {
-                calculatedWidth = $"{Math.Round(ModifyWidthBasedOnWord(word), 1)}px";
-            }
-        }
-
+        /// <param name="initialNumber"></param>
+        /// <returns></returns>
         static double CalculateWidth(double initialNumber)
         {
             // The formula for the width of the dropdown based on the number of characters in the string (thanks algebra teacher in 9th grade)
@@ -151,65 +268,51 @@ namespace IPeople.Roadrunner.Razor.Components
         [JSInvokable]
         public void CollapseDropdownIfOpen()
         {
-            var dropdown = RrStateService.GetComponent<Models.RrDropdown>(Dropdown ?? RrStateService.GetComponentById<Models.RrDropdown>(Id)) as Models.RrDropdown;
-            if (dropdown is not null)
+            if (dropdownUIState == Models.UIStates.Expanded)
             {
-                if (dropdownUIState == SettingUIStates.Expanded)
-                {
-                    dropdownUIState = SettingUIStates.Collapsed;
-                }
-                StateHasChanged();
+                dropdownUIState = Models.UIStates.Collapsed;
             }
+            StateHasChanged();
         }
 
-        private void InitializeDropdownState()
+        /// <summary>
+        /// Checks to see if something is selected, then removes it from the dropdown list so that it doesn't show up twice.
+        /// </summary>
+        private List<T>? GetProcessedItems(IEnumerable<object> myList)
         {
-            var dropdown = RrStateService.GetComponent<Models.RrDropdown>(Dropdown ?? RrStateService.GetComponentById<Models.RrDropdown>(Id)) as Models.RrDropdown;
-            if (dropdown is null)
+            if (selectedItem is not null && myList is not null && myList.Any())
             {
-                RrStateService.RegisterComponent(new Models.RrDropdown(Id));
-                dropdownInstance = RrStateService.GetComponentById<Models.RrDropdown>(Id) as Models.RrDropdown;
+                return myList
+                    .Where(item => item is T typedItem && typedItem is not null && !typedItem.Equals(selectedItem))
+                    .Cast<T>()
+                    .ToList();
             }
-            else
-            {
-                dropdownInstance = dropdown;
-            }
-            if (dropdownInstance is not null)
-            {
-                if (!string.IsNullOrEmpty(Placeholder))
-                {
-                    RrStateService.SetComponentProperty<Models.RrDropdown, string>(dropdownInstance, c => c.PlaceHolder, Placeholder);
-                    dropdownInstance = RrStateService.GetComponent<Models.RrDropdown>(dropdownInstance) as Models.RrDropdown;
-                }
-                if (Items is not null && Items.Any())
-                {
-                    var convertedItems = Items.Select(item => item?.ToString())
-                                              .Where(item => item is not null)
-                                              .Cast<string>();
+            return null;
+        }
 
-                    RrStateService.SetComponentProperty<Models.RrDropdown, IEnumerable<string>>(dropdownInstance, c => c.Items, convertedItems);
-                    dropdownInstance = RrStateService.GetComponent<Models.RrDropdown>(dropdownInstance) as Models.RrDropdown;
-                }
-                filteredItems = dropdownInstance?.Items?
-                    .Where(item => item is not null && item != dropdownInstance.Text)
-                    .ToList() ?? new List<string>();
-
-                if (dropdownUIState == Models.SettingUIStates.Expanded)
-                {
-                    dropdownCssClass = "expanded";
-                    SetMaxWidth();
-                }
-                else if (dropdownUIState == Models.SettingUIStates.Collapsed)
-                {
-                    dropdownCssClass = "minimized";
-                    SetSelectedWidth();
-                }
-                else if (dropdownUIState == Models.SettingUIStates.Neutral)
-                {
-                    dropdownCssClass = "";
-                    SetSelectedWidth();
-                }
+        /// <summary>
+        /// Sets the dropdown to the correct CSS class based on the current state.
+        /// </summary>
+        /// <param name="currentState"></param>
+        /// <returns></returns>
+        private string GetDropdownCssClassAndWidth(Models.UIStates currentState)
+        {
+            if (currentState == Models.UIStates.Expanded)
+            {
+                SetMaxWidth();
+                return "expanded";
             }
+            else if (currentState == Models.UIStates.Collapsed)
+            {
+                SetSelectedWidth();
+                return "minimized";
+            }
+            else if (currentState == Models.UIStates.Neutral)
+            {
+                SetSelectedWidth();
+                return "";
+            }
+            return "invalid-state";
         }
     }
 }

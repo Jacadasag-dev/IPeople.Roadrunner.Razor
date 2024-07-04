@@ -11,8 +11,10 @@ namespace IPeople.Roadrunner.Razor.Services
         event Action OnComponentChange;
         void RefreshComponents();
         void RegisterComponent(IRrComponentBase rrComponent);
+        void RegisterComponentById<T>(string id);
         void RemoveComponent(IRrComponentBase rrComponent);
         void RegisterOrReplaceComponent(IRrComponentBase rrComponent);
+        void SynchronizeComponent<T>(IRrComponentBase? rrComponent) where T : IRrComponentBase;
         void UpdatePreference(IRrComponentBase rrComponent);
         IRrComponentBase GetComponent<T>(IRrComponentBase rrComponent) where T : IRrComponentBase;
         IRrComponentBase GetComponentById<T>(string id) where T : IRrComponentBase;
@@ -20,7 +22,9 @@ namespace IPeople.Roadrunner.Razor.Services
         void SetComponentPropertyById<T, TProperty>(string componentId, Expression<Func<T, TProperty>> propertySelector, TProperty newValue) where T : class, IRrComponentBase;
         void SetSelectedTab(RrPanelTab tab);
         void ToggleTabSettingsExpand(RrPanelTab tab);
-        void SetTabSettingsExpandState(RrPanelTab tab, SettingUIStates state);
+        void SetTabSettingsExpandState(RrPanelTab tab, UIStates state);
         void ToggleTabSetting(RrPanel panel, RrPanelTab tab, string settingName);
+
+        string? GetDisplayValue(object? item);
     }
 }
