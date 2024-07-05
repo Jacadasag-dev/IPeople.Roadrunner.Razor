@@ -70,6 +70,7 @@ namespace IPeople.Roadrunner.Razor.Models
         public bool Visible { set; get; }
         public string? Text { set; get; }
         public string? Flag { set; get; }
+        public string? Label { get; set; }
         public object? SelectedItem { get; set; }
         public IEnumerable<object> Items { get; set; } = [];
         public string PlaceHolder { get; set; } = "Select";

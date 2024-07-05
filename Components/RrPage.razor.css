@@ -1,0 +1,61 @@
+﻿.Rr-page {
+    position: fixed;
+    height: 100%;
+    width: 100%;
+    padding: 0px;
+    margin: 0px;
+    top: var(--top-offset);
+    left: var(--left-offset);
+}
+
+.Rr-page-header-container {
+    position: absolute;
+    background-color: white;
+    height: 56px;
+    width: 100%;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    z-index: 2;
+}
+
+.Rr-page-header {
+    padding: 10px;
+    position: absolute;
+    background-color: transparent;
+    display: flex;
+}
+
+.Rr-page-body-container {
+    position: absolute;
+    top: 56px;
+    height: calc(100% - 178px);
+    width: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background-color: #f7f7f7;
+    padding: 10px;
+    z-index: 1;
+}
+
+.Rr-page-body {
+    position: absolute;
+    padding: 10px;
+}
+
+.Rr-page-footer-container {
+    position: absolute;
+    bottom: 56px;
+    left: 0px;
+    height: 62px;
+    width: 100%;
+    background-color: white;
+    z-index: 2;
+    box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1), 0 -2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+
+.Rr-page-footer {
+    padding: 10px;
+    position: absolute;
+    background-color: transparent;
+    display: flex;
+}

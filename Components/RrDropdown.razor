@@ -3,40 +3,48 @@
 @if (Visible)
 {
     InitializeDropdown();
-    <div id="@Id" class="Rr-dropdown @dropdownCssClass @(selectedItem is null && Flashing ? "fade-red" : "")"
-         style="@($"--dropdown-width: {calculatedWidth}; min-width: {MinWidth}; --max-height: {MaxHeight};") @Style"
-         @onclick="HandleDropdownClicked">
-        <span class="Rr-dropdown-selectiontext">
-            @(selectedItem is null ? placeholder : RrStateService.GetDisplayValue(selectedItem))
-        </span>
-        <span class="Rr-dropdown-arrow"></span>
-        <div class="Rr-dropdown-content">
-            <ul class="item-list">
-                @if (processedItems is not null && processedItems.Any() && exceptionMessage is null)
-                {
-                    @foreach (var item in processedItems)
+    <div class="Rr-dropdown-container" @onclick="HandleDropdownClicked">
+        @if (!string.IsNullOrEmpty(label))
+        {
+            <div class="Rr-dropdown-label-container">
+                <span class="Rr-dropdown-label">@label</span>
+            </div>
+        }
+        <div id="@Id" class="Rr-dropdown @dropdownCssClass @(selectedItem is null && Flashing ? "fade-red" : "")"
+             style="@($"--dropdown-width: {calculatedWidth}; min-width: {MinWidth}; --max-height: {MaxHeight};")
+         @(!string.IsNullOrEmpty(label) ? "margin-left: -5px; box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);" : "") @Style">
+            <span class="Rr-dropdown-selectiontext">
+                @(selectedItem is null ? placeholder : RrStateService.GetDisplayValue(selectedItem))
+            </span>
+            <span class="Rr-dropdown-arrow"></span>
+            <div class="Rr-dropdown-content">
+                <ul class="item-list">
+                    @if (processedItems is not null && processedItems.Any() && exceptionMessage is null)
                     {
-                        <li @onclick="() => HandleItemSelected(item)">
-                            <span>@RrStateService.GetDisplayValue(item)</span>
-                        </li>
+                        foreach (var item in processedItems)
+                        {
+                            <li @onclick="() => HandleItemSelected(item)">
+                                <span>@RrStateService.GetDisplayValue(item)</span>
+                            </li>
+                        }
                     }
-                }
-                else 
-                {
-                    if (exceptionMessage is not null)
+                    else
                     {
-                        <li class="no-items">
-                            <span>@exceptionMessage</span>
-                        </li>
+                        if (exceptionMessage is not null)
+                        {
+                            <li class="no-items">
+                                <span>@exceptionMessage</span>
+                            </li>
+                        }
+                        else if (processedItems is null || !processedItems.Any())
+                        {
+                            <li class="no-items">
+                                <span>empty</span>
+                            </li>
+                        }
                     }
-                    else if (processedItems is null || !processedItems.Any())
-                    {
-                        <li class="no-items">
-                            <span>empty</span>
-                        </li>
-                    }
-                }
-            </ul>
+                </ul>
+            </div>
         </div>
     </div>
 }

@@ -15,7 +15,7 @@ window.invokeHandleDropdownClicked = function (excludeId = null) {
 document.addEventListener('click', function (event) {
     let targetElement = event.target;
     while (targetElement != null) {
-        if (targetElement.classList && targetElement.classList.contains('Rr-dropdown')) {
+        if (targetElement.classList && targetElement.classList.contains('Rr-dropdown-container')) {
             return;
         }
         targetElement = targetElement.parentElement;

@@ -39,6 +39,9 @@ namespace IPeople.Roadrunner.Razor.Components
         public bool EffectsAll { get; set; } = false;
 
         [Parameter]
+        public string? Label { get; set; }
+
+        [Parameter]
         public EventCallback<T> OnSelectionChanged { get; set; }
 
         [Parameter]
@@ -54,6 +57,7 @@ namespace IPeople.Roadrunner.Razor.Components
         private string? dropdownCssClass;
         private string? calculatedWidth;
         private string? exceptionMessage;
+        private string? label;
 
         /// <summary>
         /// Initializes the dropdown component whenever it is rendered.
@@ -104,6 +108,7 @@ namespace IPeople.Roadrunner.Razor.Components
             }
             visible = notNull ? dropdownFromService?.Visible ?? Visible : Visible;
             selectedItem = notNull ? (dropdownFromService?.SelectedItem is T item ? item : default) : default;
+            label = notNull ? dropdownFromService?.Label ?? Label : Label;
             placeholder = notNull ? dropdownFromService?.PlaceHolder ?? Placeholder : Placeholder;
             processedItems = GetProcessedItems(items)?.ToList() ?? new List<T>();
             if (processedItems is null || !processedItems.Any())

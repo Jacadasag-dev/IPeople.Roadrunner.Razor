@@ -1,12 +1,19 @@
 ﻿
+.Rr-dropdown-container {
+    display: flex;
+    position: relative;
+    margin: 0;
+    padding: 0;
+}
+
 .Rr-dropdown {
     position: relative;
     height: 35px;
     width: var(--dropdown-width);
     background: #E8E8E8;
     cursor: default;
-    margin: 0;
     padding: 0;
+    margin: 0px 7px 0px 4px;
     border-radius: 7px; /* Adjust radius as needed */
     overflow: hidden; /* Hide content during transition */
     text-align: start;
@@ -21,9 +28,9 @@
     opacity: 0;
     transition: opacity 0.2s linear, width 0.3s ease;
     position: absolute;
-    top: 36px;
+    top: 34px;
     width: var(--dropdown-width);
-    height: calc(var(--max-height, 230px) - 38px);
+    height: calc(var(--max-height, 230px) - 35px);
     background-color: #FFFF;
     overflow-x: hidden;
     overflow-y: auto;
@@ -96,6 +103,40 @@
     color: #333; /* This is a dark gray, visible against a light background */
     text-transform: uppercase; /* Considering your acronyms are in uppercase */
 }
+
+.Rr-dropdown-label-container {
+    position: relative;
+    height: 35px;
+    width: auto; /* Allow width to adjust based on content */
+    cursor: default;
+    padding: 0;
+    margin: 0;
+    border-top-left-radius: 7px; /* Adjust radius as needed */
+    border-bottom-left-radius: 7px; /* Adjust radius as needed */
+    overflow: hidden; /* Hide content during transition */
+    text-align: start;
+    user-select: none; /* Prevents text from being highlighted */
+    border: thin solid #c8c6c6;
+    border-right: none;
+    z-index: 5;
+    background: linear-gradient(to bottom, #d5d5d5, #E8E8E8); /* Gradient background */
+    display: inline-block; /* Ensures the element can shrink */
+}
+
+
+
+.Rr-dropdown-label {
+    padding-right: 8px;
+    
+    margin: 6px 3px 0px 4px;
+    display: inline-block;
+    font-size: 12px;
+    font-family: 'Roboto', sans-serif; /* Substitute with your chosen font */
+    color: #333; /* This is a dark gray, visible against a light background */
+    text-transform: uppercase; /* Considering your acronyms are in uppercase */
+    font-weight: bold; /* Makes the text bold */
+}
+
 
 .Rr-dropdown-arrow {
     position: absolute;

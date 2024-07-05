@@ -1,0 +1,29 @@
+﻿<div class="Rr-page" style="@($"--top-offset: {TopOffset}; --left-offset: {LeftOffset};")">
+    @if (Header != null)
+    {
+        <div class="Rr-page-header-container">
+            <div class="Rr-page-header">
+                @Header
+            </div>
+        </div>
+    }
+
+    @if (Body != null)
+    {
+        <div class="Rr-page-body-container">
+            <div class="Rr-page-body">
+                @Body
+            </div>
+        </div>
+
+    }
+
+    @if (Footer != null)
+    {
+        <div class="Rr-page-footer-container">
+            <div class="Rr-page-footer">
+                @Footer
+            </div>
+        </div>
+    }
+</div>
