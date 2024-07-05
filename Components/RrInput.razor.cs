@@ -19,7 +19,7 @@ namespace IPeople.Roadrunner.Razor.Components
         public string MaxWidth { get; set; } = "620px";
 
         [Parameter]
-        public string MinWidth { get; set; } = "420px";
+        public string MinWidth { get; set; } = "320px";
 
         [Parameter]
         public string Style { get; set; } = "";
@@ -32,7 +32,7 @@ namespace IPeople.Roadrunner.Razor.Components
 
         [Parameter] public EventCallback<string> OnChangedText { get; set; }
 
-        [Parameter] public EventCallback<KeyboardEventArgs> OnKeyDown { get; set; }
+        [Parameter] public EventCallback<(KeyboardEventArgs, string, Models.RrInput)> OnKeyDown { get; set; }
 
         [Parameter] public EventCallback OnInputClick { get; set; }
 
@@ -82,16 +82,17 @@ namespace IPeople.Roadrunner.Razor.Components
             instantInputText = inputText;
         }
 
-        private void Onchange()
+        private async void HandleOnKeyDown(KeyboardEventArgs e)
         {
-
+            if (string.IsNullOrEmpty(inputText)) return;
+            await OnKeyDown.InvokeAsync((e, inputText, inputFromService));
         }
 
         private CancellationTokenSource debounceCts = new CancellationTokenSource();
         private async void OnTextChanged(ChangeEventArgs e)
         {
-            string newText = e.Value?.ToString();
-            if (string.IsNullOrEmpty(inputText)) return;
+            string? newText = e.Value?.ToString();
+            if (string.IsNullOrEmpty(newText)) return;
             if (deBounce)
             {
                 debounceCts.Cancel();

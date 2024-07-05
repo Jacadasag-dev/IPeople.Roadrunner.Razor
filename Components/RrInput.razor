@@ -6,7 +6,7 @@
     <input id="@Id" type="text" class="Rr-input" placeholder="@placeholder"
            style="@($"max-width:{MaxWidth}; min-width:{MinWidth};") @Style"
            value="@instantInputText" @oninput="OnTextChanged" @onclick="@OnInputClick"
-           @onkeydown="OnKeyDown" spellcheck="false">
+           @onkeydown="HandleOnKeyDown" spellcheck="false">
 }
 
 
