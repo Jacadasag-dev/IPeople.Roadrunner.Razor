@@ -22,7 +22,7 @@ namespace IPeople.Roadrunner.Razor.Services
         void UpdatePreference(IRrComponentBase rrComponent);
         IRrComponentBase? GetComponent<T>(IRrComponentBase rrComponent) where T : IRrComponentBase;
         IRrComponentBase? GetComponentById<T>(string id) where T : IRrComponentBase;
-        void SetComponentProperty<T, TProperty>(IRrComponentBase rrComponent, Expression<Func<T, TProperty?>> propertySelector, TProperty? newValue) where T : class, IRrComponentBase;
+        void SetComponentProperty<T, TProperty>(IRrComponentBase? rrComponent, Expression<Func<T, TProperty?>> propertySelector, TProperty? newValue) where T : class, IRrComponentBase;
         void SetComponentPropertyById<T, TProperty>(string componentId, Expression<Func<T, TProperty?>> propertySelector, TProperty? newValue) where T : class, IRrComponentBase;
         void SetSelectedTab(RrPanelTab tab);
         void ToggleTabSettingsExpand(RrPanelTab tab);

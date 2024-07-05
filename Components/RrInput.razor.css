@@ -8,6 +8,8 @@
     letter-spacing: 1px; /* To give a little breathing room for the uppercase letters */
     outline: none; /* Remove default outline */
     padding-left: 10px; /* Adjust the padding value as needed */
+    margin-left: 5px;
+    margin-right: 5px;
     height: 42px;
 }
 

@@ -23,16 +23,9 @@ namespace IPeople.Roadrunner.Razor.Components
         protected override void OnInitialized()
         {
             RrStateService.RefreshAllComponents += StateHasChanged;
-            RrStateService.RefreshSpecificComponentsById += RefreshComponentsById;
+            RrStateService.RefreshSpecificComponentsById += (ids) => { if (ids.Contains(Id ?? "")) StateHasChanged(); };
         }
 
-        private void RefreshComponentsById(List<string> Ids)
-        {
-            if (!string.IsNullOrEmpty(Id) && Ids.Contains(Id))
-            {
-                StateHasChanged();
-            }
-        }
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)

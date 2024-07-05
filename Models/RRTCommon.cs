@@ -53,7 +53,6 @@ namespace IPeople.Roadrunner.Razor.Models
         public string Text { set; get; }
         public string Flag { set; get; }
         public string PlaceHolder { get; set; } = "Start typing...";
-        public int MaxWidth { get; set; } = 620;
         public bool DoDeBounce { get; set; } = true;
         public RrInput(string id)
         {

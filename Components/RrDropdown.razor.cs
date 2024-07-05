@@ -78,6 +78,7 @@ namespace IPeople.Roadrunner.Razor.Components
                 {
                     RrStateService.RegisterComponentById<Models.RrDropdown>(Id);
                     RrStateService.RefreshAllComponents += StateHasChanged;
+                    RrStateService.RefreshSpecificComponentsById += (ids) => { if (ids.Contains(Id)) StateHasChanged(); };
                     dropdownFromService = RrStateService.GetComponentById<Models.RrDropdown>(Id) as Models.RrDropdown;
                 } else
                 {
@@ -109,13 +110,7 @@ namespace IPeople.Roadrunner.Razor.Components
             {
                 processedItems = items?.Cast<T>().ToList() ?? new List<T>();
             }
-
-
-
-
             dropdownCssClass = GetDropdownCssClassAndWidth(dropdownUIState);
-
-            if (notNull) RrStateService.SynchronizeComponent<Models.RrDropdown>(dropdownFromService);
         }
 
         /// <summary>

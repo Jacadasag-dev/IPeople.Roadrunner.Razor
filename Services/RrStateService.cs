@@ -170,15 +170,18 @@ namespace IPeople.Roadrunner.Razor.Services
             {
                 throw new Exception("Component or component type invalid...");
             }
-            RefreshComponentsById(rrComponent.Identifier);
         }
 
+        /// Will cause infinite loop if the component calls itself through the RefreshComponentsById method
         public void SynchronizeComponentById<T>(string? componentId) where T : IRrComponentBase
         {
             if (string.IsNullOrEmpty(componentId))
                 return;
 
-            var rrComponent = GetComponentById<T>(componentId);
+            IRrComponentBase? rrComponent = GetComponentById<T>(componentId);
+            if (rrComponent is null)
+                return;
+
             if (typeof(T) == typeof(RrInput))
             {
                 SyncComponent((RrInput)rrComponent, Components.RrInputs);
@@ -252,8 +255,11 @@ namespace IPeople.Roadrunner.Razor.Services
                 throw new Exception("Component or component type invalid...");
             }
         }
-        public void SetComponentProperty<T, TProperty>(IRrComponentBase rrComponent, Expression<Func<T, TProperty?>> propertySelector, TProperty? newValue) where T : class, IRrComponentBase
+        public void SetComponentProperty<T, TProperty>(IRrComponentBase? rrComponent, Expression<Func<T, TProperty?>> propertySelector, TProperty? newValue) where T : class, IRrComponentBase
         {
+            if (rrComponent is null)
+                return;
+
             var component = GetComponent<T>(rrComponent) as T;
             if (component is not null && propertySelector is not null)
             {
