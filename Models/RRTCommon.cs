@@ -52,7 +52,7 @@ namespace IPeople.Roadrunner.Razor.Models
         public bool Visible { set; get; }
         public string Text { set; get; }
         public string Flag { set; get; }
-        public string PlaceHolder { get; set; } = "Start typing...";
+        public string PlaceHolder { get; set; }
         public bool DoDeBounce { get; set; } = true;
         public RrInput(string id)
         {
