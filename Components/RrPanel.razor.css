@@ -15,22 +15,36 @@
         right: var(--panel-right);
     }
 
+    .Rr-panel-container.top {
+        top: var(--panel-top);
+    }
+
+    .Rr-panel-container.bottom {
+        bottom: var(--panel-bottom);
+    }
+
 .Rr-panel {
     position: absolute;
     background: white;
     overflow: hidden;
+    height: var(--panel-height);
+    width: var(--panel-width);
 }
 
     .Rr-panel.left {
-        height: var(--panel-height);
-        width: var(--panel-width);
         box-shadow: 4px 0 6px -1px rgba(0, 0, 0, 0.1), 2px 0 4px -1px rgba(0, 0, 0, 0.06);
     }
 
     .Rr-panel.right {
-        height: var(--panel-height);
-        width: var(--panel-width);
         box-shadow: -4px 0 6px -1px rgba(0, 0, 0, 0.1), -2px 0 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    .Rr-panel.top {
+        box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1), 0 -2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    .Rr-panel.bottom {
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     }
 
 .Rr-panel-header {
@@ -70,7 +84,6 @@
 .Rr-panel-statechanger {
     position: relative;
     align-content: center;
-    transition: left 0.3s ease, right 0.3s ease; /* Smooth transition for width */
     background: linear-gradient(#E8E8E8, #d0d0d0, #E8E8E8); /* Diagonal gradient background for the tabs container */
     border-right: thin solid #c8c6c6;
     border-left: thin solid #c8c6c6;
@@ -81,11 +94,25 @@
     .Rr-panel-statechanger.left {
         left: var(--state-changer-position);
         box-shadow: 4px 0 6px -1px rgba(0, 0, 0, 0.1), 2px 0 4px -1px rgba(0, 0, 0, 0.06);
+        transition: left 0.3s ease, right 0.3s ease;
     }
 
     .Rr-panel-statechanger.right {
         right: var(--state-changer-position);
         box-shadow: -4px 0 6px -1px rgba(0, 0, 0, 0.1), -2px 0 4px -1px rgba(0, 0, 0, 0.06);
+        transition: left 0.3s ease, right 0.3s ease;
+    }
+
+    .Rr-panel-statechanger.top {
+        top: var(--state-changer-position);
+        box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1), 0 -2px 4px -1px rgba(0, 0, 0, 0.06);
+        transition: top 0.3s ease, bottom 0.3s ease;
+    }
+
+    .Rr-panel-statechanger.bottom {
+        top: var(--state-changer-position);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        transition: top 0.3s ease, bottom 0.3s ease;
     }
 
 
@@ -95,6 +122,14 @@
 
 .Rr-panel-container.minimized .Rr-panel-statechanger.right {
     border-right: none;
+}
+
+.Rr-panel-container.minimized .Rr-panel-statechanger.top {
+    border-top: none;
+}
+
+.Rr-panel-container.minimized .Rr-panel-statechanger.bottom {
+    border-bottom: none;
 }
 
 .Rr-panel.minimized .Rr-panel-body {
@@ -114,32 +149,53 @@
     display: inline-block;
     width: 0;
     height: 0;
-    border-top: 5px solid transparent;
-    border-bottom: 5px solid transparent;
-    
 }
 
     .Rr-panel-statechanger-arrow.right {
+        border-top: 5px solid transparent;
+        border-bottom: 5px solid transparent;
         border-right: 5px solid #333;
     }
 
     .Rr-panel-statechanger-arrow.left {
+        border-top: 5px solid transparent;
+        border-bottom: 5px solid transparent;
         border-left: 5px solid #333;
     }
 
-.top-dots {
+    .Rr-panel-statechanger-arrow.top {
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-top: 5px solid #333;
+    }
+
+    .Rr-panel-statechanger-arrow.bottom {
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-bottom: 5px solid #333;
+    }
+
+.Rr-panel-statechanger-dots-container {
     position: absolute;
-    top: 3px;
     margin: 2px;
 }
+    .Rr-panel-statechanger-dots-container.left {
+        left: 3px;
+    }
 
-.bottom-dots {
-    position: absolute;
-    bottom: 3px;
-    margin: 2px;
-}
+    .Rr-panel-statechanger-dots-container.right {
+        right: 3px;
+    }
 
-.Rr-panel-dots {
+    .Rr-panel-statechanger-dots-container.top {
+        top: 3px;
+    }
+
+    .Rr-panel-statechanger-dots-container.bottom {
+        bottom: 3px;
+    }
+
+.Rr-panel-statechanger-dots {
     display: inline-block;
     position: relative;
     width: 4px; /* Width of the dots */
@@ -149,27 +205,37 @@
     margin: 2px 0; /* Space between the dots */
 }
 
-    .Rr-panel-dots::before,
-    .Rr-panel-dots::after {
-        content: '';
-        display: inline-block;
-        position: absolute;
-        width: 4px; /* Width of the dots */
-        height: 4px; /* Height of the dots */
-        background-color: #333; /* Color of the dots */
-        border-radius: 50%; /* Make the dots round */
-    }
+.Rr-panel-statechanger-dots::before,
+.Rr-panel-statechanger-dots::after {
+    content: '';
+    display: inline-block;
+    position: absolute;
+    width: 4px; /* Width of the dots */
+    height: 4px; /* Height of the dots */
+    background-color: #333; /* Color of the dots */
+    border-radius: 50%; /* Make the dots round */
+}
 
-    .Rr-panel-dots::before {
+    .Rr-panel-statechanger-dots.vertical::before {
         top: -8px; /* Adjust the spacing between the dots */
     }
 
-    .Rr-panel-dots::after {
+    .Rr-panel-statechanger-dots.vertical::after {
         top: 8px; /* Adjust the spacing between the dots */
     }
 
+    .Rr-panel-statechanger-dots.horizontal::before {
+        left: -8px; /* Adjust the spacing between the dots */
+    }
+
+    .Rr-panel-statechanger-dots.horizontal::after {
+        left: 8px; /* Adjust the spacing between the dots */
+    }
+
 .Rr-panel-statechanger.expanded .Rr-panel-statechanger-arrow.right,
-.Rr-panel-statechanger.expanded .Rr-panel-statechanger-arrow.left {
+.Rr-panel-statechanger.expanded .Rr-panel-statechanger-arrow.left,
+.Rr-panel-statechanger.expanded .Rr-panel-statechanger-arrow.top,
+.Rr-panel-statechanger.expanded .Rr-panel-statechanger-arrow.bottom {
     transform: rotate(180deg);
 }
 
@@ -177,20 +243,25 @@
     background: linear-gradient(#036E80, #036170, #036E80); /* Diagonal gradient background for the tabs container */
 }
 
-.Rr-panel-statechanger:hover .Rr-panel-statechanger-arrow.left {
-    border-left: 5px solid #FFFFFF; /* White color on hover */
-}
+    .Rr-panel-statechanger:hover .Rr-panel-statechanger-arrow.left {
+        border-left: 5px solid #FFFFFF; /* White color on hover */
+    }
+    .Rr-panel-statechanger:hover .Rr-panel-statechanger-arrow.right {
+        border-right: 5px solid #FFFFFF; /* White color on hover */
+    }
+    .Rr-panel-statechanger:hover .Rr-panel-statechanger-arrow.top {
+        border-top: 5px solid #FFFFFF; /* White color on hover */
+    }
+    .Rr-panel-statechanger:hover .Rr-panel-statechanger-arrow.bottom {
+        border-bottom: 5px solid #FFFFFF; /* White color on hover */
+    }
 
-.Rr-panel-statechanger:hover .Rr-panel-statechanger-arrow.right {
-    border-right: 5px solid #FFFFFF; /* White color on hover */
-}
-
-    .Rr-panel-statechanger:hover .Rr-panel-dots,
-    .Rr-panel-statechanger:hover .Rr-panel-dots::after,
-    .Rr-panel-statechanger:hover .Rr-panel-dots::before {
+    .Rr-panel-statechanger:hover .Rr-panel-statechanger-dots,
+    .Rr-panel-statechanger:hover .Rr-panel-statechanger-dots::after,
+    .Rr-panel-statechanger:hover .Rr-panel-statechanger-dots::before {
         background-color: #FFFFFF; /* Color of the dots */
     }
 
-.Rr-panel-statechanger.minimized .Rr-panel-dots {
+.Rr-panel-statechanger.minimized .Rr-panel-statechanger-dots {
     display: none;
 }

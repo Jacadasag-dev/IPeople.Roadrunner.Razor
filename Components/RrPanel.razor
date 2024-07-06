@@ -3,7 +3,7 @@
 {
     InitializePanel();
     <div class="Rr-panel-container @GetPanelTypeCssClass() @panelStateCssClass"
-         style="@($"--panel-top: {panelTop}; --panel-left: {panelLeft}; --panel-right: {panelRight};")">
+         style="@($"--panel-top: {panelTop}; --panel-bottom: {panelBottom}; --panel-left: {panelLeft}; --panel-right: {panelRight};")">
         <div class="Rr-panel @GetPanelTypeCssClass() @panelStateCssClass"
              style="@($"--panel-width: {panelWidth}; --panel-height: {panelHeight};") @Style">
             @if (Header is not null)
@@ -28,13 +28,27 @@
         <div class="Rr-panel-statechanger @GetPanelTypeCssClass() @panelStateCssClass"
              style="@($"width: {stateChangerWidth}; height: {stateChangerHeight}; --state-changer-position: {stateChangerPosition};")"
              @onclick="HandleStateChangerClicked">
-            <div class="top-dots">
-                <span class="Rr-panel-dots"></span>
-            </div>
-            <span class="Rr-panel-statechanger-arrow @GetPanelTypeCssClass()"></span>
-            <div class="bottom-dots">
-                <span class="Rr-panel-dots"></span>
-            </div>
+            @if (panelType == PanelTypes.Left || panelType == PanelTypes.Right)
+            {
+                <div class="Rr-panel-statechanger-dots-container top">
+                    <span class="Rr-panel-statechanger-dots vertical"></span>
+                </div>
+                <span class="Rr-panel-statechanger-arrow @GetPanelTypeCssClass()"></span>
+                <div class="Rr-panel-statechanger-dots-container bottom">
+                    <span class="Rr-panel-statechanger-dots vertical"></span>
+                </div>
+            }
+            else
+            {
+                <div class="Rr-panel-statechanger-dots-container left">
+                    <span class="Rr-panel-statechanger-dots horizontal"></span>
+                </div>
+                <span class="Rr-panel-statechanger-arrow @GetPanelTypeCssClass()"></span>
+                <div class="Rr-panel-statechanger-dots-container right">
+                    <span class="Rr-panel-statechanger-dots horizontal"></span>
+                </div>
+            }
+
         </div>
     </div>
 }
