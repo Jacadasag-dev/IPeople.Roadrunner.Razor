@@ -10,6 +10,25 @@ namespace IPeople.Roadrunner.Razor.Models
         Large
     }
 
+    public enum PanelTypes
+    {
+        Left,
+        Right,
+        Bottom,
+        Top,
+    }
+
+    public class PageBodyBounds
+    {
+        public int TopPosition { get; set; }
+        public int LeftPosition { get; set; }
+        public int RightPosition { get; set; }
+        public int BottomPosition { get; set; }
+        public int Height { get; set; }
+        public int Width { get; set; }
+
+    }
+
     public class RrLoading
     {
         public RrLoadingType Type { get; set; } = RrLoadingType.Authenticating;
@@ -32,8 +51,7 @@ namespace IPeople.Roadrunner.Razor.Models
     {
         public string Identifier { get; set; }
         public bool Visible { get; set; }
-        public string Text { get; set; }
-        public string Flag { get; set; }
+        public string Tag { get; set; }
     }
 
     public interface IRrComponentWithData<T>
@@ -48,10 +66,10 @@ namespace IPeople.Roadrunner.Razor.Models
 
     public class RrInput : IRrComponentBase
     {
-        public string Identifier { set; get; }
-        public bool Visible { set; get; }
-        public string Text { set; get; }
-        public string Flag { set; get; }
+        public string Identifier { get; set; }
+        public bool Visible { get; set; }
+        public string Text { get; set; }
+        public string Tag { get; set; }
         public string PlaceHolder { get; set; }
         public bool DoDeBounce { get; set; } = true;
         public RrInput(string id)
@@ -66,10 +84,9 @@ namespace IPeople.Roadrunner.Razor.Models
     /// </summary>
     public class RrDropdown : IRrComponentBase
     {
-        public string Identifier { set; get; }
-        public bool Visible { set; get; }
-        public string? Text { set; get; }
-        public string? Flag { set; get; }
+        public string Identifier { get; set; }
+        public bool Visible { get; set; }
+        public string? Tag { get; set; }
         public string? Label { get; set; }
         public object? SelectedItem { get; set; }
         public IEnumerable<object> Items { get; set; } = [];
@@ -78,19 +95,19 @@ namespace IPeople.Roadrunner.Razor.Models
         {
             Identifier = id;
         }
-        public RrDropdown(string id, string flag)
+        public RrDropdown(string id, string tag)
         {
             Identifier = id;
-            Flag = flag;
+            Tag = tag;
         }
     }
 
     public class RrPopup : IRrComponentBase
     {
-        public string Identifier { set; get; }
-        public bool Visible { set; get; }
-        public string Text { set; get; }
-        public string Flag { set; get; }
+        public string Identifier { get; set; }
+        public bool Visible { get; set; }
+        public string Text { get; set; }
+        public string Tag { get; set; }
         public object StoredDataToDisplay { get; set; }
         public List<dynamic> Items { get; set; } = [];
         public RrPopup(string id)
@@ -104,13 +121,11 @@ namespace IPeople.Roadrunner.Razor.Models
     /// </summary>
     public class RrPanel : IRrComponentBase
     {
-        public string Identifier { set; get; }
-        public bool Visible { set; get; }
-        public string Text { set; get; }
-        public string Flag { set; get; }
-        public List<RrPanelTab> Tabs { get; set; } = [];
-        public RrPanelTab SelectedTab { get; set; }
-        public RrCheckBox CheckBox { get; set; }
+        public string Identifier { get; set; }
+        public bool Visible { get; set; }
+        public string Tag { get; set; }
+        public UIStates State { get; set; }
+        public PanelTypes? Type { get; set; }
         public RrPanel(string id)
         {
             Identifier = id;
@@ -179,6 +194,7 @@ namespace IPeople.Roadrunner.Razor.Models
     {
         Expanded,
         Collapsed,
-        Neutral
+        Neutral,
+        Peaking
     }
 }

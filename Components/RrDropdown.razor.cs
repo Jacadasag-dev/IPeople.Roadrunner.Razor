@@ -9,6 +9,9 @@ namespace IPeople.Roadrunner.Razor.Components
         public string? Id { get; set; }
 
         [Parameter]
+        public string? Tag { get; set; }
+
+        [Parameter]
         public bool Disabled { get; set; } = false;
 
         [Parameter]
@@ -33,13 +36,19 @@ namespace IPeople.Roadrunner.Razor.Components
         public bool Flashing { get; set; } = false;
 
         [Parameter]
-        public List<string>? Effects { get; set; }
+        public List<string>? EffectsById { get; set; }
+
+        [Parameter]
+        public List<string>? EffectsByTag { get; set; }
 
         [Parameter]
         public bool EffectsAll { get; set; } = false;
 
         [Parameter]
         public string? Label { get; set; }
+
+        [Parameter]
+        public string? LabelStyling { get; set; }
 
         [Parameter]
         public EventCallback<T> OnSelectionChanged { get; set; }
@@ -81,9 +90,12 @@ namespace IPeople.Roadrunner.Razor.Components
                 if (!string.IsNullOrEmpty(Id))
                 {
                     RrStateService.RegisterComponentById<Models.RrDropdown>(Id);
-                    RrStateService.RefreshAllComponents += StateHasChanged;
-                    RrStateService.RefreshSpecificComponentsById += (ids) => { if (ids.Contains(Id)) StateHasChanged(); };
                     dropdownFromService = RrStateService.GetComponentById<Models.RrDropdown>(Id) as Models.RrDropdown;
+                    RrStateService.RefreshAllComponents += StateHasChanged;
+                    RrStateService.RefreshSpecificComponentsById += (ids) => { if (ids is not null && ids.Contains(Id)) StateHasChanged(); };
+                    if (dropdownFromService is not null)
+                        RrStateService.RefreshSpecificComponentsByTag += (tags) => { if (tags is not null && tags.Contains(Tag ?? dropdownFromService.Tag ?? string.Empty)) StateHasChanged(); };
+
                 } else
                 {
                     exceptionMessage = "ERROR:id_is_required";
@@ -106,6 +118,16 @@ namespace IPeople.Roadrunner.Razor.Components
                     items = new List<object>();
                 }
             }
+            if (notNull)
+            {
+                if (string.IsNullOrEmpty(dropdownFromService?.Tag))
+                {
+                    if (!string.IsNullOrEmpty(Tag))
+                    {
+                        RrStateService.SetComponentProperty<Models.RrDropdown, string>(dropdownFromService, c => c.Tag, Tag);
+                    }
+                }
+            } 
             visible = notNull ? dropdownFromService?.Visible ?? Visible : Visible;
             selectedItem = notNull ? (dropdownFromService?.SelectedItem is T item ? item : default) : default;
             label = notNull ? dropdownFromService?.Label ?? Label : Label;
@@ -146,17 +168,20 @@ namespace IPeople.Roadrunner.Razor.Components
             }
             
             SetSelectedWidth();
-            StateHasChanged();
-            if (Effects is not null && Effects.Any())
-            {
-                RrStateService.RefreshComponentsById(Effects);
-            }
-            else if (EffectsAll)
+            if (EffectsAll)
             {
                 RrStateService.RefreshComponents();
             }
-            
+            else if (EffectsById is not null && EffectsById.Any())
+            {
+                RrStateService.RefreshComponentsById(EffectsById);
+            }
+            else if (EffectsByTag is not null && EffectsByTag.Any())
+            {
+                RrStateService.RefreshComponentsByTag(EffectsByTag);
+            }
             await OnSelectionChanged.InvokeAsync(selectedItem);
+            StateHasChanged();
         }
 
         /// <summary>

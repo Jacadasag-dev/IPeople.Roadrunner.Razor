@@ -1,44 +1,41 @@
-﻿<div class="rr-panel-container">
-    <div id="rr-panel-header-@Header" class="rr-panel-header">
-        @if (!RrStateService.AppGlobalVariables.Loading.IsLoading)
-        {
-            @if (PanelTabs is not null)
+﻿
+@if (Visible)
+{
+    InitializePanel();
+    <div class="Rr-panel-container @GetPanelTypeCssClass() @panelStateCssClass"
+         style="@($"--panel-top: {panelTop}; --panel-left: {panelLeft}; --panel-right: {panelRight};")">
+        <div class="Rr-panel @GetPanelTypeCssClass() @panelStateCssClass"
+             style="@($"--panel-width: {panelWidth}; --panel-height: {panelHeight};") @Style">
+            @if (Header is not null)
             {
-                <div class="rr-panel-tabs-container">
-                    @PanelTabs
-                </div>
-            } else
-            {
-                <div class="rr-panel-header-text-container">
-                    <span id="rr-panel-header-text" class="rr-panel-header-text">@(Header ?? "")</span>
-                </div>
-            }
-            @if (PanelSettings is not null)
-            {
-                <div class="rr-panel-settings-container">
-                    @PanelSettings
+                <div class="Rr-panel-header">
+                    @Header
                 </div>
             }
-        }
+            @if (Body is not null)
+            {
+                <div class="Rr-panel-body" style="@($"height: {panelBodyOffsetHeight};")">
+                    @Body
+                </div>
+            }
+            @if (Footer is not null)
+            {
+                <div class="Rr-panel-footer">
+                    @Footer
+                </div>
+            }
+        </div>
+        <div class="Rr-panel-statechanger @GetPanelTypeCssClass() @panelStateCssClass"
+             style="@($"width: {stateChangerWidth}; height: {stateChangerHeight}; --state-changer-position: {stateChangerPosition};")"
+             @onclick="HandleStateChangerClicked">
+            <div class="top-dots">
+                <span class="Rr-panel-dots"></span>
+            </div>
+            <span class="Rr-panel-statechanger-arrow @GetPanelTypeCssClass()"></span>
+            <div class="bottom-dots">
+                <span class="Rr-panel-dots"></span>
+            </div>
+        </div>
     </div>
-    <div class="@(EnableScroll ? "rr-panel-content" : "rr-panel-content-noscroll")">
-        @if (RrStateService.AppGlobalVariables.Loading.IsLoading)
-        {
-            @switch (RrStateService.AppGlobalVariables.Loading.Type)
-            {
-                case Models.RrLoadingType.Loading:
-                case Models.RrLoadingType.Authenticating:
-                    <RrLoading Message="@RrStateService.AppGlobalVariables.Loading.Message"></RrLoading>
-                    break;
+}
 
-                case Models.RrLoadingType.Awaiting:
-                    <p>@RrStateService.AppGlobalVariables.Loading.Message</p>
-                    break;
-            }
-        }
-        else
-        {
-            @PanelContent
-        }
-    </div>
-</div>

@@ -27,18 +27,19 @@
 .Rr-page-body-container {
     position: absolute;
     top: 56px;
-    height: calc(100% - 178px);
+    height: calc(100% - 174px);
     width: 100%;
-    overflow-y: auto;
+    overflow-y: hidden;
     overflow-x: hidden;
     background-color: #f7f7f7;
-    padding: 10px;
     z-index: 1;
 }
 
 .Rr-page-body {
+    width: 100%;
     position: absolute;
     padding: 10px;
+
 }
 
 .Rr-page-footer-container {

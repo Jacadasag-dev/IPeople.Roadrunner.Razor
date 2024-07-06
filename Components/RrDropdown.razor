@@ -7,12 +7,12 @@
         @if (!string.IsNullOrEmpty(label))
         {
             <div class="Rr-dropdown-label-container">
-                <span class="Rr-dropdown-label">@label</span>
+                <span class="Rr-dropdown-label" style="@($"font-size: 12px; {LabelStyling}")">@label</span>
             </div>
         }
         <div id="@Id" class="Rr-dropdown @dropdownCssClass @(selectedItem is null && Flashing ? "fade-red" : "")"
              style="@($"--dropdown-width: {calculatedWidth}; min-width: {MinWidth}; --max-height: {MaxHeight};")
-         @(!string.IsNullOrEmpty(label) ? "margin-left: -5px; box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);" : "") @Style">
+                    @(!string.IsNullOrEmpty(label) ? "margin-left: -5px; box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);" : "") @Style">
             <span class="Rr-dropdown-selectiontext">
                 @(selectedItem is null ? placeholder : RrStateService.GetDisplayValue(selectedItem))
             </span>

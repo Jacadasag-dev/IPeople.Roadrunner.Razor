@@ -118,16 +118,15 @@
     user-select: none; /* Prevents text from being highlighted */
     border: thin solid #c8c6c6;
     border-right: none;
-    z-index: 5;
     background: linear-gradient(to bottom, #d5d5d5, #E8E8E8); /* Gradient background */
     display: inline-block; /* Ensures the element can shrink */
+    z-index: -1;
 }
 
 
 
 .Rr-dropdown-label {
     padding-right: 8px;
-    
     margin: 6px 3px 0px 4px;
     display: inline-block;
     font-size: 12px;

@@ -98,3 +98,33 @@ window.makeDraggable = function (id) {
         document.onmousemove = null;
     }
 };
+
+function getElementBounds(elementId) {
+    var element = document.getElementById(elementId);
+    if (element) {
+        var rect = element.getBoundingClientRect();
+        return {
+            top: rect.top,
+            left: rect.left,
+            width: rect.width,
+            height: rect.height,
+            right: rect.right,
+            bottom: rect.bottom
+        };
+    }
+    return null;
+}
+
+window.setupResizeListener = function (elementId, dotNetHelper) {
+    var element = document.getElementById(elementId);
+    if (element) {
+        var updateBounds = function () {
+            var bounds = window.getElementBounds(elementId);
+            dotNetHelper.invokeMethodAsync('UpdateBounds', bounds);
+        };
+        window.addEventListener('resize', updateBounds);
+        if (element) {
+            new ResizeObserver(updateBounds).observe(element);
+        }
+    }
+};

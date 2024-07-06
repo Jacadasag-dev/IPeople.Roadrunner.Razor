@@ -1,5 +1,9 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using IPeople.Roadrunner.Razor.Models;
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using System.Reflection.Emit;
+using System.Security.Principal;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace IPeople.Roadrunner.Razor.Components
 {
@@ -9,29 +13,216 @@ namespace IPeople.Roadrunner.Razor.Components
         public string? Id { get; set; }
 
         [Parameter]
-        public string Style { get; set; } = "";
+        public string? Tag { get; set; }
+
         [Parameter]
-        public RenderFragment PanelTabs { get; set; }
+        public string? PanelHeight { get; set; } = "400px";
+
         [Parameter]
-        public RenderFragment PanelContent { get; set; }
+        public string? PanelWidth { get; set; } = "600px";
+
         [Parameter]
-        public RenderFragment PanelSettings { get; set; }
+        public PanelTypes PType { get; set; }
+
         [Parameter]
-        public string Header { get; set; }
+        public PanelTypes Style { get; set; }
+
         [Parameter]
-        public bool EnableScroll { get; set; } = true;
-        protected override void OnInitialized()
+        public RenderFragment? Header { get; set; }
+
+        [Parameter]
+        public RenderFragment? Body { get; set; }
+
+        [Parameter]
+        public RenderFragment? Footer { get; set; }
+
+        [Parameter]
+        public string? PeakingDistance { get; set; } = "100px";
+
+        [Parameter]
+        public bool Visible { get; set; } = true;
+
+        [Parameter]
+        public Models.RrPanel? Panel { get; set; }
+
+        private Models.RrPanel? panelFromService;
+        private PanelTypes panelType;
+        private string? exceptionMessage;
+        private Models.UIStates panelUIState = Models.UIStates.Expanded;
+        private string? panelWidth;
+        private string? panelHeight;
+        private string? panelTop;
+        private string? panelLeft;
+        private string? panelRight;
+        private string? stateChangerWidth;
+        private string? stateChangerHeight;
+        private string? stateChangerPosition;
+        private string? stateChangerRight;
+        private string? panelStateCssClass;
+        private string? panelBodyOffsetHeight;
+
+        private void InitializePanel()
         {
-            RrStateService.RefreshAllComponents += StateHasChanged;
-            RrStateService.RefreshSpecificComponentsById += (ids) => { if (ids.Contains(Id ?? "")) StateHasChanged(); };
+            if (!string.IsNullOrEmpty(Id))
+            {
+                panelFromService = RrStateService.GetComponentById<Models.RrPanel>(Id) as Models.RrPanel;
+            }
+            else if (Panel is not null)
+            {
+                panelFromService = RrStateService.GetComponent<Models.RrPanel>(Panel) as Models.RrPanel;
+                if (panelFromService is not null)
+                {
+                    Id = panelFromService.Identifier;
+                }
+            }
+            if (panelFromService is null)
+            {
+                if (!string.IsNullOrEmpty(Id))
+                {
+                    RrStateService.RegisterComponentById<Models.RrPanel>(Id);
+                    panelFromService = RrStateService.GetComponentById<Models.RrPanel>(Id) as Models.RrPanel;
+                    RrStateService.RefreshAllComponents += StateHasChanged;
+                    RrStateService.RefreshSpecificComponentsById += (ids) => { if (ids is not null && ids.Contains(Id)) StateHasChanged(); };
+                    if (panelFromService is not null)
+                        RrStateService.RefreshSpecificComponentsByTag += (tags) => { if (tags is not null && tags.Contains(Tag ?? panelFromService.Tag ?? string.Empty)) StateHasChanged(); };
+                }
+                else {
+                    exceptionMessage = "ERROR:id_is_required";
+                }
+            }
+            bool notNull = panelFromService is not null;
+            if (notNull)
+            {
+                if (string.IsNullOrEmpty(panelFromService?.Tag))
+                {
+                    if (!string.IsNullOrEmpty(Tag))
+                    {
+                        RrStateService.SetComponentProperty<Models.RrPanel, string>(panelFromService, c => c.Tag, Tag);
+                    }
+                }
+            }
+            panelType = notNull && panelFromService is not null ? panelFromService.Type ?? PType : PType;
+            panelUIState = notNull && panelFromService is not null ? panelFromService.State : UIStates.Expanded;
+
+            panelStateCssClass = GetStateCssClass(panelUIState);
+
+            if (RrStateService.AppGlobalVariables.BodyBounds is not null)
+            {
+                if (panelType == PanelTypes.Left)
+                {
+                    if (panelUIState == UIStates.Expanded)
+                        panelLeft = $"0px";
+
+                    if (panelUIState == UIStates.Collapsed)
+                        panelLeft = $"-{PanelWidth}";
+
+                    panelWidth = PanelWidth;
+                    panelHeight = $"{RrStateService.AppGlobalVariables.BodyBounds.Height}px";
+                    panelTop = $"{RrStateService.AppGlobalVariables.BodyBounds.TopPosition}px";
+                    stateChangerWidth = "10px";
+                    stateChangerHeight = panelHeight;
+                    stateChangerPosition = panelWidth;
+                }
+
+                if (panelType == PanelTypes.Right)
+                {
+                    if (panelUIState == UIStates.Expanded)
+                    {
+                        panelWidth = PanelWidth;
+                        panelRight = $"calc({PanelWidth} - 10px)";
+                        stateChangerPosition = "10px";
+                    }
+                    if (panelUIState == UIStates.Collapsed)
+                    {
+                        panelRight = "0px";
+                        stateChangerPosition = "0px";
+                    }
+
+                    panelHeight = $"{RrStateService.AppGlobalVariables.BodyBounds.Height}px";
+                    panelTop = $"{RrStateService.AppGlobalVariables.BodyBounds.TopPosition}px";
+                    stateChangerWidth = "10px";
+                    stateChangerHeight = panelHeight;
+                }
+            }
+
+            if (Header is null && Footer is null)
+            {
+                panelBodyOffsetHeight = "0px";
+            }
+            else if (Header is not null && Footer is not null)
+            {
+                panelBodyOffsetHeight = "70px";
+            }
+            else
+            {
+                panelBodyOffsetHeight = "35px";
+            }
+
         }
 
-        protected override async Task OnAfterRenderAsync(bool firstRender)
+        private void HandleStateChangerClicked()
         {
-            if (firstRender)
+            TogglePanelState();
+            if (panelType == PanelTypes.Left || panelType == PanelTypes.Right)
             {
-                await JS.InvokeVoidAsync("observeElementWidth", $"rr-panel-header-{Header}", "rr-panel-header-narrow", "rr-panel-header-long", PanelTabs is not null ? 500 : 950, 950);
+                if (panelUIState == Models.UIStates.Expanded)
+                    panelWidth = PanelWidth;
+
+                if (panelUIState == Models.UIStates.Collapsed)
+                    panelWidth = panelLeft;
             }
+            StateHasChanged();
+        }
+
+        private void TogglePanelState()
+        {
+            if (panelUIState == Models.UIStates.Expanded)
+            {
+                RrStateService.SetComponentProperty<Models.RrPanel, UIStates>(panelFromService, s=> s.State, Models.UIStates.Collapsed);
+            }
+            else if (panelUIState == Models.UIStates.Collapsed)
+            {
+                RrStateService.SetComponentProperty<Models.RrPanel, UIStates>(panelFromService, s => s.State, panelUIState = Models.UIStates.Expanded); 
+
+            }
+        }
+
+        private string GetStateCssClass(Models.UIStates currentState)
+        {
+            if (currentState == Models.UIStates.Expanded)
+            {
+                return "expanded";
+            }
+            else if (currentState == Models.UIStates.Collapsed)
+            {
+                return "minimized";
+            }
+            else if (currentState == Models.UIStates.Neutral)
+            {
+                return "";
+            }
+            return "invalid-state";
+        }
+
+        private string GetPanelTypeCssClass()
+        {
+            if (panelType == PanelTypes.Left)
+            {
+                return "left";
+            }
+            else if (panelType == PanelTypes.Right)
+            {
+                return "right";
+            }
+            else if (panelType == PanelTypes.Top)
+            {
+                return "top";
+            }
+            else if (panelType == PanelTypes.Bottom)
+            {
+                return "bottom";
+            }
+            return "invalid-type";
         }
     }
 }

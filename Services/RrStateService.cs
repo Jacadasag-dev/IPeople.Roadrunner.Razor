@@ -9,7 +9,8 @@ namespace IPeople.Roadrunner.Razor.Services
     {
         public class GlobalVariables
         {
-            public RrLoading Loading { get; set; }
+            public RrLoading? Loading { get; set; }
+            public PageBodyBounds? BodyBounds { get; set; }
         }
 
         public class ComponentInstances
@@ -24,7 +25,8 @@ namespace IPeople.Roadrunner.Razor.Services
         public ComponentInstances Components { get; set; } = new();
         public event Action<IRrComponentBase>? OnUpdatePreference;
         public event Action? RefreshAllComponents;
-        public event Action<List<string>>? RefreshSpecificComponentsById;
+        public event Action<List<string>?>? RefreshSpecificComponentsById;
+        public event Action<List<string>?>? RefreshSpecificComponentsByTag;
         public void RefreshComponents() { RefreshAllComponents?.Invoke(); }
 
         public void RefreshComponentsById(List<string> componentIds)
@@ -35,6 +37,16 @@ namespace IPeople.Roadrunner.Razor.Services
         public void RefreshComponentsById(string componentId)
         {
             RefreshComponentsById(new List<string> { componentId });
+        }
+
+        public void RefreshComponentsByTag(List<string> componentTags)
+        {
+            RefreshSpecificComponentsByTag?.Invoke(componentTags);
+        }
+
+        public void RefreshComponentsByTag(string componentTag)
+        {
+            RefreshComponentsById(new List<string> { componentTag });
         }
 
         public void RegisterComponent(IRrComponentBase rrComponent)
@@ -304,7 +316,7 @@ namespace IPeople.Roadrunner.Razor.Services
                 }
             }
         }
-        private List<string> GetPropertyPath(Expression expression)
+        private List<string> GetPropertyPath(Expression? expression)
         {
             var path = new List<string>();
 
@@ -321,61 +333,6 @@ namespace IPeople.Roadrunner.Razor.Services
 
             throw new ArgumentException("The property selector expression is not valid.", nameof(expression));
         }
-        public void SetSelectedTab(RrPanelTab tab)
-        {
-            var panelInstance = Components.RrPanels.FirstOrDefault(p => p.Identifier == tab.Panel.Identifier && p.Tabs.Any(t => t.Name == tab.Name));
-            if (panelInstance != null)
-            {
-                panelInstance.Tabs.ForEach(t => t.IsSelected = t.Name == tab.Name);
-            }
-        }
-        public void ToggleTabSettingsExpand(RrPanelTab tab)
-        {
-            var tabInstance = (GetComponentById<RrPanel>(tab.Panel.Identifier) as RrPanel)?.Tabs.FirstOrDefault(t => t.Name == tab.Name);
-            if (tabInstance != null)
-            {
-                if (tabInstance.SettingsUIState == UIStates.Collapsed)
-                {
-                    tabInstance.SettingsUIState = UIStates.Expanded;
-                }
-                else if (tabInstance.SettingsUIState == UIStates.Neutral)
-                {
-                    tabInstance.SettingsUIState = UIStates.Expanded;
-                }
-                else
-                {
-                    tabInstance.SettingsUIState = UIStates.Collapsed;
-                }
-            }
-        }
-        public void SetTabSettingsExpandState(RrPanelTab tab, UIStates state)
-        {
-            var tabInstance = (GetComponentById<RrPanel>(tab.Panel.Identifier) as RrPanel)?.Tabs.FirstOrDefault(t => t.Name == tab.Name);
-            if (tabInstance != null)
-            {
-                tabInstance.SettingsUIState = state;
-            }
-        }
-        public void ToggleTabSetting(RrPanel panel, RrPanelTab tab, string settingName)
-        {
-            var panelInstance = Components.RrPanels.FirstOrDefault(p => p.Identifier == panel.Identifier);
-            if (panelInstance != null)
-            {
-                if (panelInstance.Tabs is not null && panelInstance.Tabs.Any() && tab != null)
-                {
-                    var tabInstance = panelInstance.Tabs.FirstOrDefault(t => t.Name == tab.Name) ?? panelInstance.Tabs.First();
-                    if (tabInstance != null)
-                    {
-                        var matchedSetting = tabInstance.Settings.FirstOrDefault(s => s.Name == settingName);
-                        if (matchedSetting != null)
-                        {
-                            matchedSetting.Active = !matchedSetting.Active;
-                        }
-                    }
-                }
-            }
-        }
-
         public string? GetDisplayValue(object? item)
         {
             if (item == null)

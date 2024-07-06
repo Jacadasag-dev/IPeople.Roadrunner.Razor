@@ -7,7 +7,10 @@ namespace IPeople.Roadrunner.Razor.Components
     public partial class RrInput
     {
         [Parameter]
-        public string Id { get; set; } = "";
+        public string? Id { get; set; }
+
+        [Parameter]
+        public string? Tag { get; set; }
 
         [Parameter]
         public bool Visible { get; set; } = true;
@@ -65,9 +68,12 @@ namespace IPeople.Roadrunner.Razor.Components
                 if (!string.IsNullOrEmpty(Id))
                 {
                     RrStateService.RegisterComponentById<Models.RrInput>(Id);
-                    RrStateService.RefreshAllComponents += StateHasChanged;
-                    RrStateService.RefreshSpecificComponentsById += (ids) => { if (ids.Contains(Id)) StateHasChanged(); };
                     inputFromService = RrStateService.GetComponentById<Models.RrInput>(Id) as Models.RrInput;
+                    RrStateService.RefreshAllComponents += StateHasChanged;
+                    RrStateService.RefreshSpecificComponentsById += (ids) => { if (ids is not null && ids.Contains(Id)) StateHasChanged(); };
+                    if (inputFromService is not null)
+                        RrStateService.RefreshSpecificComponentsByTag += (tags) => { if (tags is not null && tags.Contains(Tag ?? inputFromService.Tag ?? string.Empty)) StateHasChanged(); };
+
                 }
                 else
                 {
@@ -75,6 +81,16 @@ namespace IPeople.Roadrunner.Razor.Components
                 }
             }
             bool notNull = inputFromService is not null;
+            if (notNull)
+            {
+                if (string.IsNullOrEmpty(inputFromService?.Tag))
+                {
+                    if (!string.IsNullOrEmpty(Tag))
+                    {
+                        RrStateService.SetComponentProperty<Models.RrInput, string>(inputFromService, c => c.Tag, Tag);
+                    }
+                }
+            }
             visible = notNull ? inputFromService?.Visible ?? Visible : Visible;
             placeholder = notNull ? inputFromService?.PlaceHolder ?? Placeholder : Placeholder;
             deBounce = notNull ? inputFromService?.DoDeBounce ?? DeBounce : DeBounce;

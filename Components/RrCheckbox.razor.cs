@@ -13,6 +13,10 @@ namespace IPeople.Roadrunner.Razor.Components
         public string Style { get; set; } = "";
         [Parameter]
         public string Label { get; set; } = "";
+
+        [Parameter]
+        public string Tag { get; set; } = "";
+
         [Parameter]
         public EventCallback OnCheckboxToggled { get; set; }
     }

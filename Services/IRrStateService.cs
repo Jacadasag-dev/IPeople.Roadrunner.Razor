@@ -7,12 +7,15 @@ namespace IPeople.Roadrunner.Razor.Services
     {
         RrStateService.GlobalVariables AppGlobalVariables { get; set; }
         RrStateService.ComponentInstances Components { get; set; }
-        event Action<IRrComponentBase> OnUpdatePreference;
-        event Action RefreshAllComponents;
-        event Action<List<string>> RefreshSpecificComponentsById;
+        event Action<IRrComponentBase>? OnUpdatePreference;
+        event Action? RefreshAllComponents;
+        event Action<List<string>?>? RefreshSpecificComponentsById;
+        event Action<List<string>?>? RefreshSpecificComponentsByTag;
         void RefreshComponents();
         void RefreshComponentsById(List<string> componentIds);
         void RefreshComponentsById(string componentId);
+        void RefreshComponentsByTag(List<string> componentTags);
+        void RefreshComponentsByTag(string componentTag);
         void RegisterComponent(IRrComponentBase rrComponent);
         void RegisterComponentById<T>(string id);
         void RemoveComponent(IRrComponentBase rrComponent);
@@ -24,11 +27,6 @@ namespace IPeople.Roadrunner.Razor.Services
         IRrComponentBase? GetComponentById<T>(string id) where T : IRrComponentBase;
         void SetComponentProperty<T, TProperty>(IRrComponentBase? rrComponent, Expression<Func<T, TProperty?>> propertySelector, TProperty? newValue) where T : class, IRrComponentBase;
         void SetComponentPropertyById<T, TProperty>(string componentId, Expression<Func<T, TProperty?>> propertySelector, TProperty? newValue) where T : class, IRrComponentBase;
-        void SetSelectedTab(RrPanelTab tab);
-        void ToggleTabSettingsExpand(RrPanelTab tab);
-        void SetTabSettingsExpandState(RrPanelTab tab, UIStates state);
-        void ToggleTabSetting(RrPanel panel, RrPanelTab tab, string settingName);
-
         string? GetDisplayValue(object? item);
     }
 }
