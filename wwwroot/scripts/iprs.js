@@ -142,24 +142,42 @@ window.registerPanels = (id, dotNetHelper, panelType) => {
 
     const handleTopId = `${id}-dots-container-top`;
     const handleBottomId = `${id}-dots-container-bottom`;
+    const handleLeftId = `${id}-dots-container-left`;
+    const handleRightId = `${id}-dots-container-right`;
     const panelId = `${id}-panel`;
     const stateChangerId = `${id}-panel-statechanger`;
     const panelcontainerId = `${id}-panel-container`;
+    const handleLeft = document.getElementById(handleLeftId);
+    const handleRight = document.getElementById(handleRightId);
     const handleTop = document.getElementById(handleTopId);
     const handleBottom = document.getElementById(handleBottomId);
     const panel = document.getElementById(panelId);
     const stateChanger = document.getElementById(stateChangerId);
     const panelcontainer = document.getElementById(panelcontainerId);
 
-    if ((!handleTop && !handleBottom) || !panel || !stateChanger) return;
-
+    let startY;
     let startX;
     let initialWidth;
+    let initialHeight;
     let initialStateChangerLeft;
-    let initialPositionRight;
+    let initialStateChangerTop;
+
+    if (handleLeft && handleRight)
+    {
+        if ((!handleLeft && !handleRight) || !panel || !stateChanger) return;
+
+
+    }
+
+    if (handleTop && handleBottom)
+    {
+        if ((!handleTop && !handleBottom) || !panel || !stateChanger) return;
+
+    }
 
     const onMouseMove = (event) => {
         const diffX = event.clientX - startX;
+        const diffY = event.clientY - startY;
         
         if (window.panels[id].panelType === 'Left') {
             panel.style.width = `${initialWidth + diffX}px`;
@@ -168,7 +186,16 @@ window.registerPanels = (id, dotNetHelper, panelType) => {
         else if (window.panels[id].panelType === 'Right')
         {
             panel.style.width = `${initialWidth - diffX}px`;
-            panelcontainer.style.right = `${initialPositionRight - diffX}px`;
+            panelcontainer.style.right = `${initialWidth - diffX}px`;
+        }
+        else if (window.panels[id].panelType === 'Top')
+        {
+            panel.style.height = `${initialHeight + diffY}px`;
+            stateChanger.style.setProperty('--state-changer-position', `${initialStateChangerTop + diffY}px`);
+        }
+        else if (window.panels[id].panelType === 'Bottom') {
+            panel.style.height = `${initialHeight - diffY}px`;
+            panelcontainer.style.bottom = `${initialHeight - diffY}px`;
         }
     };
 
@@ -178,14 +205,24 @@ window.registerPanels = (id, dotNetHelper, panelType) => {
 
         stateChanger.classList.remove('no-transition');
 
-        if (window.panels[id].panelType === 'Right')
+        if (window.panels[id].panelType === 'Right' || window.panels[id].panelType === 'Bottom')
         {
             panelcontainer.classList.remove('no-transition');
         }
 
         // Invoke the FinishedDragging method
         if (window.panels[id]) {
-            const newSize = parseFloat(panel.style.width); // Convert the size to a number
+            var newSize; // Convert the size to a number
+            if (handleTop && handleBottom)
+            {
+                newSize = parseFloat(panel.style.width);
+            }
+
+            if (handleLeft && handleRight)
+            {
+                newSize = parseFloat(panel.style.height);
+            }
+
             window.panels[id].dotNetHelper.invokeMethodAsync('FinishedDragging', newSize)
                 .then(() => console.log(`Finished dragging for panel: ${id}, new size: ${newSize}, type: ${window.panels[id].panelType}`))
                 .catch(err => console.error(err));
@@ -193,14 +230,14 @@ window.registerPanels = (id, dotNetHelper, panelType) => {
     };
 
     const onMouseDown = (event) => {
+        startY = event.clientY;
         startX = event.clientX;
         initialWidth = panel.offsetWidth;
-        initialHieght = panel.offsetHeight;
-        initialPositionRight = window.innerWidth - panelcontainer.offsetLeft;
+        initialHeight = panel.offsetHeight;
         initialStateChangerTop = stateChanger.offsetTop;
         initialStateChangerLeft = stateChanger.offsetLeft;
         stateChanger.classList.add('no-transition');
-        if (window.panels[id].panelType === 'Right')
+        if (window.panels[id].panelType === 'Right' || window.panels[id].panelType === 'Bottom')
         {
             panelcontainer.classList.add('no-transition');
         }
@@ -209,6 +246,15 @@ window.registerPanels = (id, dotNetHelper, panelType) => {
         document.addEventListener('mouseup', onMouseUp);
     };
 
-    handleTop.addEventListener('mousedown', onMouseDown);
-    handleBottom.addEventListener('mousedown', onMouseDown);
+    if (handleLeft && handleRight)
+    {
+        handleLeft.addEventListener('mousedown', onMouseDown);
+        handleRight.addEventListener('mousedown', onMouseDown);
+    }
+
+    if (handleTop && handleBottom)
+    {
+        handleTop.addEventListener('mousedown', onMouseDown);
+        handleBottom.addEventListener('mousedown', onMouseDown);
+    }
 };
