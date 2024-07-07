@@ -170,6 +170,7 @@
 }
 
     .Rr-panel-statechanger-arrow.right {
+        margin-left: 2px;
         border-top: 5px solid transparent;
         border-bottom: 5px solid transparent;
         border-right: 5px solid #333;
@@ -182,6 +183,7 @@
     }
 
     .Rr-panel-statechanger-arrow.top {
+        margin-top: 2px;
         border-left: 5px solid transparent;
         border-right: 5px solid transparent;
         border-top: 5px solid #333;
@@ -193,9 +195,14 @@
         border-bottom: 5px solid #333;
     }
 
+.Rr-panel-statechanger.minimized .Rr-panel-statechanger-arrow.left {
+    margin-left: 2px;
+}
+
 .Rr-panel-statechanger-dots-container {
     position: absolute;
     margin: 2px;
+    cursor: e-resize;
 }
     .Rr-panel-statechanger-dots-container.left {
         left: 12px;
