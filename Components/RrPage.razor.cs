@@ -62,7 +62,25 @@ namespace IPeople.Roadrunner.Razor.Components
             RrStateService.RefreshComponentsByTag("Panel");
         }
 
-
-
+        private string GetBodyHeight()
+        {
+            if (Header is null && Footer is null)
+            {
+                return "height: 100%;";
+            }
+            else if (Header is not null && Footer is not null)
+            {
+                return "height: calc(100% - 118px);";
+            }
+            else if (Header is null)
+            {
+                return "height: calc(100% - 56px);";
+            }
+            else if (Footer is null)
+            {
+                return "height: calc(100% - 56px);";
+            }
+            return "invalid";
+        }
     }
 }

@@ -27,7 +27,6 @@
 .Rr-page-body-container {
     position: absolute;
     top: 56px;
-    height: calc(100% - 174px);
     width: 100%;
     overflow-y: hidden;
     overflow-x: hidden;
@@ -43,7 +42,7 @@
 
 .Rr-page-footer-container {
     position: absolute;
-    bottom: 56px;
+    bottom: 0px;
     left: 0px;
     height: 62px;
     width: 100%;

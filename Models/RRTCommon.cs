@@ -22,7 +22,8 @@ namespace IPeople.Roadrunner.Razor.Models
     {
         Top,
         Bottom,
-        Both
+        Both,
+        None
     }
 
     public class PageBodyBounds

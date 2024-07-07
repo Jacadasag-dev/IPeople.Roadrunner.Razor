@@ -1,5 +1,6 @@
 ﻿using IPeople.Roadrunner.Razor.Models;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using System.Reflection.Emit;
 using System.Security.Principal;
@@ -37,7 +38,7 @@ namespace IPeople.Roadrunner.Razor.Components
         public string? PeakingDistance { get; set; } = "100px";
 
         [Parameter]
-        public SidePanelOffsets SidePanelOffset { get; set; }
+        public SidePanelOffsets SidePanelOffset { get; set; } = SidePanelOffsets.None;
 
         [Parameter]
         public bool Visible { get; set; } = true;
