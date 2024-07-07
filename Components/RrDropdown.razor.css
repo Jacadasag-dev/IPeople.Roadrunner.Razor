@@ -127,9 +127,9 @@
 
 .Rr-dropdown-label {
     padding-right: 8px;
-    margin: 6px 3px 0px 4px;
+    margin: 8px 3px 0px 4px;
     display: inline-block;
-    font-size: 12px;
+    font-size: 14px;
     font-family: 'Roboto', sans-serif; /* Substitute with your chosen font */
     color: #333; /* This is a dark gray, visible against a light background */
     text-transform: uppercase; /* Considering your acronyms are in uppercase */

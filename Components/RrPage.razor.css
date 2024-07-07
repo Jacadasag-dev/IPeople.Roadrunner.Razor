@@ -1,7 +1,7 @@
 ﻿.Rr-page {
     position: fixed;
-    height: 100%;
-    width: 100%;
+    height: calc(100% - var(--top-offset));
+    width: calc(100% - var(--left-offset));
     padding: 0px;
     margin: 0px;
     top: var(--top-offset);

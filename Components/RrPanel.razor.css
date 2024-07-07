@@ -201,25 +201,37 @@
 
 .Rr-panel-statechanger-dots-container {
     position: absolute;
-    margin: 2px;
-    cursor: e-resize;
 }
     .Rr-panel-statechanger-dots-container.left {
-        left: 12px;
-        bottom: -9px;
+        left: 22px;
+        bottom: -1px;
+        height: 10px;
+        width: 30px;
+        cursor: ns-resize;
     }
 
     .Rr-panel-statechanger-dots-container.right {
-        right: 12px;
-        bottom: -9px;
+        right: 22px;
+        bottom: -1px;
+        height: 10px;
+        width: 30px;
+        cursor: ns-resize;
     }
 
     .Rr-panel-statechanger-dots-container.top {
         top: 3px;
+        right: 0px;
+        width: 9px;
+        height: 29px;
+        cursor: ew-resize;
     }
 
     .Rr-panel-statechanger-dots-container.bottom {
         bottom: 3px;
+        right: 0px;
+        width: 9px;
+        height: 29px;
+        cursor: ew-resize;
     }
 
 .Rr-panel-statechanger-dots {
@@ -229,8 +241,17 @@
     height: 4px; /* Height of the dots */
     background-color: #333; /* Color of the dots */
     border-radius: 50%; /* Make the dots round */
-    margin: 2px 0; /* Space between the dots */
 }
+
+    .Rr-panel-statechanger-dots.vertical {
+        right: -3px;
+        top: -1px;
+    }
+
+    .Rr-panel-statechanger-dots.horizontal {
+        left: 5px;
+        bottom: 10px;
+    }
 
 .Rr-panel-statechanger-dots::before,
 .Rr-panel-statechanger-dots::after {
@@ -252,7 +273,7 @@
     }
 
     .Rr-panel-statechanger-dots.horizontal::before {
-        left: -8px; /* Adjust the spacing between the dots */
+        left: 16px; /* Adjust the spacing between the dots */
     }
 
     .Rr-panel-statechanger-dots.horizontal::after {
