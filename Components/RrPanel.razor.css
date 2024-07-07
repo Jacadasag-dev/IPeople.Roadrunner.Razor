@@ -171,13 +171,14 @@
 
     .Rr-panel-statechanger-arrow-container.horizontal {
         width: calc(100% - 104px);
-        height: 9px;
-        bottom: 0px;
+        height: 11px;
+        bottom: -1px;
         text-align: center;
     }
 
     .Rr-panel-statechanger-arrow-container.vertical {
-        width: 9px;
+        right: -1px;
+        width: 11px;
         height: calc(100% - 70px);
         align-content: center;
         top: 34px;
@@ -195,36 +196,36 @@
         border-top: 5px solid transparent;
         border-bottom: 5px solid transparent;
         border-right: 5px solid #333;
-        left: 2px;
+        left: 3px;
     }
 
     .Rr-panel-statechanger-arrow.left {
         border-top: 5px solid transparent;
         border-bottom: 5px solid transparent;
         border-left: 5px solid #333;
-        left: 1px;
+        left: 3px;
     }
 
     .Rr-panel-statechanger-arrow.top {
         border-left: 5px solid transparent;
         border-right: 5px solid transparent;
         border-top: 5px solid #333;
-        top: 2px;
+        top: 3px;
     }
 
     .Rr-panel-statechanger-arrow.bottom {
         border-left: 5px solid transparent;
         border-right: 5px solid transparent;
         border-bottom: 5px solid #333;
-        top: 2px;
-    }
-
-    .Rr-panel-statechanger.minimized .Rr-panel-statechanger-arrow.left {
-        left: 2px;
+        top: 3px;
     }
 
     .Rr-panel-statechanger.expanded .Rr-panel-statechanger-arrow.bottom {
-        top: 2px;
+        top: 4px;
+    }
+
+    .Rr-panel-statechanger.expanded .Rr-panel-statechanger-arrow.right {
+        left: 4px;
     }
 
 .Rr-panel-statechanger-dots-container {
