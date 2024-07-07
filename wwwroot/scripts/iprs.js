@@ -140,16 +140,18 @@ window.registerPanels = (id, dotNetHelper, panelType) => {
     };
     console.log(`Panel registered: ${id}, Type: ${panelType}`, dotNetHelper);
 
-    const handleId = `${id}-dots-container-top`;
+    const handleTopId = `${id}-dots-container-top`;
+    const handleBottomId = `${id}-dots-container-bottom`;
     const panelId = `${id}-panel`;
     const stateChangerId = `${id}-panel-statechanger`;
     const panelcontainerId = `${id}-panel-container`;
-    const handle = document.getElementById(handleId);
+    const handleTop = document.getElementById(handleTopId);
+    const handleBottom = document.getElementById(handleBottomId);
     const panel = document.getElementById(panelId);
     const stateChanger = document.getElementById(stateChangerId);
     const panelcontainer = document.getElementById(panelcontainerId);
 
-    if (!handle || !panel || !stateChanger) return;
+    if ((!handleTop && !handleBottom) || !panel || !stateChanger) return;
 
     let startX;
     let initialWidth;
@@ -193,10 +195,10 @@ window.registerPanels = (id, dotNetHelper, panelType) => {
     const onMouseDown = (event) => {
         startX = event.clientX;
         initialWidth = panel.offsetWidth;
-        initialPosition = panel.offsetLeft;
+        initialHieght = panel.offsetHeight;
         initialPositionRight = window.innerWidth - panelcontainer.offsetLeft;
+        initialStateChangerTop = stateChanger.offsetTop;
         initialStateChangerLeft = stateChanger.offsetLeft;
-        initialStateChangerRight = 0;
         stateChanger.classList.add('no-transition');
         if (window.panels[id].panelType === 'Right')
         {
@@ -207,5 +209,6 @@ window.registerPanels = (id, dotNetHelper, panelType) => {
         document.addEventListener('mouseup', onMouseUp);
     };
 
-    handle.addEventListener('mousedown', onMouseDown);
+    handleTop.addEventListener('mousedown', onMouseDown);
+    handleBottom.addEventListener('mousedown', onMouseDown);
 };
