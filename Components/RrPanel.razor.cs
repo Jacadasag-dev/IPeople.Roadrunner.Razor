@@ -230,8 +230,8 @@ namespace IPeople.Roadrunner.Razor.Components
             else if (panelUIState == Models.UIStates.Collapsed)
             {
                 RrStateService.SetComponentProperty<Models.RrPanel, UIStates>(panelFromService, s => s.State, panelUIState = Models.UIStates.Expanded); 
-
             }
+            StateHasChanged();
         }
 
         private string GetStateCssClass(Models.UIStates currentState)
@@ -285,10 +285,16 @@ namespace IPeople.Roadrunner.Razor.Components
         [JSInvokable]
         public void FinishedDragging(int newSize)
         {
+            string newPanelSize;
             if (newSize < 100)
-                newSize = 100;
-
-            RrStateService.SetComponentProperty<Models.RrPanel, string>(panelFromService, s => s.Size, $"{newSize}px");
+            {
+                newPanelSize = PanelSize ?? "350px";
+                TogglePanelState();
+            } else
+            {
+                newPanelSize = $"{newSize}px";
+            }
+            RrStateService.SetComponentProperty<Models.RrPanel, string>(panelFromService, s => s.Size, newPanelSize);
         }
     }
 }

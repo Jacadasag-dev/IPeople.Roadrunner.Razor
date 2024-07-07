@@ -203,25 +203,36 @@ window.registerPanels = (id, dotNetHelper, panelType) => {
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
 
-        stateChanger.classList.remove('no-transition');
-
-        if (window.panels[id].panelType === 'Right' || window.panels[id].panelType === 'Bottom')
-        {
-            panelcontainer.classList.remove('no-transition');
-        }
-
         // Invoke the FinishedDragging method
         if (window.panels[id]) {
             var newSize; // Convert the size to a number
             if (handleTop && handleBottom)
             {
                 newSize = parseFloat(panel.style.width);
+                if (newSize < 100) {
+                    panel.style.width = initialWidth + 'px';
+                    if (window.panels[id].panelType === 'Left') {
+                        stateChanger.style.setProperty('--state-changer-position', `${initialStateChangerLeft}px`);
+                    }
+                }
             }
 
             if (handleLeft && handleRight)
             {
                 newSize = parseFloat(panel.style.height);
+                if (newSize < 100) {
+                    panel.style.height = initialHeight + 'px';
+                    if (window.panels[id].panelType === 'Top') {
+                        stateChanger.style.setProperty('--state-changer-position', `${initialStateChangerTop}px`);
+                    }
+                }
             }
+
+            stateChanger.classList.remove('no-transition');
+            panel.classList.remove('no-transition');
+            panelcontainer.classList.remove('no-transition');
+
+
 
             window.panels[id].dotNetHelper.invokeMethodAsync('FinishedDragging', newSize)
                 .then(() => console.log(`Finished dragging for panel: ${id}, new size: ${newSize}, type: ${window.panels[id].panelType}`))
@@ -237,10 +248,9 @@ window.registerPanels = (id, dotNetHelper, panelType) => {
         initialStateChangerTop = stateChanger.offsetTop;
         initialStateChangerLeft = stateChanger.offsetLeft;
         stateChanger.classList.add('no-transition');
-        if (window.panels[id].panelType === 'Right' || window.panels[id].panelType === 'Bottom')
-        {
-            panelcontainer.classList.add('no-transition');
-        }
+        panel.classList.add('no-transition');
+        panelcontainer.classList.add('no-transition');
+        
 
         document.addEventListener('mousemove', onMouseMove);
         document.addEventListener('mouseup', onMouseUp);
