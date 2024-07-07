@@ -18,6 +18,13 @@ namespace IPeople.Roadrunner.Razor.Models
         Top,
     }
 
+    public enum SidePanelOffsets
+    {
+        Top,
+        Bottom,
+        Both
+    }
+
     public class PageBodyBounds
     {
         public int TopPosition { get; set; }
