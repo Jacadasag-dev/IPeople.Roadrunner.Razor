@@ -133,38 +133,59 @@ window.setupResizeListener = function (elementId, dotNetHelper) {
 
 window.panels = {};
 
-window.registerPanels = (id, dotNetHelper) => {
-    window.panels[id] = dotNetHelper;
-    console.log(`Panel registered: ${id}`, dotNetHelper);
+window.registerPanels = (id, dotNetHelper, panelType) => {
+    window.panels[id] = {
+        dotNetHelper: dotNetHelper,
+        panelType: panelType
+    };
+    console.log(`Panel registered: ${id}, Type: ${panelType}`, dotNetHelper);
 
     const handleId = `${id}-dots-container-top`;
     const panelId = `${id}-panel`;
     const stateChangerId = `${id}-panel-statechanger`;
+    const panelcontainerId = `${id}-panel-container`;
     const handle = document.getElementById(handleId);
     const panel = document.getElementById(panelId);
     const stateChanger = document.getElementById(stateChangerId);
+    const panelcontainer = document.getElementById(panelcontainerId);
 
     if (!handle || !panel || !stateChanger) return;
 
     let startX;
     let initialWidth;
     let initialStateChangerLeft;
+    let initialPositionRight;
 
     const onMouseMove = (event) => {
         const diffX = event.clientX - startX;
-        panel.style.width = `${initialWidth + diffX}px`;
-        stateChanger.style.left = `${initialStateChangerLeft + diffX}px`;
+        
+        if (window.panels[id].panelType === 'Left') {
+            panel.style.width = `${initialWidth + diffX}px`;
+            stateChanger.style.setProperty('--state-changer-position', `${initialStateChangerLeft + diffX}px`);
+        }
+        else if (window.panels[id].panelType === 'Right')
+        {
+            panel.style.width = `${initialWidth - diffX}px`;
+            panelcontainer.style.right = `${initialPositionRight - diffX}px`;
+        }
     };
 
     const onMouseUp = () => {
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
+
         stateChanger.classList.remove('no-transition');
+
+        if (window.panels[id].panelType === 'Right')
+        {
+            panelcontainer.classList.remove('no-transition');
+        }
+
         // Invoke the FinishedDragging method
         if (window.panels[id]) {
             const newSize = parseFloat(panel.style.width); // Convert the size to a number
-            window.panels[id].invokeMethodAsync('FinishedDragging', newSize)
-                .then(() => console.log(`Finished dragging for panel: ${id}, new size: ${newSize}`))
+            window.panels[id].dotNetHelper.invokeMethodAsync('FinishedDragging', newSize)
+                .then(() => console.log(`Finished dragging for panel: ${id}, new size: ${newSize}, type: ${window.panels[id].panelType}`))
                 .catch(err => console.error(err));
         }
     };
@@ -172,8 +193,16 @@ window.registerPanels = (id, dotNetHelper) => {
     const onMouseDown = (event) => {
         startX = event.clientX;
         initialWidth = panel.offsetWidth;
+        initialPosition = panel.offsetLeft;
+        initialPositionRight = window.innerWidth - panelcontainer.offsetLeft;
         initialStateChangerLeft = stateChanger.offsetLeft;
+        initialStateChangerRight = 0;
         stateChanger.classList.add('no-transition');
+        if (window.panels[id].panelType === 'Right')
+        {
+            panelcontainer.classList.add('no-transition');
+        }
+
         document.addEventListener('mousemove', onMouseMove);
         document.addEventListener('mouseup', onMouseUp);
     };

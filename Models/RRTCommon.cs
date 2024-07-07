@@ -135,6 +135,7 @@ namespace IPeople.Roadrunner.Razor.Models
         public string Tag { get; set; }
         public UIStates State { get; set; }
         public PanelTypes? Type { get; set; }
+        public bool Transition { get; set; }
         public RrPanel(string id)
         {
             Identifier = id;

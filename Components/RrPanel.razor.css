@@ -69,7 +69,6 @@
     background-color: inherit;
     opacity: 1;
     transition: opacity 0.5s linear;
-    background: red;
 }
 
 .Rr-panel-footer {
@@ -90,11 +89,7 @@
     position: absolute;
     align-content: center;
     cursor: pointer;
-    user-select: none; /* Prevent text selection */
-}
-
-.no-transition {
-    transition: none !important;
+    user-select: none; /* Prevent text selection */    
 }
 
     .Rr-panel-statechanger.left {
@@ -138,6 +133,9 @@
         z-index: 5;
     }
 
+.no-transition {
+    transition: none !important;
+}
 
 .Rr-panel-container.minimized .Rr-panel-statechanger.left {
     border-left: none;
@@ -167,42 +165,67 @@
     opacity: 0;
 }
 
+.Rr-panel-statechanger-arrow-container {
+   position: absolute;
+}
+
+    .Rr-panel-statechanger-arrow-container.horizontal {
+        width: calc(100% - 104px);
+        height: 9px;
+        bottom: 0px;
+        text-align: center;
+    }
+
+    .Rr-panel-statechanger-arrow-container.vertical {
+        width: 9px;
+        height: calc(100% - 70px);
+        align-content: center;
+        top: 34px;
+    }
+
+
 .Rr-panel-statechanger-arrow {
-    margin: 1px;
+    position: absolute;
     display: inline-block;
     width: 0;
     height: 0;
 }
 
     .Rr-panel-statechanger-arrow.right {
-        margin-left: 2px;
         border-top: 5px solid transparent;
         border-bottom: 5px solid transparent;
         border-right: 5px solid #333;
+        left: 2px;
     }
 
     .Rr-panel-statechanger-arrow.left {
         border-top: 5px solid transparent;
         border-bottom: 5px solid transparent;
         border-left: 5px solid #333;
+        left: 1px;
     }
 
     .Rr-panel-statechanger-arrow.top {
-        margin-top: 2px;
         border-left: 5px solid transparent;
         border-right: 5px solid transparent;
         border-top: 5px solid #333;
+        top: 2px;
     }
 
     .Rr-panel-statechanger-arrow.bottom {
         border-left: 5px solid transparent;
         border-right: 5px solid transparent;
         border-bottom: 5px solid #333;
+        top: 2px;
     }
 
-.Rr-panel-statechanger.minimized .Rr-panel-statechanger-arrow.left {
-    margin-left: 2px;
-}
+    .Rr-panel-statechanger.minimized .Rr-panel-statechanger-arrow.left {
+        left: 2px;
+    }
+
+    .Rr-panel-statechanger.expanded .Rr-panel-statechanger-arrow.bottom {
+        top: 2px;
+    }
 
 .Rr-panel-statechanger-dots-container {
     position: absolute;

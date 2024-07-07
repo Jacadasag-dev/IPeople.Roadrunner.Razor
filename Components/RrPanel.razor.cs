@@ -24,7 +24,7 @@ namespace IPeople.Roadrunner.Razor.Components
         public PanelTypes PType { get; set; }
 
         [Parameter]
-        public PanelTypes Style { get; set; }
+        public string? Style { get; set; }
 
         [Parameter]
         public RenderFragment? Header { get; set; }
@@ -180,8 +180,8 @@ namespace IPeople.Roadrunner.Razor.Components
                         panelRight = panelSize;
 
                     if (panelUIState == UIStates.Collapsed)
-                        panelRight = "0px";
-                        
+                        panelRight = $"0px";
+
                     panelWidth = panelSize;
 
                     var heightOffset = (SidePanelOffset == SidePanelOffsets.Both) ? 20 : 10;
@@ -276,20 +276,19 @@ namespace IPeople.Roadrunner.Razor.Components
         {
             if (firstRender)
             {
-                await JS.InvokeVoidAsync("registerPanels", Id, DotNetObjectReference.Create(this));
+                await JS.InvokeVoidAsync("registerPanels", Id, DotNetObjectReference.Create(this), PType.ToString());
             }
+            RrStateService.SetComponentProperty<Models.RrPanel, bool>(panelFromService, s => s.Transition, true);
         }
+
 
         [JSInvokable]
-        public async Task FinishedDragging(int newSize)
+        public void FinishedDragging(int newSize)
         {
             if (newSize < 100)
-            {
-               newSize = 100;
-            }
-            RrStateService.SetComponentProperty<Models.RrPanel, string>(panelFromService, s => s.Size, $"{newSize}px");
-            StateHasChanged();
-        }
+                newSize = 100;
 
+            RrStateService.SetComponentProperty<Models.RrPanel, string>(panelFromService, s => s.Size, $"{newSize}px");
+        }
     }
 }
