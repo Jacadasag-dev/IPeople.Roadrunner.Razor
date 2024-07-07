@@ -131,32 +131,4 @@ window.setupResizeListener = function (elementId, dotNetHelper) {
 
 
 
-window.initializePanelResizer = (panelId, dotContainerId, dotClass) => {
-    const panel = document.getElementById(panelId);
-    const dotContainer = document.getElementById(dotContainerId);
-    const dots = document.getElementsByClassName(dotClass);
 
-    let startX, startWidth;
-
-    const mouseMoveHandler = (e) => {
-        const newWidth = startWidth + (e.clientX - startX);
-        panel.style.width = `${newWidth}px`;
-        DotNet.invokeMethodAsync('YourAssemblyName', 'UpdatePanelWidth', panelId, newWidth.toString());
-    };
-
-    const mouseUpHandler = () => {
-        document.removeEventListener('mousemove', mouseMoveHandler);
-        document.removeEventListener('mouseup', mouseUpHandler);
-    };
-
-    const mouseDownHandler = (e) => {
-        startX = e.clientX;
-        startWidth = parseInt(document.defaultView.getComputedStyle(panel).width, 10);
-        document.addEventListener('mousemove', mouseMoveHandler);
-        document.addEventListener('mouseup', mouseUpHandler);
-    };
-
-    for (let i = 0; i < dots.length; i++) {
-        dots[i].addEventListener('mousedown', mouseDownHandler);
-    }
-};

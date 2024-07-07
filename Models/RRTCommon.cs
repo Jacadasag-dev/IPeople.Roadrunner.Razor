@@ -130,6 +130,7 @@ namespace IPeople.Roadrunner.Razor.Models
     {
         public string Identifier { get; set; }
         public bool Visible { get; set; }
+        public string Size { get; set; }
         public string Tag { get; set; }
         public UIStates State { get; set; }
         public PanelTypes? Type { get; set; }
