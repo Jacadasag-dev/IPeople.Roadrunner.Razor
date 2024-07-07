@@ -131,4 +131,52 @@ window.setupResizeListener = function (elementId, dotNetHelper) {
 
 
 
+window.panels = {};
 
+window.registerPanels = (id, dotNetHelper) => {
+    window.panels[id] = dotNetHelper;
+    console.log(`Panel registered: ${id}`, dotNetHelper);
+
+    const handleId = `${id}-dots-container-top`;
+    const panelId = `${id}-panel`;
+    const stateChangerId = `${id}-panel-statechanger`;
+    const handle = document.getElementById(handleId);
+    const panel = document.getElementById(panelId);
+    const stateChanger = document.getElementById(stateChangerId);
+
+    if (!handle || !panel || !stateChanger) return;
+
+    let startX;
+    let initialWidth;
+    let initialStateChangerLeft;
+
+    const onMouseMove = (event) => {
+        const diffX = event.clientX - startX;
+        panel.style.width = `${initialWidth + diffX}px`;
+        stateChanger.style.left = `${initialStateChangerLeft + diffX}px`;
+    };
+
+    const onMouseUp = () => {
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+        stateChanger.classList.remove('no-transition');
+        // Invoke the FinishedDragging method
+        if (window.panels[id]) {
+            const newSize = parseFloat(panel.style.width); // Convert the size to a number
+            window.panels[id].invokeMethodAsync('FinishedDragging', newSize)
+                .then(() => console.log(`Finished dragging for panel: ${id}, new size: ${newSize}`))
+                .catch(err => console.error(err));
+        }
+    };
+
+    const onMouseDown = (event) => {
+        startX = event.clientX;
+        initialWidth = panel.offsetWidth;
+        initialStateChangerLeft = stateChanger.offsetLeft;
+        stateChanger.classList.add('no-transition');
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+    };
+
+    handle.addEventListener('mousedown', onMouseDown);
+};

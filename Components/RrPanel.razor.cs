@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
+using Radzen;
 using System.Reflection.Emit;
 using System.Security.Principal;
 using static System.Net.Mime.MediaTypeNames;
@@ -115,18 +116,15 @@ namespace IPeople.Roadrunner.Razor.Components
                 if (panelType == PanelTypes.Bottom)
                 {
                     if (panelUIState == UIStates.Expanded)
-                    {
-                        stateChangerPosition = "10px" ;
-                        panelBottom = $"calc({panelSize} - 10px)";
-                    }
+                        panelBottom = panelSize;
+                    
                     if (panelUIState == UIStates.Collapsed)
-                    {
                         panelBottom = "0px";
-                        stateChangerPosition = "0px";
-                    }
+
                     panelLeft = $"{RrStateService.AppGlobalVariables.BodyBounds.LeftPosition}px";
                     panelWidth = $"{RrStateService.AppGlobalVariables.BodyBounds.Width}px";
                     panelHeight = panelSize;
+                    stateChangerPosition = "0px";
                     stateChangerWidth = panelWidth;
                     stateChangerHeight = "10px";
                 }
@@ -179,15 +177,11 @@ namespace IPeople.Roadrunner.Razor.Components
                 if (panelType == PanelTypes.Right)
                 {
                     if (panelUIState == UIStates.Expanded)
-                    {
-                        panelRight = $"calc({panelSize} - 10px)";
-                        stateChangerPosition = "10px";
-                    }
+                        panelRight = panelSize;
+
                     if (panelUIState == UIStates.Collapsed)
-                    {
                         panelRight = "0px";
-                        stateChangerPosition = "0px";
-                    }
+                        
                     panelWidth = panelSize;
 
                     var heightOffset = (SidePanelOffset == SidePanelOffsets.Both) ? 20 : 10;
@@ -202,7 +196,7 @@ namespace IPeople.Roadrunner.Razor.Components
                     }
                     panelTop = $"{topOffset}px";
                     stateChangerHeight = panelHeight;
-
+                    stateChangerPosition = "0px";
                     stateChangerWidth = "10px";
                 }
             }
@@ -278,20 +272,24 @@ namespace IPeople.Roadrunner.Razor.Components
             return "invalid-type";
         }
 
-        //protected override async Task OnAfterRenderAsync(bool firstRender)
-        //{
-        //    if (firstRender)
-        //    {
-        //        await JS.InvokeVoidAsync("initializePanelResizer", $"{Id}-panel", $"{Id}-dotContainer", "Rr-panel-statechanger-dots vertical");
-        //    }
-        //}
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+            {
+                await JS.InvokeVoidAsync("registerPanels", Id, DotNetObjectReference.Create(this));
+            }
+        }
 
-        //[JSInvokable]
-        //public async Task UpdatePanelSize(string panelId, string newSize)
-        //{
-        //    panelSize = newSize;
-        //    RrStateService.SetComponentProperty<Models.RrPanel, string>(panelFromService, s => s.Size, newSize);
-        //}
+        [JSInvokable]
+        public async Task FinishedDragging(int newSize)
+        {
+            if (newSize < 100)
+            {
+               newSize = 100;
+            }
+            RrStateService.SetComponentProperty<Models.RrPanel, string>(panelFromService, s => s.Size, $"{newSize}px");
+            StateHasChanged();
+        }
 
     }
 }

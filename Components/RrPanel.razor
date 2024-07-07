@@ -4,7 +4,7 @@
     InitializePanel();
     <div class="Rr-panel-container @GetPanelTypeCssClass() @panelStateCssClass"
          style="@($"--panel-top: {panelTop}; --panel-bottom: {panelBottom}; --panel-left: {panelLeft}; --panel-right: {panelRight};")">
-        <div class="Rr-panel @GetPanelTypeCssClass() @panelStateCssClass"
+        <div id="@($"{Id}-panel")" class="Rr-panel @GetPanelTypeCssClass() @panelStateCssClass"
              style="@($"--panel-width: {panelWidth}; --panel-height: {panelHeight};") @Style">
             @if (Header is not null)
             {
@@ -25,12 +25,12 @@
                 </div>
             }
         </div>
-        <div class="Rr-panel-statechanger @GetPanelTypeCssClass() @panelStateCssClass"
+        <div id="@($"{Id}-panel-statechanger")" class="Rr-panel-statechanger @GetPanelTypeCssClass() @panelStateCssClass"
              style="@($"width: {stateChangerWidth}; height: {stateChangerHeight}; --state-changer-position: {stateChangerPosition};")"
              @onclick="HandleStateChangerClicked">
             @if (panelType == PanelTypes.Left || panelType == PanelTypes.Right)
             {
-                <div class="Rr-panel-statechanger-dots-container top">
+                <div id="@($"{Id}-dots-container-top")" class="Rr-panel-statechanger-dots-container top">
                     <span class="Rr-panel-statechanger-dots vertical"></span>
                 </div>
                 <span class="Rr-panel-statechanger-arrow @GetPanelTypeCssClass()"></span>

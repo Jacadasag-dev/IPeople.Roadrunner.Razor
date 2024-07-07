@@ -56,7 +56,6 @@
     position: relative;
     height: 35px;
     align-content: center;
-    width: var(--panel-width);
     background: #E8E8E8;
     /*box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);*/
     border-bottom: 2px solid rgba(0, 0, 0, 0.1); /* Adjust thickness and color as needed */
@@ -70,13 +69,14 @@
     background-color: inherit;
     opacity: 1;
     transition: opacity 0.5s linear;
+    background: red;
 }
 
 .Rr-panel-footer {
     position: absolute;
+    width: 100%;
     height: 35px;
     align-content: center;
-    width: var(--panel-width);
     bottom: 0px;
     background: #E8E8E8;
     border-top: 2px solid rgba(0, 0, 0, 0.1); /* Adjust thickness and color as needed */
@@ -87,9 +87,14 @@
 }
 
 .Rr-panel-statechanger {
-    position: relative;
+    position: absolute;
     align-content: center;
     cursor: pointer;
+    user-select: none; /* Prevent text selection */
+}
+
+.no-transition {
+    transition: none !important;
 }
 
     .Rr-panel-statechanger.left {
