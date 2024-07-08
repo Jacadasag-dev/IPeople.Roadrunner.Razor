@@ -316,6 +316,22 @@
     transform: rotate(180deg);
 }
 
+.Rr-panel-statechanger.minimized .Rr-panel-statechanger-dots-container.right,
+.Rr-panel-statechanger.minimized .Rr-panel-statechanger-dots-container.left,
+.Rr-panel-statechanger.minimized .Rr-panel-statechanger-dots-container.top,
+.Rr-panel-statechanger.minimized .Rr-panel-statechanger-dots-container.bottom {
+    display: none;
+}
+
+.Rr-panel-statechanger.minimized .Rr-panel-statechanger-arrow-container.horizontal {
+    width: 100%;
+    left: 0px;
+}
+.Rr-panel-statechanger.minimized .Rr-panel-statechanger-arrow-container.vertical {
+    height: 100%;
+    top: 0px;
+}
+
 .Rr-panel-statechanger:hover {
     background: linear-gradient(#036E80, #036170, #036E80); /* Diagonal gradient background for the tabs container */
 }

@@ -134,12 +134,6 @@ window.setupResizeListener = function (elementId, dotNetHelper) {
 window.panels = {};
 
 window.registerPanels = (id, dotNetHelper, panelType) => {
-    window.panels[id] = {
-        dotNetHelper: dotNetHelper,
-        panelType: panelType
-    };
-    console.log(`Panel registered: ${id}, Type: ${panelType}`, dotNetHelper);
-
     const handleTopId = `${id}-dots-container-top`;
     const handleBottomId = `${id}-dots-container-bottom`;
     const handleLeftId = `${id}-dots-container-left`;
@@ -154,6 +148,12 @@ window.registerPanels = (id, dotNetHelper, panelType) => {
     const panel = document.getElementById(panelId);
     const stateChanger = document.getElementById(stateChangerId);
     const panelcontainer = document.getElementById(panelcontainerId);
+
+    window.panels[id] = {
+        dotNetHelper: dotNetHelper,
+        panelType: panelType,
+        panelcontainer: panelcontainer
+    };
 
     let startY;
     let startX;
@@ -234,9 +234,7 @@ window.registerPanels = (id, dotNetHelper, panelType) => {
 
 
 
-            window.panels[id].dotNetHelper.invokeMethodAsync('FinishedDragging', newSize)
-                .then(() => console.log(`Finished dragging for panel: ${id}, new size: ${newSize}, type: ${window.panels[id].panelType}`))
-                .catch(err => console.error(err));
+            window.panels[id].dotNetHelper.invokeMethodAsync('FinishedDragging', newSize).catch(err => console.error(err));
         }
     };
 
@@ -250,21 +248,41 @@ window.registerPanels = (id, dotNetHelper, panelType) => {
         stateChanger.classList.add('no-transition');
         panel.classList.add('no-transition');
         panelcontainer.classList.add('no-transition');
-        
+
+        focusPanel(id, panelcontainer);
 
         document.addEventListener('mousemove', onMouseMove);
         document.addEventListener('mouseup', onMouseUp);
+    };
+
+    const focusPanel = (focusedId, focusedPanelContainer) => {
+        for (const id in window.panels) {
+            const currentPanelContainer = window.panels[id].panelcontainer;
+            if (currentPanelContainer) {
+                if (id === focusedId) {
+                    focusedPanelContainer.style.zIndex = 1000; // Set this to the desired z-index value for focused panel
+                    console.log('Focused panel: ' + id);
+                    console.log(`panelcontainer zIndex: ${focusedPanelContainer.style.zIndex}`);
+                } else {
+                    currentPanelContainer.style.zIndex = 2; // Set this to the default z-index value for unfocused panels
+                    console.log('Unfocused panel: ' + id);
+                    console.log(`panelcontainer zIndex: ${currentPanelContainer.style.zIndex}`);
+                }
+            }
+        }
     };
 
     if (handleLeft && handleRight)
     {
         handleLeft.addEventListener('mousedown', onMouseDown);
         handleRight.addEventListener('mousedown', onMouseDown);
+        panel.addEventListener('mousedown', () => focusPanel(id, panelcontainer));
     }
 
     if (handleTop && handleBottom)
     {
         handleTop.addEventListener('mousedown', onMouseDown);
         handleBottom.addEventListener('mousedown', onMouseDown);
+        panel.addEventListener('mousedown', () => focusPanel(id, panelcontainer));
     }
 };

@@ -14,7 +14,7 @@
             }
             @if (Body is not null)
             {
-                <div class="Rr-panel-body" style="@($"height: {panelBodyOffsetHeight};")">
+                <div class="Rr-panel-body" style="@($"height: calc(100% - {panelBodyOffsetHeight});") @GetAllowedScrolling()">
                     @Body
                 </div>
             }

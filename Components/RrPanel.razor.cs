@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using Radzen;
 using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
 using System.Security.Principal;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -42,7 +43,19 @@ namespace IPeople.Roadrunner.Razor.Components
         public SidePanelOffsets SidePanelOffset { get; set; } = SidePanelOffsets.None;
 
         [Parameter]
+        public bool AllowScrollingX { get; set; } = false;
+
+        [Parameter]
+        public bool AllowScrollingY { get; set; } = false;
+
+        [Parameter]
+        public bool AllowScrolling { get; set; } = false;
+
+        [Parameter]
         public bool Visible { get; set; } = true;
+
+        [Parameter]
+        public UIStates InitialState { get; set; } = UIStates.Expanded;
 
         [Parameter]
         public Models.RrPanel? Panel { get; set; }
@@ -94,8 +107,7 @@ namespace IPeople.Roadrunner.Razor.Components
                     exceptionMessage = "ERROR:id_is_required";
                 }
             }
-            bool notNull = panelFromService is not null;
-            if (notNull)
+            if (panelFromService is not null)
             {
                 if (string.IsNullOrEmpty(panelFromService?.Tag))
                 {
@@ -105,9 +117,22 @@ namespace IPeople.Roadrunner.Razor.Components
                     }
                 }
             }
-            panelType = notNull && panelFromService is not null ? panelFromService.Type ?? PType : PType;
-            panelUIState = notNull && panelFromService is not null ? panelFromService.State : UIStates.Expanded;
-            panelSize = notNull && panelFromService is not null ? panelFromService.Size ?? PanelSize : PanelSize;
+            panelType = panelFromService is not null ? panelFromService.Type ?? PType : PType;
+            if (panelFromService is not null)
+            {
+                if (panelFromService.State == UIStates.Neutral)
+                {
+                    panelUIState = InitialState;
+                } else
+                {
+                    panelUIState = panelFromService.State;
+                }
+            }
+            else
+            {
+                panelUIState = InitialState;
+            }
+            panelSize = panelFromService is not null ? panelFromService.Size ?? PanelSize : PanelSize;
 
             panelStateCssClass = GetStateCssClass(panelUIState);
 
@@ -295,6 +320,26 @@ namespace IPeople.Roadrunner.Razor.Components
                 newPanelSize = $"{newSize}px";
             }
             RrStateService.SetComponentProperty<Models.RrPanel, string>(panelFromService, s => s.Size, newPanelSize);
+        }
+
+        private string GetAllowedScrolling()
+        {
+            if (AllowScrolling)
+            {
+                return "overflow: auto";
+            }
+            else
+            {
+                if (AllowScrollingX)
+                {
+                    return "overflow-x: auto";
+                }
+                if (AllowScrollingY)
+                {
+                    return "overflow-y: auto";
+                }
+            }
+            return "invalid-scrolling";
         }
     }
 }

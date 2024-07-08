@@ -133,7 +133,7 @@ namespace IPeople.Roadrunner.Razor.Models
         public bool Visible { get; set; }
         public string Size { get; set; }
         public string Tag { get; set; }
-        public UIStates State { get; set; }
+        public UIStates State { get; set; } = UIStates.Neutral;
         public PanelTypes? Type { get; set; }
         public bool Transition { get; set; }
         public RrPanel(string id)
