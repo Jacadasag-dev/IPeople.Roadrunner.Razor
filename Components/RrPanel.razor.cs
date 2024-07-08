@@ -55,7 +55,13 @@ namespace IPeople.Roadrunner.Razor.Components
         public bool Visible { get; set; } = true;
 
         [Parameter]
+        public bool AllowLoading { get; set; } = false;
+
+        [Parameter]
         public UIStates InitialState { get; set; } = UIStates.Expanded;
+
+        [Parameter]
+        public bool HeaderDefaultStyling { get; set; } = false;
 
         [Parameter]
         public Models.RrPanel? Panel { get; set; }
@@ -254,7 +260,7 @@ namespace IPeople.Roadrunner.Razor.Components
             }
             else if (panelUIState == Models.UIStates.Collapsed)
             {
-                RrStateService.SetComponentProperty<Models.RrPanel, UIStates>(panelFromService, s => s.State, panelUIState = Models.UIStates.Expanded); 
+                RrStateService.SetComponentProperty<Models.RrPanel, UIStates>(panelFromService, s => s.State, panelUIState = Models.UIStates.Expanded);
             }
             StateHasChanged();
         }
@@ -339,7 +345,16 @@ namespace IPeople.Roadrunner.Razor.Components
                     return "overflow-y: auto";
                 }
             }
-            return "invalid-scrolling";
+            return "";
+        }
+
+        private string GetHeaderStylingCssClass()
+        {
+            if (HeaderDefaultStyling)
+            {
+                return "Rr-panel-header-styling";
+            }
+            return "";
         }
     }
 }

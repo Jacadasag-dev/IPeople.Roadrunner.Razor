@@ -260,13 +260,17 @@ window.registerPanels = (id, dotNetHelper, panelType) => {
             const currentPanelContainer = window.panels[id].panelcontainer;
             if (currentPanelContainer) {
                 if (id === focusedId) {
-                    focusedPanelContainer.style.zIndex = 1000; // Set this to the desired z-index value for focused panel
-                    console.log('Focused panel: ' + id);
-                    console.log(`panelcontainer zIndex: ${focusedPanelContainer.style.zIndex}`);
-                } else {
-                    currentPanelContainer.style.zIndex = 2; // Set this to the default z-index value for unfocused panels
-                    console.log('Unfocused panel: ' + id);
-                    console.log(`panelcontainer zIndex: ${currentPanelContainer.style.zIndex}`);
+                    focusedPanelContainer.style.zIndex = 25; // Set this to the desired z-index value for focused panel
+                }
+                else
+                {
+                    if (window.panels[id].panelType === 'Right' || window.panels[id].panelType === 'Left') {
+                        currentPanelContainer.style.zIndex = 21;
+                    }
+                    else
+                    {
+                        currentPanelContainer.style.zIndex = 22;
+                    }
                 }
             }
         }

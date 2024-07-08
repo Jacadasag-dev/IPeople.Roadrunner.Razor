@@ -9,23 +9,23 @@
     .Rr-panel-container.left {
         top: var(--panel-top);
         left: var(--panel-left);
-        z-index: 1;
+        z-index: 21;
     }
 
     .Rr-panel-container.right {
         top: var(--panel-top);
         right: var(--panel-right);
-        z-index: 1;
+        z-index: 21;
     }
 
     .Rr-panel-container.top {
         top: var(--panel-top);
-        z-index: 2;
+        z-index: 22;
     }
 
     .Rr-panel-container.bottom {
         bottom: var(--panel-bottom);
-        z-index: 2;
+        z-index: 22;
     }
 
 .Rr-panel {
@@ -61,7 +61,17 @@
     border-bottom: 2px solid rgba(0, 0, 0, 0.1); /* Adjust thickness and color as needed */
     opacity: 1;
     transition: opacity 0.5s linear;
-    z-index: 2;
+    z-index: 22;
+}
+
+.Rr-panel-header-styling {
+    padding: 5px 0px 0px 20px;
+    cursor: default;
+    font-size: 16px;
+    font-family: 'Roboto', sans-serif; /* Substitute with your chosen font */
+    color: #333; /* This is a dark gray, visible against a light background */
+    text-transform: uppercase; /* Considering your acronyms are in uppercase */
+    letter-spacing: 1px; /* To give a little breathing room for the uppercase letters */
 }
 
 .Rr-panel-body {
@@ -82,7 +92,7 @@
     /*box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1), 0 -2px 4px -1px rgba(0, 0, 0, 0.06);*/
     opacity: 1;
     transition: opacity 0.5s linear;
-    z-index: 2;
+    z-index: 22;
 }
 
 .Rr-panel-statechanger {
@@ -130,7 +140,7 @@
         display: flex;
         justify-content: center;
         background: linear-gradient(90deg, #E8E8E8, #d0d0d0, #E8E8E8);
-        z-index: 5;
+        z-index: 25;
     }
 
 .no-transition {
