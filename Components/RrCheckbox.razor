@@ -1,1 +1,17 @@
-﻿<h3>Not Completed</h3>
+﻿@if (Visible)
+{
+    InitializeCheckbox();
+    <div class="Rr-checkbox-container">
+        @if (!string.IsNullOrEmpty(label))
+        {
+            <div class="Rr-checkbox-label-container">
+                <label class="Rr-checkbox-label" for="@Id">@label</label>
+            </div>
+        }
+        <label class="Rr-checkbox">
+            <input id="@Id" type="checkbox" @bind="isChecked" @onclick="HandleOnCheckboxClick">
+            <span class="checkmark"></span>
+        </label>
+    </div>
+}
+

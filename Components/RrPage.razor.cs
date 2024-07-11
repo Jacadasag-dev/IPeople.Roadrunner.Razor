@@ -1,4 +1,5 @@
-﻿using IPeople.Roadrunner.Razor.Services;
+﻿using IPeople.Roadrunner.Razor.Models;
+using IPeople.Roadrunner.Razor.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System;
@@ -11,6 +12,7 @@ namespace IPeople.Roadrunner.Razor.Components
 {
     public partial class RrPage
     {
+        #region Parameters
         [Parameter]
         public RenderFragment Header { get; set; }
 
@@ -25,9 +27,11 @@ namespace IPeople.Roadrunner.Razor.Components
 
         [Parameter]
         public string LeftOffset { get; set; } = "0px";
+        #endregion
 
-        private Bounds bounds;
-
+        /// <summary>
+        /// Used for interfacing with javascript for sizing the body
+        /// </summary>
         public class Bounds
         {
             public double Top { get; set; }
@@ -37,6 +41,8 @@ namespace IPeople.Roadrunner.Razor.Components
             public double Right { get; set; }
             public double Bottom { get; set; }
         }
+
+        private Bounds? bounds;
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {

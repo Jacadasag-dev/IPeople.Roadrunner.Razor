@@ -102,6 +102,7 @@
     font-family: 'Roboto', sans-serif; /* Substitute with your chosen font */
     color: #333; /* This is a dark gray, visible against a light background */
     text-transform: uppercase; /* Considering your acronyms are in uppercase */
+    letter-spacing: .1px;
 }
 
 .Rr-dropdown-label-container {
@@ -123,19 +124,16 @@
     z-index: -1;
 }
 
-
-
 .Rr-dropdown-label {
     padding-right: 8px;
     margin: 8px 3px 0px 4px;
     display: inline-block;
-    font-size: 14px;
+    font-size: 12px;
     font-family: 'Roboto', sans-serif; /* Substitute with your chosen font */
     color: #333; /* This is a dark gray, visible against a light background */
     text-transform: uppercase; /* Considering your acronyms are in uppercase */
     font-weight: bold; /* Makes the text bold */
 }
-
 
 .Rr-dropdown-arrow {
     position: absolute;
@@ -161,8 +159,6 @@
 .Rr-dropdown.expanded .Rr-dropdown-arrow {
     transform: rotate(180deg);
 }
-
-
 
 .Rr-dropdown.expanded .Rr-dropdown-content {
     opacity: 1;

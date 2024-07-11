@@ -1,0 +1,73 @@
+﻿@using System.Dynamic
+@using System.Reflection
+@using Microsoft.AspNetCore.Components.Web.Virtualization
+@typeparam TItem
+@if (Items != null && Items.Any())
+{
+    <div class="Rr-dynamictable-headerbar-container">
+    </div>
+
+    <div class="Rr-dynamictable-table-container">
+        <table id="@($"{Id}-table")" class="compact-table">
+            <thead>
+                <tr>
+                    @foreach ((string Name, string Width) columnInfo in GetColumnInfo(Items.First()))
+                    {
+                        <th style="width:@(columnInfo.Width ?? "auto")" @onclick="() => HandleColumnHeaderClicked(columnInfo)">
+                            @columnInfo.Name
+                            <div class="resizer"></div>
+                        </th>
+                    }
+                    @if (Action != null)
+                    {
+                        <th style="width:@(ActionColumnWidth ?? "auto")">
+                            @ActionName
+                            <div class="resizer"></div>
+                        </th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @if (Virtualize)
+                {
+                    <Virtualize TItem="TItem" Items="@Items.ToList()" Context="item" OverscanCount="50" SpacerElement="tr">
+                        <tr>
+                            @foreach (Object value in GetPropertyValues(item))
+                            {
+                                <td>@value</td>
+                            }
+                            @if (Action != null)
+                            {
+                                <td>
+                                    @Action(item)
+                                </td>
+                            }
+                        </tr>
+                    </Virtualize>
+                }
+                else
+                {
+                    @foreach (TItem item in Items)
+                    {
+                        <tr>
+                            @foreach (Object value in GetPropertyValues(item))
+                            {
+                                <td>@value</td>
+                            }
+                            @if (Action != null)
+                            {
+                                <td>
+                                    @Action(item)
+                                </td>
+                            }
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <h6 class="Rr-dynamictable-nullmessage">@NullOrEmptyMessage</h6>
+}

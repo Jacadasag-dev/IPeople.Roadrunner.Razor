@@ -6,6 +6,7 @@ namespace IPeople.Roadrunner.Razor.Components
 {
     public partial class RrInput
     {
+        #region Parameters
         [Parameter]
         public string? Id { get; set; }
 
@@ -22,7 +23,7 @@ namespace IPeople.Roadrunner.Razor.Components
         public string MaxWidth { get; set; } = "620px";
 
         [Parameter]
-        public string MinWidth { get; set; } = "320px";
+        public string MinWidth { get; set; } = "0px";
 
         [Parameter]
         public string Style { get; set; } = "";
@@ -32,15 +33,21 @@ namespace IPeople.Roadrunner.Razor.Components
 
         [Parameter]
         public string? Text { get; set; } = "";
+        
+        [Parameter]
+        public EventCallback<string> OnChangedText { get; set; }
 
-        [Parameter] public EventCallback<string> OnChangedText { get; set; }
+        [Parameter]
+        public EventCallback<(KeyboardEventArgs, string, Models.RrInput)> OnKeyDown { get; set; }
 
-        [Parameter] public EventCallback<(KeyboardEventArgs, string, Models.RrInput)> OnKeyDown { get; set; }
+        [Parameter]
+        public EventCallback OnInputClick { get; set; }
 
-        [Parameter] public EventCallback OnInputClick { get; set; }
+        [Parameter]
+        public Models.RrInput? Input { get; set; }
+        #endregion
 
-        [Parameter] public Models.RrInput? Input { get; set; }
-
+        #region Private Fields
         private Models.RrInput? inputFromService;
         private string? exceptionMessage;
         private bool visible;
@@ -48,7 +55,9 @@ namespace IPeople.Roadrunner.Razor.Components
         private string? placeholder;
         private string? inputText;
         private string? instantInputText;
-        
+        private CancellationTokenSource debounceCts = new CancellationTokenSource();
+        #endregion
+
         private void InitializeInput()
         {
             if (!string.IsNullOrEmpty(Id))
@@ -104,7 +113,6 @@ namespace IPeople.Roadrunner.Razor.Components
             await OnKeyDown.InvokeAsync((e, inputText, inputFromService));
         }
 
-        private CancellationTokenSource debounceCts = new CancellationTokenSource();
         private async void OnTextChanged(ChangeEventArgs e)
         {
             string? newText = e.Value?.ToString();

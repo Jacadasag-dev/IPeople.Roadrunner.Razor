@@ -16,4 +16,43 @@
         public string UnknownIcon { get; set; } = "_content/IPeople.Roadrunner.Razor/images/StatusIcons/question-mark-16.png";
         // Add other icon paths as needed
     }
+
+    public enum ButtonSizes
+    {
+        Small,
+        Medium,
+        Large
+    }
+
+    public enum PanelTypes
+    {
+        Left,
+        Right,
+        Bottom,
+        Top,
+    }
+
+    public enum SidePanelOffsets
+    {
+        Top,
+        Bottom,
+        Both,
+        None
+    }
+
+    public enum RrLoadingType
+    {
+        Awaiting,
+        Loading,
+        Querying,
+        Authenticating,
+    }
+
+    public enum UIStates
+    {
+        Expanded,
+        Collapsed,
+        Neutral,
+        Peaking
+    }
 }

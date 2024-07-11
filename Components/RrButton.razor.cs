@@ -5,6 +5,7 @@ namespace IPeople.Roadrunner.Razor.Components
 {
     public partial class RrButton
     {
+        #region Parameters
         [Parameter]
         public string Id { get; set; } = "";
 
@@ -18,7 +19,9 @@ namespace IPeople.Roadrunner.Razor.Components
         public ButtonSizes Size { get; set; } = ButtonSizes.Medium;
 
         [Parameter]
-        public RenderFragment ChildContent { get; set; }
+        public RenderFragment? ChildContent { get; set; }
+        #endregion
+
         private bool selected = false;
         private async void HandleOnClick()
         {
@@ -26,7 +29,6 @@ namespace IPeople.Roadrunner.Razor.Components
             StateHasChanged();
             await OnClick.InvokeAsync();
         }
-
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (selected)

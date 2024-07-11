@@ -12,43 +12,41 @@ namespace IPeople.Roadrunner.Razor.Services
             public RrLoading? Loading { get; set; }
             public PageBodyBounds? BodyBounds { get; set; }
         }
-
         public class ComponentInstances
         {
             public List<RrInput> RrInputs { get; set; } = [];
             public List<RrDropdown> RrDropdowns { get; set; } = [];
             public List<RrPanel> RrPanels { get; set; } = [];
             public List<RrPopup> RrPopups { get; set; } = [];
+            public List<RrCheckbox> RrCheckboxes { get; set; } = [];
         }
-
         public GlobalVariables AppGlobalVariables { get; set; } = new();
         public ComponentInstances Components { get; set; } = new();
-        public event Action<IRrComponentBase>? OnUpdatePreference;
         public event Action? RefreshAllComponents;
         public event Action<List<string>?>? RefreshSpecificComponentsById;
         public event Action<List<string>?>? RefreshSpecificComponentsByTag;
-        public void RefreshComponents() { RefreshAllComponents?.Invoke(); }
 
+        #region Refresh Component
+        public void RefreshComponents() { RefreshAllComponents?.Invoke(); }
         public void RefreshComponentsById(List<string> componentIds)
         {
             RefreshSpecificComponentsById?.Invoke(componentIds);
         }
-
         public void RefreshComponentsById(string componentId)
         {
             RefreshComponentsById(new List<string> { componentId });
         }
-
         public void RefreshComponentsByTag(List<string> componentTags)
         {
             RefreshSpecificComponentsByTag?.Invoke(componentTags);
         }
-
         public void RefreshComponentsByTag(string componentTag)
         {
-            RefreshComponentsById(new List<string> { componentTag });
+            RefreshSpecificComponentsByTag?.Invoke(new List<string> { componentTag });
         }
+        #endregion
 
+        #region Register Component
         public void RegisterComponent(IRrComponentBase rrComponent)
         {
             if (rrComponent == null)
@@ -68,31 +66,31 @@ namespace IPeople.Roadrunner.Razor.Services
                 case RrPopup rrPopup:
                     RegisterOrAddComponent(Components.RrPopups, rrPopup);
                     break;
+                case RrCheckbox rrCheckbox:
+                    RegisterOrAddComponent(Components.RrCheckboxes, rrCheckbox);
+                    break;
                 default:
                     throw new ArgumentException("Unsupported component type", nameof(rrComponent));
             }
         }
-
         public void RegisterComponentById<T>(string id)
         {
-            if (typeof(T) == typeof(RrInput))
+            switch (typeof(T))
             {
-                var rrInput = new RrInput(id);
-                RegisterOrAddComponent(Components.RrInputs, rrInput);
-            }
-            else if (typeof(T) == typeof(RrDropdown))
-            {
-                var rrDropdown = new RrDropdown(id);
-                RegisterOrAddComponent(Components.RrDropdowns, rrDropdown);
-            }
-            else if (typeof(T) == typeof(RrPanel))
-            {
-                var rrPanel = new RrPanel(id);
-                RegisterOrAddComponent(Components.RrPanels, rrPanel);
-            }
-            else
-            {
-                throw new Exception("Component or component type invalid...");
+                case Type t when t == typeof(RrInput):
+                    RegisterOrAddComponent(Components.RrInputs, new RrInput(id));
+                    break;
+                case Type t when t == typeof(RrDropdown):
+                    RegisterOrAddComponent(Components.RrDropdowns, new RrDropdown(id));
+                    break;
+                case Type t when t == typeof(RrPanel):
+                    RegisterOrAddComponent(Components.RrPanels, new RrPanel(id));
+                    break;
+                case Type t when t == typeof(RrCheckbox):
+                    RegisterOrAddComponent(Components.RrCheckboxes, new RrCheckbox(id));
+                    break;
+                default:
+                    throw new Exception("Component or component type invalid...");
             }
         }
         public void RemoveComponent(IRrComponentBase rrComponent)
@@ -111,6 +109,9 @@ namespace IPeople.Roadrunner.Razor.Services
                 case RrPopup rrPopup:
                     RemoveOrIgnoreComponent(Components.RrPopups, rrPopup);
                     break;
+                case RrCheckbox rrCheckbox:
+                    RemoveOrIgnoreComponent(Components.RrCheckboxes, rrCheckbox);
+                    break;
                 default:
                     throw new ArgumentException("Unsupported component type", nameof(rrComponent));
             }
@@ -128,9 +129,208 @@ namespace IPeople.Roadrunner.Razor.Services
                 case RrPanel rrPanel:
                     RegisterOrReplaceComponent(Components.RrPanels, rrPanel);
                     break;
+                case RrCheckbox rrCheckbox:
+                    RegisterOrReplaceComponent(Components.RrCheckboxes, rrCheckbox);
+                    break;
                 default:
                     throw new ArgumentException("Unsupported component type", nameof(rrComponent));
             }
+        }
+        #endregion
+
+        #region Get Component
+        public T? GetComponent<T>(IRrComponentBase rrComponent) where T : class, IRrComponentBase
+        {
+            switch (typeof(T))
+            {
+                case Type t when t == typeof(RrInput):
+                    return Components.RrInputs.FirstOrDefault(i => i.Identifier == rrComponent.Identifier) as T;
+                case Type t when t == typeof(RrDropdown):
+                    return Components.RrDropdowns.FirstOrDefault(d => d.Identifier == rrComponent.Identifier) as T;
+                case Type t when t == typeof(RrPanel):
+                    return Components.RrPanels.FirstOrDefault(p => p.Identifier == rrComponent.Identifier) as T;
+                case Type t when t == typeof(RrCheckbox):
+                    return Components.RrCheckboxes.FirstOrDefault(p => p.Identifier == rrComponent.Identifier) as T;
+                default:
+                    throw new Exception("Component or component type invalid...");
+            }
+        }
+        public T? GetComponentById<T>(string id) where T : class, IRrComponentBase
+        {
+            switch (typeof(T))
+            {
+                case Type t when t == typeof(RrInput):
+                    return Components.RrInputs.FirstOrDefault(i => i.Identifier == id) as T;
+                case Type t when t == typeof(RrDropdown):
+                    return Components.RrDropdowns.FirstOrDefault(d => d.Identifier == id) as T;
+                case Type t when t == typeof(RrPanel):
+                    return Components.RrPanels.FirstOrDefault(p => p.Identifier == id) as T;
+                case Type t when t == typeof(RrCheckbox):
+                    return Components.RrCheckboxes.FirstOrDefault(p => p.Identifier == id) as T;
+                default:
+                    throw new Exception("Component or component type invalid...");
+            }
+        }
+        public List<T> GetComponentsByTag<T>(string tag) where T : class, IRrComponentBase
+        {
+            List<T> components = new List<T>();
+            switch (typeof(T))
+            {
+                case Type t when t == typeof(RrInput):
+                    components.AddRange(Components.RrInputs
+                        .Where(i => !string.IsNullOrEmpty(i.Tag) && i.Tag.Equals(tag, StringComparison.OrdinalIgnoreCase))
+                        .Cast<T>()
+                        .ToList());
+                    break;
+                case Type t when t == typeof(RrDropdown):
+                    components.AddRange(Components.RrDropdowns
+                        .Where(d => !string.IsNullOrEmpty(d.Tag) && d.Tag.Equals(tag, StringComparison.OrdinalIgnoreCase))
+                        .Cast<T>()
+                        .ToList());
+                    break;
+                case Type t when t == typeof(RrPanel):
+                    components.AddRange(Components.RrPanels
+                        .Where(p => !string.IsNullOrEmpty(p.Tag) && p.Tag.Equals(tag, StringComparison.OrdinalIgnoreCase))
+                        .Cast<T>()
+                        .ToList());
+                    break;
+                case Type t when t == typeof(RrCheckbox):
+                    components.AddRange(Components.RrCheckboxes
+                        .Where(p => !string.IsNullOrEmpty(p.Tag) && p.Tag.Equals(tag, StringComparison.OrdinalIgnoreCase))
+                        .Cast<T>()
+                        .ToList());
+                    break;
+                default:
+                    throw new Exception($"Component type {typeof(T).Name} is invalid.");
+            }
+            return components;
+        }
+        #endregion
+
+        #region Set Component
+        public void SetComponentProperty<T, TProperty>(IRrComponentBase? rrComponent, Expression<Func<T, TProperty?>> propertySelector, TProperty? newValue) where T : class, IRrComponentBase
+        {
+            if (rrComponent is null)
+                return;
+
+            var component = GetComponent<T>(rrComponent) as T;
+            if (component is not null && propertySelector is not null)
+            {
+                List<string>? propertyPath = GetPropertyPath(propertySelector.Body);
+                object? targetObject = component as object;
+                for (int i = 0; i < propertyPath.Count - 1; i++)
+                {
+                    PropertyInfo? propertyInfo = targetObject?.GetType().GetProperty(propertyPath[i]);
+                    targetObject = propertyInfo?.GetValue(targetObject);
+                }
+                PropertyInfo? finalPropertyInfo = targetObject?.GetType().GetProperty(propertyPath.Last());
+                if (finalPropertyInfo != null && finalPropertyInfo.CanWrite)
+                {
+                    finalPropertyInfo.SetValue(targetObject, newValue);
+                }
+            }
+        }
+        public void SetComponentPropertyById<T, TProperty>(string componentId, Expression<Func<T, TProperty?>> propertySelector, TProperty? newValue) where T : class, IRrComponentBase
+        {
+            var component = GetComponentById<T>(componentId);
+            if (component != null)
+            {
+                List<string>? propertyPath = GetPropertyPath(propertySelector.Body);
+                object? targetObject = component;
+                for (int i = 0; i < propertyPath.Count - 1; i++)
+                {
+                    PropertyInfo? propertyInfo = targetObject?.GetType().GetProperty(propertyPath[i]);
+                    targetObject = propertyInfo?.GetValue(targetObject);
+                }
+                PropertyInfo? finalPropertyInfo = targetObject?.GetType().GetProperty(propertyPath.Last());
+                if (finalPropertyInfo != null && finalPropertyInfo.CanWrite)
+                {
+                    finalPropertyInfo.SetValue(targetObject, newValue);
+                }
+            }
+        }
+        public void SetComponentsPropertyByTag<T, TProperty>(string componentTag, Expression<Func<T, TProperty?>> propertySelector, TProperty? newValue) where T : class, IRrComponentBase
+        {
+            List<T> components = GetComponentsByTag<T>(componentTag)?.Cast<T>().ToList() ?? new List<T>();
+            if (components == null || components.Count == 0)
+                return;
+
+            foreach (T component in components)
+            {
+                if (component == null)
+                    continue;
+
+                List<string>? propertyPath = GetPropertyPath(propertySelector.Body);
+                object? targetObject = component;
+                for (int i = 0; i < propertyPath.Count - 1; i++)
+                {
+                    PropertyInfo? propertyInfo = targetObject?.GetType().GetProperty(propertyPath[i]);
+                    targetObject = propertyInfo?.GetValue(targetObject);
+                }
+                PropertyInfo? finalPropertyInfo = targetObject?.GetType().GetProperty(propertyPath.Last());
+                if (finalPropertyInfo != null && finalPropertyInfo.CanWrite)
+                    finalPropertyInfo.SetValue(targetObject, newValue);
+            }
+        }
+        #endregion
+
+        #region Helpers Methods
+        public string? GetDisplayValue(object? item)
+        {
+            if (item is null)
+                return "null";
+
+            switch (item)
+            {
+                case string strItem:
+                    return strItem;
+                case Enum enumItem:
+                    return enumItem.ToString();
+            }
+            Type? type = item.GetType();
+            // Check for property or field named "Name"
+            MemberInfo? nameMember = type.GetMember("Name").FirstOrDefault();
+            if (nameMember != null && (nameMember.MemberType == MemberTypes.Property || nameMember.MemberType == MemberTypes.Field))
+            {
+                object? value = GetMemberValue(item, nameMember);
+                if (value is string nameValue)
+                {
+                    return nameValue;
+                }
+            }
+            // Check for property or field named "Text"
+            MemberInfo? textMember = type.GetMember("Text").FirstOrDefault();
+            if (textMember != null && (textMember.MemberType == MemberTypes.Property || textMember.MemberType == MemberTypes.Field))
+            {
+                object? value = GetMemberValue(item, textMember);
+                if (value is string textValue)
+                {
+                    return textValue;
+                }
+            }
+            // Check for any string properties
+            PropertyInfo? stringProperty = type.GetProperties().FirstOrDefault(p => p.PropertyType == typeof(string));
+            if (stringProperty != null)
+            {
+                return stringProperty.GetValue(item) as string;
+            }
+            // Check for any string fields
+            FieldInfo? stringField = type.GetFields().FirstOrDefault(f => f.FieldType == typeof(string));
+            if (stringField != null)
+            {
+                return stringField.GetValue(item) as string;
+            }
+
+            return type.Name;
+        }
+        private object? GetMemberValue(object obj, MemberInfo member)
+        {
+            return member switch
+            {
+                PropertyInfo property => property.GetValue(obj),
+                FieldInfo field => field.GetValue(obj),
+                _ => null
+            };
         }
         private void RegisterOrAddComponent<T>(List<T> componentList, T component) where T : IRrComponentBase
         {
@@ -160,244 +360,19 @@ namespace IPeople.Roadrunner.Razor.Services
                 componentList.Remove(existingComponent);
             }
         }
-
-        public void SynchronizeComponent<T>(IRrComponentBase? rrComponent) where T : IRrComponentBase
-        {
-            if (rrComponent is null)
-                return;
-
-            if (typeof(T) == typeof(RrInput))
-            {
-                SyncComponent((RrInput)rrComponent, Components.RrInputs);
-            }
-            else if (typeof(T) == typeof(RrDropdown))
-            {
-                SyncComponent((RrDropdown)rrComponent, Components.RrDropdowns);
-            }
-            else if (typeof(T) == typeof(RrPanel))
-            {
-                SyncComponent((RrPanel)rrComponent, Components.RrPanels);
-            }
-            else
-            {
-                throw new Exception("Component or component type invalid...");
-            }
-        }
-
-        /// Will cause infinite loop if the component calls itself through the RefreshComponentsById method
-        public void SynchronizeComponentById<T>(string? componentId) where T : IRrComponentBase
-        {
-            if (string.IsNullOrEmpty(componentId))
-                return;
-
-            IRrComponentBase? rrComponent = GetComponentById<T>(componentId);
-            if (rrComponent is null)
-                return;
-
-            if (typeof(T) == typeof(RrInput))
-            {
-                SyncComponent((RrInput)rrComponent, Components.RrInputs);
-            }
-            else if (typeof(T) == typeof(RrDropdown))
-            {
-                SyncComponent((RrDropdown)rrComponent, Components.RrDropdowns);
-            }
-            else if (typeof(T) == typeof(RrPanel))
-            {
-                SyncComponent((RrPanel)rrComponent, Components.RrPanels);
-            }
-            else
-            {
-                throw new Exception("Component or component type invalid...");
-            }
-            RefreshComponentsById(rrComponent.Identifier);
-        }
-
-        private void SyncComponent<TComponent>(TComponent newComponent, List<TComponent> componentList) where TComponent : IRrComponentBase
-        {
-            var existingComponent = componentList.FirstOrDefault(c => c.Identifier == newComponent.Identifier);
-            if (existingComponent != null)
-            {
-                var index = componentList.IndexOf(existingComponent);
-                componentList[index] = newComponent;
-            }
-        }
-
-
-        public void UpdatePreference(IRrComponentBase rrComponent)
-        {
-            OnUpdatePreference?.Invoke(rrComponent);
-        }
-       
-        public IRrComponentBase? GetComponent<T>(IRrComponentBase rrComponent) where T : IRrComponentBase
-        {
-            if (typeof(T) == typeof(RrInput))
-            {
-                return Components.RrInputs.FirstOrDefault(i => i.Identifier == rrComponent.Identifier);
-            }
-            else if (typeof(T) == typeof(RrDropdown))
-            {
-                return Components.RrDropdowns.FirstOrDefault(d => d.Identifier == rrComponent.Identifier);
-            }
-            else if (typeof(T) == typeof(RrPanel))
-            {
-                return Components.RrPanels.FirstOrDefault(p => p.Identifier == rrComponent.Identifier);
-            }
-            else
-            {
-                throw new Exception("Component or component type invalid...");
-            }
-        }
-        public IRrComponentBase? GetComponentById<T>(string id) where T : IRrComponentBase
-        {
-            if (typeof(T) == typeof(RrInput))
-            {
-                return Components.RrInputs.FirstOrDefault(i => i.Identifier == id);
-            }
-            else if (typeof(T) == typeof(RrDropdown))
-            {
-                return Components.RrDropdowns.FirstOrDefault(d => d.Identifier == id);
-            }
-            else if (typeof(T) == typeof(RrPanel))
-            {
-                return Components.RrPanels.FirstOrDefault(p => p.Identifier == id);
-            }
-            else
-            {
-                throw new Exception("Component or component type invalid...");
-            }
-        }
-        public void SetComponentProperty<T, TProperty>(IRrComponentBase? rrComponent, Expression<Func<T, TProperty?>> propertySelector, TProperty? newValue) where T : class, IRrComponentBase
-        {
-            if (rrComponent is null)
-                return;
-
-            var component = GetComponent<T>(rrComponent) as T;
-            if (component is not null && propertySelector is not null)
-            {
-                // Get the property path from the expression
-                var propertyPath = GetPropertyPath(propertySelector.Body);
-
-                // Get the actual property to set the value
-                object? targetObject = component as object;
-                for (int i = 0; i < propertyPath.Count - 1; i++)
-                {
-                    PropertyInfo? propertyInfo = targetObject?.GetType().GetProperty(propertyPath[i]);
-                    targetObject = propertyInfo?.GetValue(targetObject);
-                }
-
-                var finalPropertyInfo = targetObject?.GetType().GetProperty(propertyPath.Last());
-                if (finalPropertyInfo != null && finalPropertyInfo.CanWrite)
-                {
-                    finalPropertyInfo.SetValue(targetObject, newValue);
-                }
-            }
-        }
-        public void SetComponentPropertyById<T, TProperty>(string componentId, Expression<Func<T, TProperty?>> propertySelector, TProperty? newValue) where T : class, IRrComponentBase
-        {
-            var component = GetComponentById<T>(componentId) as T;
-            if (component != null)
-            {
-                // Get the property path from the expression
-                var propertyPath = GetPropertyPath(propertySelector.Body);
-
-                // Get the actual property to set the value
-                var targetObject = component as object;
-                for (int i = 0; i < propertyPath.Count - 1; i++)
-                {
-                    var propertyInfo = targetObject?.GetType().GetProperty(propertyPath[i]);
-                    targetObject = propertyInfo?.GetValue(targetObject);
-                }
-
-                var finalPropertyInfo = targetObject?.GetType().GetProperty(propertyPath.Last());
-                if (finalPropertyInfo != null && finalPropertyInfo.CanWrite)
-                {
-                    finalPropertyInfo.SetValue(targetObject, newValue);
-                }
-            }
-        }
         private List<string> GetPropertyPath(Expression? expression)
         {
-            var path = new List<string>();
-
+            List<string>? path = [];
             while (expression is MemberExpression memberExpression)
             {
                 path.Insert(0, memberExpression.Member.Name);
                 expression = memberExpression.Expression;
             }
-
             if (expression is ParameterExpression)
-            {
                 return path;
-            }
 
             throw new ArgumentException("The property selector expression is not valid.", nameof(expression));
         }
-        public string? GetDisplayValue(object? item)
-        {
-            if (item == null)
-            {
-                return "null";
-            }
-
-            switch (item)
-            {
-                case string strItem:
-                    return strItem;
-                case Enum enumItem:
-                    return enumItem.ToString();
-            }
-
-            var type = item.GetType();
-
-            // Check for property or field named "Name"
-            var nameMember = type.GetMember("Name").FirstOrDefault();
-            if (nameMember != null && (nameMember.MemberType == MemberTypes.Property || nameMember.MemberType == MemberTypes.Field))
-            {
-                var value = GetMemberValue(item, nameMember);
-                if (value is string nameValue)
-                {
-                    return nameValue;
-                }
-            }
-
-            // Check for property or field named "Text"
-            var textMember = type.GetMember("Text").FirstOrDefault();
-            if (textMember != null && (textMember.MemberType == MemberTypes.Property || textMember.MemberType == MemberTypes.Field))
-            {
-                var value = GetMemberValue(item, textMember);
-                if (value is string textValue)
-                {
-                    return textValue;
-                }
-            }
-
-            // Check for any string properties
-            var stringProperty = type.GetProperties().FirstOrDefault(p => p.PropertyType == typeof(string));
-            if (stringProperty != null)
-            {
-                return stringProperty.GetValue(item) as string;
-            }
-
-            // Check for any string fields
-            var stringField = type.GetFields().FirstOrDefault(f => f.FieldType == typeof(string));
-            if (stringField != null)
-            {
-                return stringField.GetValue(item) as string;
-            }
-
-            return type.Name;
-        }
-
-        private object? GetMemberValue(object obj, MemberInfo member)
-        {
-            return member switch
-            {
-                PropertyInfo property => property.GetValue(obj),
-                FieldInfo field => field.GetValue(obj),
-                _ => null
-            };
-        }
-
+        #endregion
     }
 }

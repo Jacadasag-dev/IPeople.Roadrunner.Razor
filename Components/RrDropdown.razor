@@ -7,7 +7,7 @@
         @if (!string.IsNullOrEmpty(label))
         {
             <div class="Rr-dropdown-label-container">
-                <span class="Rr-dropdown-label" style="@($"font-size: 12px; {LabelStyling}")">@label</span>
+                <span class="Rr-dropdown-label" style="@($"{LabelStyling}")">@label</span>
             </div>
         }
         <div id="@Id" class="Rr-dropdown @dropdownCssClass @(selectedItem is null && Flashing ? "fade-red" : "")"

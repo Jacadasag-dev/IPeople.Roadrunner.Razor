@@ -3,29 +3,6 @@ using Microsoft.AspNetCore.Components;
 
 namespace IPeople.Roadrunner.Razor.Models
 {
-    public enum ButtonSizes
-    {
-        Small,
-        Medium,
-        Large
-    }
-
-    public enum PanelTypes
-    {
-        Left,
-        Right,
-        Bottom,
-        Top,
-    }
-
-    public enum SidePanelOffsets
-    {
-        Top,
-        Bottom,
-        Both,
-        None
-    }
-
     public class PageBodyBounds
     {
         public int TopPosition { get; set; }
@@ -34,27 +11,9 @@ namespace IPeople.Roadrunner.Razor.Models
         public int BottomPosition { get; set; }
         public int Height { get; set; }
         public int Width { get; set; }
-
     }
 
-    public class RrLoading
-    {
-        public RrLoadingType Type { get; set; } = RrLoadingType.Authenticating;
-        public bool IsLoading { get; set; } = true;
-        public string Message { get; set; } = "Authenticating...";
-    }
-
-    public enum RrLoadingType
-    {
-        Awaiting,
-        Loading,
-        Querying,
-        Authenticating,
-    }
-
-    /// <summary>
-    /// Used by IPeople.Roadrunner.Razor for custom razor component for RrScout
-    /// </summary>
+    #region RrComponent Instance Models
     public interface IRrComponentBase
     {
         public string Identifier { get; set; }
@@ -62,23 +21,26 @@ namespace IPeople.Roadrunner.Razor.Models
         public string Tag { get; set; }
     }
 
-    public interface IRrComponentWithData<T>
+    public class RrCheckbox : IRrComponentBase
     {
-        T Data { get; set; }
+        public string Identifier { get; set; }
+        public bool Visible { get; set; }
+        public string? Text { get; set; }
+        public string? Tag { get; set; }
+        public bool IsChecked { get; set; }
+        public RrCheckbox(string id)
+        {
+            Identifier = id;
+        }
     }
-
-    /// <summary>
-    /// Used by IPeople.Roadrunner.Razor for custom razor component for RrScout
-    /// </summary>
-    /// 
 
     public class RrInput : IRrComponentBase
     {
         public string Identifier { get; set; }
         public bool Visible { get; set; }
-        public string Text { get; set; }
-        public string Tag { get; set; }
-        public string PlaceHolder { get; set; }
+        public string? Text { get; set; }
+        public string? Tag { get; set; }
+        public string? PlaceHolder { get; set; }
         public bool DoDeBounce { get; set; } = true;
         public RrInput(string id)
         {
@@ -86,10 +48,6 @@ namespace IPeople.Roadrunner.Razor.Models
         }
     }
 
-
-    /// <summary>
-    /// Used by IPeople.Roadrunner.Razor for custom razor component for RrScout
-    /// </summary>
     public class RrDropdown : IRrComponentBase
     {
         public string Identifier { get; set; }
@@ -124,9 +82,6 @@ namespace IPeople.Roadrunner.Razor.Models
         }
     }
 
-    /// <summary>
-    /// Used by IPeople.Roadrunner.Razor for custom razor component for RrScout
-    /// </summary>
     public class RrPanel : IRrComponentBase
     {
         public string Identifier { get; set; }
@@ -142,69 +97,11 @@ namespace IPeople.Roadrunner.Razor.Models
         }
     }
 
-    public class RrCheckBox
+    public class RrLoading
     {
-        public string Identifier { get; set; }
-        public string Text { get; set; }
-        public bool IsChecked { get; set; }
+        public RrLoadingType Type { get; set; } = RrLoadingType.Authenticating;
+        public bool IsLoading { get; set; } = true;
+        public string Message { get; set; } = "Authenticating...";
     }
-
-    public class RrPanelSetting
-    {
-        public string Name { get; set; }
-        public RrPanelSettingTypes Type { get; set; }
-        public bool Active { get; set; }
-        public bool IsInverse { get; set; }
-        public List<SettingColumnCondition> Conditions { get; set; } = [];
-    }
-    public class SettingColumnCondition
-    {
-        public ColumnConditionType Type { get; set; }
-        public string ColumnName { get; set; }
-        public string ColumnValue { get; set; }
-        public SettingEffectType EffectType { get; set; }
-        public bool Value { get; set; }
-    }
-
-    public enum SettingEffectType
-    {
-        Row,
-        Column,
-    }
-
-    public enum ColumnConditionType
-    {
-        ValueEquals,
-        ColumnExists,
-    }
-
-    public enum RrPanelSettingTypes
-    {
-        Slider,
-        Button,
-    }
-    /// <summary>
-    /// Used by IPeople.Roadrunner.Razor for custom razor component for RrScout
-    /// </summary>
-    public class RrPanelTab
-    {
-        public string Name { get; set; }
-        public RenderFragment Content { get; set; }
-        public Type ComponentType { get; set; }
-        public UIStates SettingsUIState { get; set; } = UIStates.Neutral;
-        public List<RrPanelSetting> Settings { get; set; }
-        public object? Data { get; set; }
-        public bool IsSelected { get; set; } = false;
-        public bool Visible { get; set; } = true;
-        public bool Disabled { get; set; } = false;
-        public RrPanel Panel { get; set; }
-    }
-
-    public enum UIStates
-    {
-        Expanded,
-        Collapsed,
-        Neutral,
-        Peaking
-    }
+    #endregion
 }

@@ -1,8 +1,19 @@
-﻿
-<div class="container">
-    <div class="spinner">
-        <div class="brush brush1"></div>
-        <div class="brush brush2"></div>
-    </div>
-    <p class="message">@Message</p>
-</div>
+﻿@if (Loading is not null && Loading.IsLoading && AllowLoading)
+{
+    switch (Loading.Type)
+    {
+        case Razor.Models.RrLoadingType.Loading:
+        case Razor.Models.RrLoadingType.Authenticating:
+            <div class="container">
+                <div class="spinner">
+                    <div class="brush brush1"></div>
+                    <div class="brush brush2"></div>
+                </div>
+                <p class="message">@Loading.Message</p>
+            </div>
+            break;
+        case Razor.Models.RrLoadingType.Awaiting:
+            <p>@Loading.Message</p>
+            break;
+    }
+}

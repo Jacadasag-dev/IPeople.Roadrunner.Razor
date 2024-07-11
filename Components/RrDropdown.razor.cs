@@ -5,6 +5,7 @@ namespace IPeople.Roadrunner.Razor.Components
 {
     public partial class RrDropdown<T> : ComponentBase
     {
+        #region Parameters
         [Parameter]
         public string? Id { get; set; }
 
@@ -55,7 +56,9 @@ namespace IPeople.Roadrunner.Razor.Components
 
         [Parameter]
         public Models.RrDropdown? Dropdown { get; set; }
+        #endregion
 
+        #region Private Fields
         private Models.RrDropdown? dropdownFromService;
         private IEnumerable<object> items = [];
         private bool visible;
@@ -67,6 +70,7 @@ namespace IPeople.Roadrunner.Razor.Components
         private string? calculatedWidth;
         private string? exceptionMessage;
         private string? label;
+        #endregion
 
         /// <summary>
         /// Initializes the dropdown component whenever it is rendered.
@@ -75,11 +79,11 @@ namespace IPeople.Roadrunner.Razor.Components
         {
             if (!string.IsNullOrEmpty(Id))
             {
-                dropdownFromService = RrStateService.GetComponentById<Models.RrDropdown>(Id) as Models.RrDropdown;
+                dropdownFromService = RrStateService.GetComponentById<Models.RrDropdown>(Id);
             } 
             else if (Dropdown is not null)
             {
-                dropdownFromService = RrStateService.GetComponent<Models.RrDropdown>(Dropdown) as Models.RrDropdown;
+                dropdownFromService = RrStateService.GetComponent<Models.RrDropdown>(Dropdown);
                 if (dropdownFromService is not null)
                 {
                     Id = dropdownFromService.Identifier;
@@ -90,7 +94,7 @@ namespace IPeople.Roadrunner.Razor.Components
                 if (!string.IsNullOrEmpty(Id))
                 {
                     RrStateService.RegisterComponentById<Models.RrDropdown>(Id);
-                    dropdownFromService = RrStateService.GetComponentById<Models.RrDropdown>(Id) as Models.RrDropdown;
+                    dropdownFromService = RrStateService.GetComponentById<Models.RrDropdown>(Id);
                     RrStateService.RefreshAllComponents += StateHasChanged;
                     RrStateService.RefreshSpecificComponentsById += (ids) => { if (ids is not null && ids.Contains(Id)) StateHasChanged(); };
                     if (dropdownFromService is not null)
@@ -293,6 +297,10 @@ namespace IPeople.Roadrunner.Razor.Components
             if (word.Contains("."))
             {
                 width -= (word.Count(c => c == '.') * 10);
+            }
+            if (word.IndexOf("w", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                width += word.Count(c => char.ToLower(c) == 'w') * 5;
             }
             return width;
         }

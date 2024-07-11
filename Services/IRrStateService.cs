@@ -7,7 +7,6 @@ namespace IPeople.Roadrunner.Razor.Services
     {
         RrStateService.GlobalVariables AppGlobalVariables { get; set; }
         RrStateService.ComponentInstances Components { get; set; }
-        event Action<IRrComponentBase>? OnUpdatePreference;
         event Action? RefreshAllComponents;
         event Action<List<string>?>? RefreshSpecificComponentsById;
         event Action<List<string>?>? RefreshSpecificComponentsByTag;
@@ -20,13 +19,12 @@ namespace IPeople.Roadrunner.Razor.Services
         void RegisterComponentById<T>(string id);
         void RemoveComponent(IRrComponentBase rrComponent);
         void RegisterOrReplaceComponent(IRrComponentBase rrComponent);
-        void SynchronizeComponent<T>(IRrComponentBase? rrComponent) where T : IRrComponentBase;
-        void SynchronizeComponentById<T>(string? componentId) where T : IRrComponentBase;
-        void UpdatePreference(IRrComponentBase rrComponent);
-        IRrComponentBase? GetComponent<T>(IRrComponentBase rrComponent) where T : IRrComponentBase;
-        IRrComponentBase? GetComponentById<T>(string id) where T : IRrComponentBase;
+        T? GetComponent<T>(IRrComponentBase rrComponent) where T : class, IRrComponentBase;
+        T? GetComponentById<T>(string id) where T : class, IRrComponentBase;
+        List<T> GetComponentsByTag<T>(string tag) where T : class, IRrComponentBase;
         void SetComponentProperty<T, TProperty>(IRrComponentBase? rrComponent, Expression<Func<T, TProperty?>> propertySelector, TProperty? newValue) where T : class, IRrComponentBase;
         void SetComponentPropertyById<T, TProperty>(string componentId, Expression<Func<T, TProperty?>> propertySelector, TProperty? newValue) where T : class, IRrComponentBase;
+        void SetComponentsPropertyByTag<T, TProperty>(string componentTag, Expression<Func<T, TProperty?>> propertySelector, TProperty? newValue) where T : class, IRrComponentBase;
         string? GetDisplayValue(object? item);
     }
 }

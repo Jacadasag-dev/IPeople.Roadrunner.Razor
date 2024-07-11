@@ -1,0 +1,55 @@
+﻿.compact-table {
+    border-collapse: collapse;
+    font-size: 12px;
+    background: #E8E8E8;
+}
+
+    .compact-table th,
+    .compact-table td {
+        padding: 2px 5px;
+        margin: 0;
+        border: 1px solid #ddd;
+        text-align: left;
+    }
+
+    .compact-table thead tr {
+        background-color: #036E80; /* Change this color as needed */
+        color: white; /* Optional: to ensure the text is readable */
+    }
+
+
+.Rr-dynamictable-headerbar-container {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    height: 20px;
+    width: 100%;
+    background-color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.Rr-dynamictable-table-container {
+    padding: 20px 0px 0px 0px;
+    height: auto;
+    width: 100%;
+}
+
+.Rr-dynamictable-nullmessage {
+    position: absolute;
+    padding: 50px;
+    left: 42%;
+}
+
+.resizer {
+    display: inline-block;
+    width: 10px;
+    cursor: col-resize;
+    user-select: none;
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}

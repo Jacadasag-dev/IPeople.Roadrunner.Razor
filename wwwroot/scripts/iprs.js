@@ -290,3 +290,56 @@ window.registerPanels = (id, dotNetHelper, panelType) => {
         panel.addEventListener('mousedown', () => focusPanel(id, panelcontainer));
     }
 };
+
+
+
+window.tables = {};
+
+window.registerTables = function (id, dotNetHelper) {
+
+    const tableId = `${id}-table`;
+    const table = document.getElementById(tableId);
+
+    window.tables[tableId] = {
+        dotNetHelper: dotNetHelper
+    };
+
+    if (!table) {
+        console.error(`Table with ID '${tableId}' not found.`);
+        return;
+    } else {
+        console.log(`Table with ID '${tableId}' found.`);
+    }
+
+    const headers = table.querySelectorAll("th");
+
+    headers.forEach((header) => {
+        const resizer = document.createElement("div");
+        resizer.className = "resizer";
+        resizer.addEventListener("mousedown", (e) => startDrag(e, header, tableId));
+        header.appendChild(resizer);
+    });
+
+    function startDrag(e, header, tableId) {
+        const onDrag = (e) => onDragHandler(e, header);
+        const stopDrag = () => stopDragHandler(onDrag, stopDrag);
+
+        document.addEventListener("mousemove", onDrag);
+        document.addEventListener("mouseup", stopDrag);
+
+        let startX = e.clientX;
+        let startWidth = header.offsetWidth;
+
+        function onDragHandler(e) {
+            let newWidth = startWidth + (e.clientX - startX);
+            header.style.width = `${newWidth}px`;
+        }
+
+        function stopDragHandler(onDrag, stopDrag) {
+            document.removeEventListener("mousemove", onDrag);
+            document.removeEventListener("mouseup", stopDrag);
+            // Invoke a method on the Blazor component (if needed)
+            window.tables[tableId].dotNetHelper.invokeMethodAsync('OnColumnResized', header.innerText, newWidth);
+        }
+    }
+};

@@ -14,35 +14,10 @@
             }
             @if (Body is not null)
             {
-                if (AllowLoading)
-                {
-                    if (RrStateService.AppGlobalVariables.Loading is not null && RrStateService.AppGlobalVariables.Loading.IsLoading)
-                    {
-                        switch (RrStateService.AppGlobalVariables.Loading.Type)
-                        {
-                            case Razor.Models.RrLoadingType.Loading:
-                            case Razor.Models.RrLoadingType.Authenticating:
-                                <RrLoading Message="@RrStateService.AppGlobalVariables.Loading.Message"></RrLoading>
-                                break;
-
-                            case Razor.Models.RrLoadingType.Awaiting:
-                                <p>@RrStateService.AppGlobalVariables.Loading.Message</p>
-                                break;
-                        }
-                    }
-                    else
-                    {
-                        <div class="Rr-panel-body" style="@($"height: calc(100% - {panelBodyOffsetHeight});") @GetAllowedScrolling()">
-                            @Body
-                        </div>
-                    }
-                }
-                else
-                {
-                    <div class="Rr-panel-body" style="@($"height: calc(100% - {panelBodyOffsetHeight});") @GetAllowedScrolling()">
-                        @Body
-                    </div>
-                }
+                <RrLoading AllowLoading="AllowLoading" Loading="@RrStateService.AppGlobalVariables.Loading"></RrLoading>
+                <div class="Rr-panel-body" style="@($"height: calc(100% - {panelBodyOffsetHeight});") @GetAllowedScrolling()">
+                    @Body
+                </div>
             }
             @if (Footer is not null)
             {

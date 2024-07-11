@@ -12,6 +12,7 @@ namespace IPeople.Roadrunner.Razor.Components
 {
     public partial class RrPanel
     {
+        #region Parameters
         [Parameter]
         public string? Id { get; set; }
 
@@ -65,7 +66,9 @@ namespace IPeople.Roadrunner.Razor.Components
 
         [Parameter]
         public Models.RrPanel? Panel { get; set; }
+        #endregion
 
+        #region Private Fields
         private Models.RrPanel? panelFromService;
         private PanelTypes panelType;
         private string? exceptionMessage;
@@ -83,6 +86,7 @@ namespace IPeople.Roadrunner.Razor.Components
         private string? panelStateCssClass;
         private string? panelBodyOffsetHeight;
         private string? panelSize;
+        #endregion
 
         private void InitializePanel()
         {
@@ -311,7 +315,6 @@ namespace IPeople.Roadrunner.Razor.Components
             }
             RrStateService.SetComponentProperty<Models.RrPanel, bool>(panelFromService, s => s.Transition, true);
         }
-
 
         [JSInvokable]
         public void FinishedDragging(int newSize)
