@@ -129,16 +129,8 @@ window.setupResizeListener = function (elementId, dotNetHelper) {
     }
 };
 
-
-
-
-
-
-
-
-
 class Panel {
-    constructor(panelElement, dotNetHelper, type, latching, container, stateChanger) {
+    constructor(panelElement, dotNetHelper, type, latching, container, stateChanger, minLatchingWidth) {
         this.element = panelElement;
         this.initialWidth = 0;
         this.initialHeight = 0;
@@ -149,6 +141,7 @@ class Panel {
         this.type = type;
         this.latching = latching;
         this.dotNetHelper = dotNetHelper;
+        this.minLatchingWidth = minLatchingWidth
     }
 
     disableTransitions() {
@@ -166,14 +159,14 @@ class Panel {
 
 window.panels = {};
 
-window.registerPanels = (id, dotNetHelper, panelType, latching) => {
+window.registerPanels = (id, dotNetHelper, panelType, latching, minLatchingWidth) => {
     const panelElement = document.getElementById(`${id}-panel`);
     if (!panelElement) return;
 
     if (!window.panels[id]) {
         const container = document.getElementById(`${id}-panel-container`);
         const stateChanger = document.getElementById(`${id}-panel-statechanger`);
-        window.panels[id] = new Panel(panelElement, dotNetHelper, panelType, latching, container, stateChanger);
+        window.panels[id] = new Panel(panelElement, dotNetHelper, panelType, latching, container, stateChanger, minLatchingWidth);
     }
     const handleLeft = document.getElementById(`${id}-dots-container-left`);
     const handleRight = document.getElementById(`${id}-dots-container-right`);
@@ -193,15 +186,20 @@ window.registerPanels = (id, dotNetHelper, panelType, latching) => {
     }
 
     const onMouseMove = (event) => {
-        console.log('onMouseMove');
         const diffX = event.clientX - startX;
         const diffY = event.clientY - startY;
         
-        if (window.panels[id].latching) {
-            leftPanel.element.style.width = `${leftPanel.initialWidth + diffX}px`;
-            leftPanel.stateChanger.style.setProperty('--state-changer-position', `${leftPanel.initialStateChangerLeft + diffX}px`);
-            rightPanel.element.style.width = `${rightPanel.initialWidth - diffX}px`;
-            rightPanel.container.style.right = `${rightPanel.initialWidth - diffX}px`;
+        if (window.panels[id].latching && leftPanel && rightPanel) {
+            const minWidth = leftPanel.minLatchingWidth;
+            const newLeftWidth = leftPanel.initialWidth + diffX;
+            const newRightWidth = rightPanel.initialWidth - diffX;
+
+            if (newLeftWidth >= minWidth && newRightWidth >= minWidth) {
+                leftPanel.element.style.width = `${newLeftWidth}px`;
+                leftPanel.stateChanger.style.setProperty('--state-changer-position', `${leftPanel.initialStateChangerLeft + diffX}px`);
+                rightPanel.element.style.width = `${newRightWidth}px`;
+                rightPanel.container.style.right = `${newRightWidth}px`;
+            }
         } else {
             const panel = window.panels[id];
             if (panel.type === 'Left') {
@@ -221,7 +219,6 @@ window.registerPanels = (id, dotNetHelper, panelType, latching) => {
     };
 
     const onMouseUp = () => {
-        console.log('onMouseUp');
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
 
@@ -281,12 +278,11 @@ window.registerPanels = (id, dotNetHelper, panelType, latching) => {
     }
 
     const onMouseDown = (event) => {
-        console.log('onMouseDown');
         startY = event.clientY;
         startX = event.clientX;
         const panel = window.panels[id];
 
-        if (panel.latching) {
+        if (panel.latching && leftPanel && rightPanel) {
             leftPanel.disableTransitions();
             rightPanel.disableTransitions();
             initializePanelState(leftPanel);

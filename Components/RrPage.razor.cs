@@ -30,6 +30,9 @@ namespace IPeople.Roadrunner.Razor.Components
 
         [CascadingParameter]
         public string LatchingPanels { get; set; } = "400px";
+
+        [CascadingParameter]
+        public int MinLatchingPanelWidth { get; set; } = 200;
         #endregion
 
         /// <summary>

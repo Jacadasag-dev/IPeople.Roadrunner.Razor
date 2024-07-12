@@ -69,6 +69,9 @@ namespace IPeople.Roadrunner.Razor.Components
 
         [CascadingParameter]
         public string? LatchingPanels { get; set; }
+
+        [CascadingParameter]
+        public int MinLatchingPanelWidth { get; set; }
         #endregion
 
         #region Private Fields
@@ -368,7 +371,7 @@ namespace IPeople.Roadrunner.Razor.Components
         {
             if (firstRender)
             {
-                await JS.InvokeVoidAsync("registerPanels", Id, DotNetObjectReference.Create(this), panelType.ToString(), isLatching);
+                await JS.InvokeVoidAsync("registerPanels", Id, DotNetObjectReference.Create(this), panelType.ToString(), isLatching, MinLatchingPanelWidth);
             }
             RrStateService.SetComponentProperty<Models.RrPanel, bool>(panelFromService, s => s.Transition, true);
         }
