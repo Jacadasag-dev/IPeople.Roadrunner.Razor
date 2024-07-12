@@ -66,6 +66,9 @@ namespace IPeople.Roadrunner.Razor.Components
 
         [Parameter]
         public Models.RrPanel? Panel { get; set; }
+
+        [CascadingParameter]
+        public string? LatchingPanels { get; set; }
         #endregion
 
         #region Private Fields
@@ -85,10 +88,18 @@ namespace IPeople.Roadrunner.Razor.Components
         private string? stateChangerRight;
         private string? panelStateCssClass;
         private string? panelBodyOffsetHeight;
-        private string? panelSize;
+        private string? initialPanelSize;
+        private string? focusedZIndexStyling;
+        private bool isLatching = false;
         #endregion
 
         private void InitializePanel()
+        {
+            InitializePanelModel();
+            InitializeFields();
+        }
+
+        private void InitializePanelModel()
         {
             if (!string.IsNullOrEmpty(Id))
             {
@@ -113,7 +124,8 @@ namespace IPeople.Roadrunner.Razor.Components
                     if (panelFromService is not null)
                         RrStateService.RefreshSpecificComponentsByTag += (tags) => { if (tags is not null && tags.Contains(Tag ?? panelFromService.Tag ?? string.Empty)) StateHasChanged(); };
                 }
-                else {
+                else
+                {
                     exceptionMessage = "ERROR:id_is_required";
                 }
             }
@@ -127,13 +139,21 @@ namespace IPeople.Roadrunner.Razor.Components
                     }
                 }
             }
+        }
+
+        private void InitializeFields()
+        {
+            // PanelType
             panelType = panelFromService is not null ? panelFromService.Type ?? PType : PType;
+            // Latching
+            isLatching = !string.IsNullOrEmpty(LatchingPanels) && (panelType == PanelTypes.Left || panelType == PanelTypes.Right);
             if (panelFromService is not null)
             {
                 if (panelFromService.State == UIStates.Neutral)
                 {
                     panelUIState = InitialState;
-                } else
+                }
+                else
                 {
                     panelUIState = panelFromService.State;
                 }
@@ -142,100 +162,17 @@ namespace IPeople.Roadrunner.Razor.Components
             {
                 panelUIState = InitialState;
             }
-            panelSize = panelFromService is not null ? panelFromService.Size ?? PanelSize : PanelSize;
 
+            // PanelSize
+            initialPanelSize = panelFromService is not null ? panelFromService.Size ?? PanelSize : PanelSize;
+
+            // PanelStateCssClass
             panelStateCssClass = GetStateCssClass(panelUIState);
 
-            if (RrStateService.AppGlobalVariables.BodyBounds is not null)
-            {
-                if (panelType == PanelTypes.Bottom)
-                {
-                    if (panelUIState == UIStates.Expanded)
-                        panelBottom = panelSize;
-                    
-                    if (panelUIState == UIStates.Collapsed)
-                        panelBottom = "0px";
+            // PanelPositioningAndDimensions
+            InitializePanelPositioningAndDimensions(panelType);
 
-                    panelLeft = $"{RrStateService.AppGlobalVariables.BodyBounds.LeftPosition}px";
-                    panelWidth = $"{RrStateService.AppGlobalVariables.BodyBounds.Width}px";
-                    panelHeight = panelSize;
-                    stateChangerPosition = "0px";
-                    stateChangerWidth = panelWidth;
-                    stateChangerHeight = "10px";
-                }
-
-                if (panelType == PanelTypes.Top)
-                {
-                    if (panelUIState == UIStates.Expanded)
-                        panelTop = $"0px";
-
-                    if (panelUIState == UIStates.Collapsed)
-                        panelTop = $"-{panelSize}";
-
-                    
-                    panelLeft = $"{RrStateService.AppGlobalVariables.BodyBounds.LeftPosition}px";
-                    panelWidth = $"{RrStateService.AppGlobalVariables.BodyBounds.Width}px";
-                    panelHeight = panelSize;
-                    stateChangerWidth = panelWidth;
-                    stateChangerHeight = "10px";
-                    stateChangerPosition = $"{panelSize}";
-                }
-
-                if (panelType == PanelTypes.Left)
-                {
-                    if (panelUIState == UIStates.Expanded)
-                        panelLeft = $"{RrStateService.AppGlobalVariables.BodyBounds.LeftPosition}";
-
-                    if (panelUIState == UIStates.Collapsed)
-                        panelLeft = $"-{panelSize}";
-
-                    panelWidth = panelSize;
-                    panelHeight = $"{RrStateService.AppGlobalVariables.BodyBounds.Height}px";
-
-                    var heightOffset = (SidePanelOffset == SidePanelOffsets.Both) ? 20 : 10;
-                    var topOffset = (SidePanelOffset == SidePanelOffsets.Top || SidePanelOffset == SidePanelOffsets.Both) ? 10 : 0;
-                    if (SidePanelOffset == SidePanelOffsets.Bottom || SidePanelOffset == SidePanelOffsets.Top || SidePanelOffset == SidePanelOffsets.Both)
-                    {
-                        panelHeight = $"calc({RrStateService.AppGlobalVariables.BodyBounds.Height}px - {heightOffset}px)";
-                    }
-                    else
-                    {
-                        panelHeight = $"{RrStateService.AppGlobalVariables.BodyBounds.Height}px";
-                    }
-                    panelTop = $"{topOffset}px";
-                    stateChangerHeight = panelHeight;
-
-
-                    stateChangerWidth = "10px";
-                    stateChangerPosition = panelWidth;
-                }
-                if (panelType == PanelTypes.Right)
-                {
-                    if (panelUIState == UIStates.Expanded)
-                        panelRight = panelSize;
-
-                    if (panelUIState == UIStates.Collapsed)
-                        panelRight = $"0px";
-
-                    panelWidth = panelSize;
-
-                    var heightOffset = (SidePanelOffset == SidePanelOffsets.Both) ? 20 : 10;
-                    var topOffset = (SidePanelOffset == SidePanelOffsets.Top || SidePanelOffset == SidePanelOffsets.Both) ? 10 : 0;
-                    if (SidePanelOffset == SidePanelOffsets.Bottom || SidePanelOffset == SidePanelOffsets.Top || SidePanelOffset == SidePanelOffsets.Both)
-                    {
-                        panelHeight = $"calc({RrStateService.AppGlobalVariables.BodyBounds.Height}px - {heightOffset}px)";
-                    }
-                    else
-                    {
-                        panelHeight = $"{RrStateService.AppGlobalVariables.BodyBounds.Height}px";
-                    }
-                    panelTop = $"{topOffset}px";
-                    stateChangerHeight = panelHeight;
-                    stateChangerPosition = "0px";
-                    stateChangerWidth = "10px";
-                }
-            }
-
+            // PanelHeightOffset
             if (Header is null && Footer is null)
             {
                 panelBodyOffsetHeight = "0px";
@@ -248,12 +185,99 @@ namespace IPeople.Roadrunner.Razor.Components
             {
                 panelBodyOffsetHeight = "35px";
             }
+        }
 
+        private void InitializePanelPositioningAndDimensions(PanelTypes typeOfPanel)
+        {
+            if (RrStateService.AppGlobalVariables.BodyBounds is null)
+                return;
+
+            if (typeOfPanel == PanelTypes.Bottom || typeOfPanel == PanelTypes.Top)
+            {
+                panelLeft = $"{RrStateService.AppGlobalVariables.BodyBounds.LeftPosition}px";
+                panelWidth = $"{RrStateService.AppGlobalVariables.BodyBounds.Width}px";
+                panelHeight = initialPanelSize;
+                stateChangerWidth = panelWidth;
+                stateChangerHeight = "10px";
+
+                if (panelType == PanelTypes.Bottom)
+                {
+                    if (panelUIState == UIStates.Expanded)
+                        panelBottom = initialPanelSize;
+
+                    if (panelUIState == UIStates.Collapsed)
+                        panelBottom = "0px";
+
+                    stateChangerPosition = "0px";
+                }
+
+                if (panelType == PanelTypes.Top)
+                {
+                    if (panelUIState == UIStates.Expanded)
+                        panelTop = $"0px";
+
+                    if (panelUIState == UIStates.Collapsed)
+                        panelTop = $"-{initialPanelSize}";
+
+                    stateChangerPosition = $"{initialPanelSize}";
+                }
+            }
+            else if (typeOfPanel == PanelTypes.Left || typeOfPanel == PanelTypes.Right)
+            {
+                int heightOffset = (SidePanelOffset == SidePanelOffsets.Both) ? 20 : 10;
+                int topOffset = (SidePanelOffset == SidePanelOffsets.Top || SidePanelOffset == SidePanelOffsets.Both) ? 10 : 0;
+
+                if (!isLatching)
+                    panelWidth = initialPanelSize;      
+
+                stateChangerWidth = "10px";
+                stateChangerHeight = panelHeight;
+                panelTop = $"{topOffset}px";
+                panelHeight = (SidePanelOffset == SidePanelOffsets.Bottom || SidePanelOffset == SidePanelOffsets.Top || SidePanelOffset == SidePanelOffsets.Both)
+                    ? $"calc({RrStateService.AppGlobalVariables.BodyBounds.Height}px - {heightOffset}px)"
+                    : $"{RrStateService.AppGlobalVariables.BodyBounds.Height}px";
+
+                if (panelType == PanelTypes.Left)
+                {
+                    if (isLatching)
+                    {
+                        panelLeft = $"{RrStateService.AppGlobalVariables.BodyBounds.LeftPosition}";
+                        panelWidth = $"{LatchingPanels}";
+                    }
+                    else
+                    {
+                        if (panelUIState == UIStates.Expanded)
+                            panelLeft = $"{RrStateService.AppGlobalVariables.BodyBounds.LeftPosition}";
+
+                        if (panelUIState == UIStates.Collapsed)
+                            panelLeft = $"-{initialPanelSize}";
+
+                    }
+                    stateChangerPosition = panelWidth;
+                }
+                if (panelType == PanelTypes.Right)
+                {
+                    if (isLatching)
+                    {
+                        panelRight = $"calc({RrStateService.AppGlobalVariables.BodyBounds.Width - 20}px - {LatchingPanels})";
+                        panelWidth = $"calc({RrStateService.AppGlobalVariables.BodyBounds.Width - 20}px - {LatchingPanels})";
+                    }
+                    else
+                    {
+                        if (panelUIState == UIStates.Expanded)
+                            panelRight = initialPanelSize;
+
+                        if (panelUIState == UIStates.Collapsed)
+                            panelRight = $"0px";
+                    }
+                    stateChangerPosition = "0px";
+                }
+            }
         }
 
         private void HandleStateChangerClicked()
         {
-            TogglePanelState();            
+            TogglePanelState();  
         }
 
         private void TogglePanelState()
@@ -269,8 +293,18 @@ namespace IPeople.Roadrunner.Razor.Components
             StateHasChanged();
         }
 
+        private void CollapsePanelState()
+        {
+            if (panelUIState == Models.UIStates.Expanded)
+            {
+                RrStateService.SetComponentProperty<Models.RrPanel, UIStates>(panelFromService, s => s.State, Models.UIStates.Collapsed);
+            }
+            StateHasChanged();
+        }
+
         private string GetStateCssClass(Models.UIStates currentState)
         {
+            if (isLatching) return "neutral";
             if (currentState == Models.UIStates.Expanded)
             {
                 return "expanded";
@@ -307,11 +341,34 @@ namespace IPeople.Roadrunner.Razor.Components
             return "invalid-type";
         }
 
+        private string GetCenterStateChangerCssClass()
+        {
+
+            if (panelType == PanelTypes.Left)
+            {
+                return "center-left";
+            }
+            else if (panelType == PanelTypes.Right)
+            {
+                return "center-right";
+            }
+            return "";
+        }
+
+        private string GetPanelLatchingCssClass()
+        {
+            if (isLatching)
+            {
+                return "latching";
+            }
+            return "";
+        }
+
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
             {
-                await JS.InvokeVoidAsync("registerPanels", Id, DotNetObjectReference.Create(this), PType.ToString());
+                await JS.InvokeVoidAsync("registerPanels", Id, DotNetObjectReference.Create(this), panelType.ToString(), isLatching);
             }
             RrStateService.SetComponentProperty<Models.RrPanel, bool>(panelFromService, s => s.Transition, true);
         }
@@ -329,6 +386,21 @@ namespace IPeople.Roadrunner.Razor.Components
                 newPanelSize = $"{newSize}px";
             }
             RrStateService.SetComponentProperty<Models.RrPanel, string>(panelFromService, s => s.Size, newPanelSize);
+        }
+
+        [JSInvokable]
+        public void PanelClickedOnScriptHandler(string id, string action)
+        {
+            if (action == "latching-collapse" && id != Id)
+                CollapsePanelState();
+            
+            if (action == "panel-focused")
+                focusedZIndexStyling = id == Id ? "z-index: 25" : "";
+        }
+
+        private string? GetFocusedZIndexStyling()
+        {
+            return focusedZIndexStyling;
         }
 
         private string GetAllowedScrolling()

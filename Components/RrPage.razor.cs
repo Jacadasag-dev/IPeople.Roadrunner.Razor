@@ -27,6 +27,9 @@ namespace IPeople.Roadrunner.Razor.Components
 
         [Parameter]
         public string LeftOffset { get; set; } = "0px";
+
+        [CascadingParameter]
+        public string LatchingPanels { get; set; } = "400px";
         #endregion
 
         /// <summary>

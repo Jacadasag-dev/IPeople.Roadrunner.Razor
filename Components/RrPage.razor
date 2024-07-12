@@ -10,12 +10,13 @@
 
     @if (Body != null)
     {
-        <div id="pagebody" class="Rr-page-body-container" style="@GetBodyHeight()">
-            <div class="Rr-page-body">
-                @Body
+        <CascadingValue Value="@LatchingPanels">
+            <div id="pagebody" class="Rr-page-body-container" style="@GetBodyHeight()">
+                <div class="Rr-page-body">
+                    @Body
+                </div>
             </div>
-        </div>
-
+        </CascadingValue>
     }
 
     @if (Footer != null)

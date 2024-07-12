@@ -9,23 +9,23 @@
     .Rr-panel-container.left {
         top: var(--panel-top);
         left: var(--panel-left);
-        z-index: 21;
     }
 
     .Rr-panel-container.right {
         top: var(--panel-top);
         right: var(--panel-right);
-        z-index: 21;
     }
 
     .Rr-panel-container.top {
         top: var(--panel-top);
-        z-index: 22;
     }
 
     .Rr-panel-container.bottom {
         bottom: var(--panel-bottom);
-        z-index: 22;
+    }
+
+    .Rr-panel-container.expanded {
+        z-index: 1000;
     }
 
 .Rr-panel {
@@ -61,7 +61,6 @@
     border-bottom: 2px solid rgba(0, 0, 0, 0.1); /* Adjust thickness and color as needed */
     opacity: 1;
     transition: opacity 0.5s linear;
-    z-index: 22;
 }
 
 .Rr-panel-header-styling {
@@ -92,7 +91,6 @@
     /*box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1), 0 -2px 4px -1px rgba(0, 0, 0, 0.06);*/
     opacity: 1;
     transition: opacity 0.5s linear;
-    z-index: 22;
 }
 
 .Rr-panel-statechanger {
@@ -140,7 +138,26 @@
         display: flex;
         justify-content: center;
         background: linear-gradient(90deg, #E8E8E8, #d0d0d0, #E8E8E8);
-        z-index: 25;
+    }
+
+    .Rr-panel-statechanger.left.latching {
+        border-right: none;
+        border-left: thin solid #c8c6c6;
+        left: var(--state-changer-position);
+        box-shadow: none;
+        transition: left 0.3s ease, right 0.3s ease;
+        background: linear-gradient(#E8E8E8, #d0d0d0, #E8E8E8);
+        cursor: ew-resize;
+    }
+
+    .Rr-panel-statechanger.right.latching {
+        border-right: thin solid #c8c6c6;
+        border-left: none;
+        right: var(--state-changer-position);
+        box-shadow: none;
+        transition: left 0.3s ease, right 0.3s ease;
+        background: linear-gradient(#E8E8E8, #d0d0d0, #E8E8E8);
+        cursor: ew-resize;
     }
 
 .no-transition {
@@ -273,6 +290,14 @@
         cursor: ew-resize;
     }
 
+    .Rr-panel-statechanger-dots-container.center-left {
+        left: 4px;
+    }
+
+    .Rr-panel-statechanger-dots-container.center-right {
+        display: none;
+    }
+
 .Rr-panel-statechanger-dots {
     display: inline-block;
     position: relative;
@@ -343,7 +368,7 @@
 }
 
 .Rr-panel-statechanger:hover {
-    background: linear-gradient(#036E80, #036170, #036E80); /* Diagonal gradient background for the tabs container */
+    
 }
 
     .Rr-panel-statechanger:hover .Rr-panel-statechanger-arrow.left {
@@ -363,6 +388,12 @@
     .Rr-panel-statechanger:hover .Rr-panel-statechanger-dots::after,
     .Rr-panel-statechanger:hover .Rr-panel-statechanger-dots::before {
         background-color: #FFFFFF; /* Color of the dots */
+    }
+
+    .Rr-panel-statechanger:hover .Rr-panel-statechanger-dots.center-left,
+    .Rr-panel-statechanger:hover .Rr-panel-statechanger-dots.center-left::after,
+    .Rr-panel-statechanger:hover .Rr-panel-statechanger-dots.center-left::before {
+        background-color: #333; /* Color of the dots */
     }
 
 .Rr-panel-statechanger.minimized .Rr-panel-statechanger-dots {
