@@ -268,7 +268,11 @@ namespace IPeople.Roadrunner.Razor.Components
                     if (latching)
                     {
                         panelLeft = $"{RrStateService.AppGlobalVariables.BodyBounds.LeftPosition}";
-                        panelWidth = $"{LatchingPanelInitialSize}";
+
+                        if (string.IsNullOrEmpty(adjustedLatchedPanelSize))
+                            panelSize = LatchingPanelInitialSize;
+
+                        panelWidth = $"{panelSize}";
                     }
                     else
                     {

@@ -245,6 +245,8 @@ window.registerPanels = (id, dotNetHelper, panelType, latchingType, minLatchingW
             leftPanel.enableTransitions();
             rightPanel.enableTransitions();
             newSize = leftSize;
+            leftPanel.dotNetHelper.invokeMethodAsync('FinishedDragging', newSize, leftPanelId, rightPanelId).catch(err => console.error(err));
+            rightPanel.dotNetHelper.invokeMethodAsync('FinishedDragging', newSize, leftPanelId, rightPanelId).catch(err => console.error(err));
         } else {
             if (handleTop && handleBottom) {
                 newSize = parseFloat(panel.element.style.width);
@@ -265,9 +267,10 @@ window.registerPanels = (id, dotNetHelper, panelType, latchingType, minLatchingW
                 }
             }
             panel.enableTransitions();
+            panel.dotNetHelper.invokeMethodAsync('FinishedDragging', newSize, leftPanelId, rightPanelId).catch(err => console.error(err));
         }
 
-        panel.dotNetHelper.invokeMethodAsync('FinishedDragging', newSize, leftPanelId, rightPanelId).catch(err => console.error(err));
+        
     };
 
     function initializePanelState(panel) {
