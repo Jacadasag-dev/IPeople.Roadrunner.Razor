@@ -26,7 +26,7 @@
         z-index: 1;
     }
 
-    .Rr-panel-container.latching {
+    .Rr-panel-container.latching-vertical {
         transition: none;
     }
 
@@ -146,7 +146,7 @@
         background: linear-gradient(90deg, #E8E8E8, #d0d0d0, #E8E8E8);
     }
 
-    .Rr-panel-statechanger.left.latching {
+    .Rr-panel-statechanger.left.latching-vertical {
         border-right: none;
         border-left: thin solid #c8c6c6;
         left: var(--state-changer-position);
@@ -156,7 +156,7 @@
         cursor: ew-resize;
     }
 
-    .Rr-panel-statechanger.right.latching {
+    .Rr-panel-statechanger.right.latching-vertical {
         border-right: thin solid #c8c6c6;
         border-left: none;
         right: var(--state-changer-position);
@@ -164,7 +164,6 @@
         transition: left 0.3s ease, right 0.3s ease;
         background: linear-gradient(#E8E8E8, #d0d0d0, #E8E8E8);
         cursor: ew-resize;
-        
     }
 
 .no-transition {

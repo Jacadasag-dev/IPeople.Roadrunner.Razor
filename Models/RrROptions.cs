@@ -17,6 +17,12 @@
         // Add other icon paths as needed
     }
 
+    public enum LatchingTypes
+    {
+        None,
+        Vertical,
+        Horizontal,
+    }
     public enum ButtonSizes
     {
         Small,

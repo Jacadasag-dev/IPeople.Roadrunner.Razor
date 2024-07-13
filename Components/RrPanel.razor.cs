@@ -68,13 +68,16 @@ namespace IPeople.Roadrunner.Razor.Components
         public Models.RrPanel? Panel { get; set; }
 
         [CascadingParameter]
-        public string? LatchingPanelLeftWidth { get; set; }
+        public string? LatchingPanelInitialSize { get; set; }
 
         [CascadingParameter]
-        public int LatchingPanelsMininmumAdjustmentWidth { get; set; }
+        public int LatchingPanelsMininmumAdjustmentSize { get; set; }
 
         [CascadingParameter]
         public bool Latching { get; set; }
+
+        [CascadingParameter]
+        public LatchingTypes LatchingType { get; set; }
         #endregion
 
         #region Private Fields
@@ -97,6 +100,7 @@ namespace IPeople.Roadrunner.Razor.Components
         private string? panelSize;
         private string? focusedZIndexStyling;
         private string? adjustedLatchedPanelSize;
+        private bool latching;
         #endregion
 
         private void InitializePanel()
@@ -151,7 +155,22 @@ namespace IPeople.Roadrunner.Razor.Components
         {
             // PanelType
             panelType = panelFromService is not null ? panelFromService.Type ?? PType : PType;
+
             // Latching
+            if (LatchingType == LatchingTypes.Vertical && (panelType == PanelTypes.Left || panelType == PanelTypes.Right))
+            {
+                latching = true;
+            }
+            else if (LatchingType == LatchingTypes.Horizontal && (panelType == PanelTypes.Top || panelType == PanelTypes.Bottom))
+            {
+                latching = true;
+            }
+            else
+            {
+                latching = false;
+            }
+
+
             if (panelFromService is not null)
             {
                 if (panelFromService.State == UIStates.Neutral)
@@ -167,6 +186,8 @@ namespace IPeople.Roadrunner.Razor.Components
             {
                 panelUIState = InitialState;
             }
+
+
 
             // PanelSize
             panelSize = panelFromService is not null ? panelFromService.Size ?? PanelSize : PanelSize;
@@ -232,7 +253,7 @@ namespace IPeople.Roadrunner.Razor.Components
                 int heightOffset = (SidePanelOffset == SidePanelOffsets.Both) ? 20 : 10;
                 int topOffset = (SidePanelOffset == SidePanelOffsets.Top || SidePanelOffset == SidePanelOffsets.Both) ? 10 : 0;
 
-                if (!Latching)
+                if (!latching)
                     panelWidth = panelSize;      
 
                 stateChangerWidth = "10px";
@@ -244,10 +265,10 @@ namespace IPeople.Roadrunner.Razor.Components
 
                 if (panelType == PanelTypes.Left)
                 {
-                    if (Latching)
+                    if (latching)
                     {
                         panelLeft = $"{RrStateService.AppGlobalVariables.BodyBounds.LeftPosition}";
-                        panelWidth = $"{LatchingPanelLeftWidth}";
+                        panelWidth = $"{LatchingPanelInitialSize}";
                     }
                     else
                     {
@@ -262,24 +283,13 @@ namespace IPeople.Roadrunner.Razor.Components
                 }
                 if (panelType == PanelTypes.Right)
                 {
-                    if (Latching)
+                    if (latching)
                     {
-
-
                         if (string.IsNullOrEmpty(adjustedLatchedPanelSize))
-                        {
-                            panelSize = LatchingPanelLeftWidth;
-                            panelRight = $"calc({RrStateService.AppGlobalVariables.BodyBounds.Width - 20}px - {panelSize})";
-                            panelWidth = $"calc({RrStateService.AppGlobalVariables.BodyBounds.Width - 20}px - {panelSize})";
-                        }
-                        else
-                        {
-                            panelRight = $"calc({RrStateService.AppGlobalVariables.BodyBounds.Width - 20}px - {panelSize})";
-                            panelWidth = $"calc({RrStateService.AppGlobalVariables.BodyBounds.Width - 20}px - {panelSize})";
-                        }
-                            
-
-
+                            panelSize = LatchingPanelInitialSize;
+                        
+                        panelRight = $"calc({RrStateService.AppGlobalVariables.BodyBounds.Width - 20}px - {panelSize})";
+                        panelWidth = $"calc({RrStateService.AppGlobalVariables.BodyBounds.Width - 20}px - {panelSize})";
 
                     }
                     else
@@ -315,6 +325,7 @@ namespace IPeople.Roadrunner.Razor.Components
 
         private void CollapsePanelState()
         {
+
             if (panelUIState == Models.UIStates.Expanded)
             {
                 RrStateService.SetComponentProperty<Models.RrPanel, UIStates>(panelFromService, s => s.State, Models.UIStates.Collapsed);
@@ -324,7 +335,8 @@ namespace IPeople.Roadrunner.Razor.Components
 
         private string GetStateCssClass(Models.UIStates currentState)
         {
-            if (Latching) return "latching";
+            if (latching && LatchingType == LatchingTypes.Vertical) return "latching-vertical";
+            if (latching && LatchingType == LatchingTypes.Horizontal) return "latching-horizontal";
             if (currentState == Models.UIStates.Expanded)
             {
                 return "expanded";
@@ -379,9 +391,8 @@ namespace IPeople.Roadrunner.Razor.Components
         {
             if (firstRender)
             {
-                await JS.InvokeVoidAsync("registerPanels", Id, DotNetObjectReference.Create(this), panelType.ToString(), (Latching && (panelType == PanelTypes.Left || panelType == PanelTypes.Right)), LatchingPanelsMininmumAdjustmentWidth);
+                await JS.InvokeVoidAsync("registerPanels", Id, DotNetObjectReference.Create(this), panelType.ToString(), LatchingType.ToString(), LatchingPanelsMininmumAdjustmentSize);
             }
-            RrStateService.SetComponentProperty<Models.RrPanel, bool>(panelFromService, s => s.Transition, true);
         }
 
         [JSInvokable]

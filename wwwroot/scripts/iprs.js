@@ -130,7 +130,7 @@ window.setupResizeListener = function (elementId, dotNetHelper) {
 };
 
 class Panel {
-    constructor(id, panelElement, dotNetHelper, type, latching, container, stateChanger, minLatchingWidth) {
+    constructor(id, panelElement, dotNetHelper, type, latchingType, container, stateChanger, minLatchingWidth) {
         this.id = id;
         this.element = panelElement;
         this.initialWidth = 0;
@@ -140,7 +140,7 @@ class Panel {
         this.initialStateChangerLeft = "";
         this.initialStateChangerTop = "";
         this.type = type;
-        this.latching = latching;
+        this.latchingType = latchingType;
         this.dotNetHelper = dotNetHelper;
         this.minLatchingWidth = minLatchingWidth
     }
@@ -160,14 +160,14 @@ class Panel {
 
 window.panels = {};
 
-window.registerPanels = (id, dotNetHelper, panelType, latching, minLatchingWidth) => {
+window.registerPanels = (id, dotNetHelper, panelType, latchingType, minLatchingWidth) => {
     const panelElement = document.getElementById(`${id}-panel`);
     if (!panelElement) return;
 
     if (!window.panels[id]) {
         const container = document.getElementById(`${id}-panel-container`);
         const stateChanger = document.getElementById(`${id}-panel-statechanger`);
-        window.panels[id] = new Panel(id, panelElement, dotNetHelper, panelType, latching, container, stateChanger, minLatchingWidth);
+        window.panels[id] = new Panel(id, panelElement, dotNetHelper, panelType, latchingType, container, stateChanger, minLatchingWidth);
     }
     const handleLeft = document.getElementById(`${id}-dots-container-left`);
     const handleRight = document.getElementById(`${id}-dots-container-right`);
@@ -178,7 +178,7 @@ window.registerPanels = (id, dotNetHelper, panelType, latching, minLatchingWidth
     let startY;
     let startX;
 
-    if (window.panels[id].latching) {
+    if (window.panels[id].latchingType === 'Vertical') {
         for (const key in window.panels) {
             let panel = window.panels[key];
             if (panel.type === 'Left') leftPanel = panel;
@@ -190,7 +190,7 @@ window.registerPanels = (id, dotNetHelper, panelType, latching, minLatchingWidth
         const diffX = event.clientX - startX;
         const diffY = event.clientY - startY;
         
-        if (window.panels[id].latching && leftPanel && rightPanel) {
+        if (window.panels[id].latchingType === 'Vertical' && leftPanel && rightPanel) {
             const minWidth = leftPanel.minLatchingWidth;
             const newLeftWidth = leftPanel.initialWidth + diffX;
             const newRightWidth = rightPanel.initialWidth - diffX;
@@ -230,7 +230,7 @@ window.registerPanels = (id, dotNetHelper, panelType, latching, minLatchingWidth
         let leftSize = -1;
         let leftPanelId;
 
-        if (panel.latching && leftPanel && rightPanel) {
+        if (panel.latchingType === 'Vertical' && leftPanel && rightPanel) {
             leftPanelId = leftPanel.id;
             leftSize = parseFloat(leftPanel.element.style.width);
             if (leftSize < 100) {
@@ -287,7 +287,7 @@ window.registerPanels = (id, dotNetHelper, panelType, latching, minLatchingWidth
         startX = event.clientX;
         const panel = window.panels[id];
 
-        if (panel.latching && leftPanel && rightPanel) {
+        if (panel.latchingType === 'Vertical' && leftPanel && rightPanel) {
             leftPanel.disableTransitions();
             rightPanel.disableTransitions();
             initializePanelState(leftPanel);
@@ -307,7 +307,7 @@ window.registerPanels = (id, dotNetHelper, panelType, latching, minLatchingWidth
         for (const key in window.panels) {
             const panel = window.panels[key];
             let action = "";
-            if (window.panels[id].latching) {
+            if (window.panels[id].latchingType === 'Vertical') {
                 action = "latching-collapse";
             }
             else
@@ -318,7 +318,9 @@ window.registerPanels = (id, dotNetHelper, panelType, latching, minLatchingWidth
         }
     };
 
-    if (window.panels[id].latching && leftPanel && rightPanel) {
+    console.log(window.panels[id].latchingType);
+
+    if (window.panels[id].latchingType === 'Vertical' && leftPanel && rightPanel) {
         leftPanel.stateChanger.addEventListener('mousedown', onMouseDown);
         rightPanel.stateChanger.addEventListener('mousedown', onMouseDown);
         leftPanel.element.addEventListener('mousedown', () => focusPanel(leftPanel));
