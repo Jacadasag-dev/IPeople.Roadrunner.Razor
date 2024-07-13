@@ -26,9 +26,9 @@
                 </div>
             }
         </div>
-        <div id="@($"{Id}-panel-statechanger")" class="Rr-panel-statechanger @GetPanelTypeCssClass() @panelStateCssClass @GetPanelLatchingCssClass()"
+        <div id="@($"{Id}-panel-statechanger")" class="Rr-panel-statechanger @GetPanelTypeCssClass() @panelStateCssClass"
              style="@($"width: {stateChangerWidth}; height: {stateChangerHeight}; --state-changer-position: {stateChangerPosition};")">
-            @if (isLatching && (panelType == PanelTypes.Left || panelType == PanelTypes.Right))
+            @if (Latching && (panelType == PanelTypes.Left || panelType == PanelTypes.Right))
             {
                 <div id="@($"{Id}-dots-container-center")" class="Rr-panel-statechanger-dots-container @GetCenterStateChangerCssClass()">
                     <span class="Rr-panel-statechanger-dots vertical @GetCenterStateChangerCssClass()"></span>

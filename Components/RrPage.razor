@@ -10,15 +10,18 @@
 
     @if (Body != null)
     {
-        <CascadingValue Value="@MinLatchingPanelWidth">
-            <CascadingValue Value="@LatchingPanels">
-                <div id="pagebody" class="Rr-page-body-container" style="@GetBodyHeight()">
-                    <div class="Rr-page-body">
-                        @Body
+        <CascadingValue Value="@Latching">
+            <CascadingValue Value="@LatchingPanelsMininmumAdjustmentWidth">
+                <CascadingValue Value="@LatchingPanelLeftWidth">
+                    <div id="pagebody" class="Rr-page-body-container" style="@GetBodyHeight()">
+                        <div class="Rr-page-body">
+                            @Body
+                        </div>
                     </div>
-                </div>
+                </CascadingValue>
             </CascadingValue>
         </CascadingValue>
+        
     }
 
     @if (Footer != null)

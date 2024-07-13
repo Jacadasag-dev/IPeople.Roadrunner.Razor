@@ -130,7 +130,8 @@ window.setupResizeListener = function (elementId, dotNetHelper) {
 };
 
 class Panel {
-    constructor(panelElement, dotNetHelper, type, latching, container, stateChanger, minLatchingWidth) {
+    constructor(id, panelElement, dotNetHelper, type, latching, container, stateChanger, minLatchingWidth) {
+        this.id = id;
         this.element = panelElement;
         this.initialWidth = 0;
         this.initialHeight = 0;
@@ -166,7 +167,7 @@ window.registerPanels = (id, dotNetHelper, panelType, latching, minLatchingWidth
     if (!window.panels[id]) {
         const container = document.getElementById(`${id}-panel-container`);
         const stateChanger = document.getElementById(`${id}-panel-statechanger`);
-        window.panels[id] = new Panel(panelElement, dotNetHelper, panelType, latching, container, stateChanger, minLatchingWidth);
+        window.panels[id] = new Panel(id, panelElement, dotNetHelper, panelType, latching, container, stateChanger, minLatchingWidth);
     }
     const handleLeft = document.getElementById(`${id}-dots-container-left`);
     const handleRight = document.getElementById(`${id}-dots-container-right`);
@@ -223,23 +224,27 @@ window.registerPanels = (id, dotNetHelper, panelType, latching, minLatchingWidth
         document.removeEventListener('mouseup', onMouseUp);
 
         const panel = window.panels[id];
-        let newSize;
+        let newSize = -1;
 
-        if (panel.latching) {
-            if (panel.type === 'Left') {
-                newSize = parseFloat(leftPanel.element.style.width);
-                if (newSize < 100) {
-                    leftPanel.element.style.width = `${leftPanel.initialWidth}px`;
-                    leftPanel.stateChanger.style.setProperty('--state-changer-position', `${leftPanel.initialStateChangerLeft}px`);
-                }
-            } else if (panel.type === 'Right') {
-                newSize = parseFloat(rightPanel.element.style.width);
-                if (newSize < 100) {
-                    rightPanel.element.style.width = `${rightPanel.initialWidth}px`;
-                }
+        let rightPanelId;
+        let leftSize = -1;
+        let leftPanelId;
+
+        if (panel.latching && leftPanel && rightPanel) {
+            leftPanelId = leftPanel.id;
+            leftSize = parseFloat(leftPanel.element.style.width);
+            if (leftSize < 100) {
+                leftPanel.element.style.width = `${leftPanel.initialWidth}px`;
+                leftPanel.stateChanger.style.setProperty('--state-changer-position', `${leftPanel.initialStateChangerLeft}px`);
+            }
+            rightSize = parseFloat(rightPanel.element.style.width);
+            rightPanelId = rightPanel.id;
+            if (rightSize < 100) {
+                rightPanel.element.style.width = `${rightPanel.initialWidth}px`;
             }
             leftPanel.enableTransitions();
             rightPanel.enableTransitions();
+            newSize = leftSize;
         } else {
             if (handleTop && handleBottom) {
                 newSize = parseFloat(panel.element.style.width);
@@ -262,7 +267,7 @@ window.registerPanels = (id, dotNetHelper, panelType, latching, minLatchingWidth
             panel.enableTransitions();
         }
 
-        panel.dotNetHelper.invokeMethodAsync('FinishedDragging', newSize).catch(err => console.error(err));
+        panel.dotNetHelper.invokeMethodAsync('FinishedDragging', newSize, leftPanelId, rightPanelId).catch(err => console.error(err));
     };
 
     function initializePanelState(panel) {
@@ -301,7 +306,6 @@ window.registerPanels = (id, dotNetHelper, panelType, latching, minLatchingWidth
     const focusPanel = () => {
         for (const key in window.panels) {
             const panel = window.panels[key];
-            console.log(`${panel.type}: ${panel.container.style.zIndex}`);
             let action = "";
             if (window.panels[id].latching) {
                 action = "latching-collapse";

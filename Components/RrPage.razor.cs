@@ -28,11 +28,14 @@ namespace IPeople.Roadrunner.Razor.Components
         [Parameter]
         public string LeftOffset { get; set; } = "0px";
 
-        [CascadingParameter]
-        public string LatchingPanels { get; set; } = "400px";
+        [Parameter]
+        public string? LatchingPanelLeftWidth { get; set; } = "400px";
 
-        [CascadingParameter]
-        public int MinLatchingPanelWidth { get; set; } = 200;
+        [Parameter]
+        public int LatchingPanelsMininmumAdjustmentWidth { get; set; } = 200;
+
+        [Parameter]
+        public bool Latching { get; set; } = false;
         #endregion
 
         /// <summary>
