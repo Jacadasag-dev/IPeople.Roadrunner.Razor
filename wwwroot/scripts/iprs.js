@@ -307,7 +307,7 @@ window.registerPanels = (id, dotNetHelper, panelType, latchingType, minLatchingW
         for (const key in window.panels) {
             const panel = window.panels[key];
             let action = "";
-            if (window.panels[id].latchingType === 'Vertical') {
+            if (window.panels[id].latchingType === 'Vertical' && leftPanel && rightPanel) {
                 action = "latching-collapse";
             }
             else

@@ -325,12 +325,14 @@ namespace IPeople.Roadrunner.Razor.Components
 
         private void CollapsePanelState()
         {
-
-            if (panelUIState == Models.UIStates.Expanded)
+            if (!latching)
             {
-                RrStateService.SetComponentProperty<Models.RrPanel, UIStates>(panelFromService, s => s.State, Models.UIStates.Collapsed);
+                if (panelUIState == Models.UIStates.Expanded)
+                {
+                    RrStateService.SetComponentProperty<Models.RrPanel, UIStates>(panelFromService, s => s.State, Models.UIStates.Collapsed);
+                }
+                StateHasChanged();
             }
-            StateHasChanged();
         }
 
         private string GetStateCssClass(Models.UIStates currentState)
