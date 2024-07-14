@@ -4,7 +4,7 @@ using IPeople.Roadrunner.Razor.Models;
 
 namespace IPeople.Roadrunner.Razor.Components
 {
-    public partial class RrInput
+    public partial class RrInput : IRrComponentBase
     {
         #region Parameters
         [Parameter]
@@ -17,7 +17,7 @@ namespace IPeople.Roadrunner.Razor.Components
         public bool Visible { get; set; } = true;
 
         [Parameter]
-        public string Placeholder { get; set; } = "Start typing...";
+        public string? Placeholder { get; set; } = "Start typing...";
 
         [Parameter]
         public string MaxWidth { get; set; } = "620px";
@@ -42,9 +42,6 @@ namespace IPeople.Roadrunner.Razor.Components
 
         [Parameter]
         public EventCallback OnInputClick { get; set; }
-
-        [Parameter]
-        public Models.RrInput? Input { get; set; }
         #endregion
 
         #region Private Fields
@@ -60,50 +57,12 @@ namespace IPeople.Roadrunner.Razor.Components
 
         private void InitializeInput()
         {
-            if (!string.IsNullOrEmpty(Id))
-            {
-                inputFromService = RrStateService.GetComponentById<Models.RrInput>(Id) as Models.RrInput;
-            }
-            else if (Input is not null)
-            {
-                inputFromService = RrStateService.GetComponent<Models.RrInput>(Input) as Models.RrInput;
-                if (inputFromService is not null)
-                {
-                    Id = inputFromService.Identifier;
-                }
-            }
-            if (inputFromService is null)
-            {
-                if (!string.IsNullOrEmpty(Id))
-                {
-                    RrStateService.RegisterComponentById<Models.RrInput>(Id);
-                    inputFromService = RrStateService.GetComponentById<Models.RrInput>(Id) as Models.RrInput;
-                    RrStateService.RefreshAllComponents += StateHasChanged;
-                    RrStateService.RefreshSpecificComponentsById += (ids) => { if (ids is not null && ids.Contains(Id)) StateHasChanged(); };
-                    if (inputFromService is not null)
-                        RrStateService.RefreshSpecificComponentsByTag += (tags) => { if (tags is not null && tags.Contains(Tag ?? inputFromService.Tag ?? string.Empty)) StateHasChanged(); };
-
-                }
-                else
-                {
-                    exceptionMessage = "ERROR:id_is_required";
-                }
-            }
-            bool notNull = inputFromService is not null;
-            if (notNull)
-            {
-                if (string.IsNullOrEmpty(inputFromService?.Tag))
-                {
-                    if (!string.IsNullOrEmpty(Tag))
-                    {
-                        RrStateService.SetComponentProperty<Models.RrInput, string>(inputFromService, c => c.Tag, Tag);
-                    }
-                }
-            }
-            visible = notNull ? inputFromService?.Visible ?? Visible : Visible;
-            placeholder = notNull ? inputFromService?.PlaceHolder ?? Placeholder : Placeholder;
-            deBounce = notNull ? inputFromService?.DoDeBounce ?? DeBounce : DeBounce;
-            inputText = notNull ? string.IsNullOrEmpty(inputFromService?.Text) ? Text : (string.IsNullOrEmpty(Text) ? inputFromService.Text : Text) : exceptionMessage;
+            Id = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue<RrInput, string>(this, p => p.Id, Id);
+            Visible = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue<RrInput, bool>(this, p => p.Visible, Visible);
+            Tag = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue<RrInput, string>(this, p => p.Tag, Tag);
+            Placeholder = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue<RrInput, string>(this, p => p.Placeholder, Placeholder);
+            DeBounce = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue<RrInput, bool>(this, p => p.DeBounce, DeBounce);
+            inputText = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue<RrInput, string>(this, p => p.Text, Text);
             instantInputText = inputText;
         }
 
@@ -130,13 +89,13 @@ namespace IPeople.Roadrunner.Razor.Components
                     return;
                 }
                 inputText = newText;
-                RrStateService.SetComponentProperty<Models.RrInput, string>(inputFromService, c => c.Text, inputText);
+                RrStateService.SetComponentPropertyById<Models.RrInput, string>(Id, c => c.Text, inputText);
                 await OnChangedText.InvokeAsync(inputText);
             }
             else
             {
                 inputText = newText;
-                RrStateService.SetComponentProperty<Models.RrInput, string>(inputFromService, c => c.Text, inputText);
+                RrStateService.SetComponentPropertyById<Models.RrInput, string>(Id, c => c.Text, inputText);
                 await OnChangedText.InvokeAsync(inputText);
             }
         }

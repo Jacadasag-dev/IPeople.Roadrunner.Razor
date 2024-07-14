@@ -1,17 +1,11 @@
 ﻿using IPeople.Roadrunner.Razor.Models;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
-using Radzen;
-using System.Reflection.Emit;
-using System.Runtime.CompilerServices;
-using System.Security.Principal;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace IPeople.Roadrunner.Razor.Components
 {
-    public partial class RrPanel
-    {
+    public partial class RrPanel : IRrComponentBase
+    {        
         #region Parameters
         [Parameter]
         public string? Id { get; set; }
@@ -20,7 +14,7 @@ namespace IPeople.Roadrunner.Razor.Components
         public string? Tag { get; set; }
 
         [Parameter]
-        public string? PanelSize { get; set; } = "400px";
+        public string? Size { get; set; } = "400px";
 
         [Parameter]
         public PanelTypes PType { get; set; }
@@ -65,7 +59,7 @@ namespace IPeople.Roadrunner.Razor.Components
         public bool HeaderDefaultStyling { get; set; } = false;
 
         [Parameter]
-        public Models.RrPanel? Panel { get; set; }
+        public UIStates State { get; set; }
 
         [CascadingParameter]
         public string? LatchingPanelInitialSize { get; set; }
@@ -81,10 +75,6 @@ namespace IPeople.Roadrunner.Razor.Components
         #endregion
 
         #region Private Fields
-        private Models.RrPanel? panelFromService;
-        private PanelTypes panelType;
-        private string? exceptionMessage;
-        private UIStates panelUIState;
         private string? panelWidth;
         private string? panelHeight;
         private string? panelTop;
@@ -97,120 +87,31 @@ namespace IPeople.Roadrunner.Razor.Components
         private string? stateChangerRight;
         private string? panelStateCssClass;
         private string? panelBodyOffsetHeight;
-        private string? panelSize;
         private string? focusedZIndexStyling;
         private string? adjustedLatchedPanelSize;
-        private bool latching;
+
         #endregion
+
+        public DotNetObjectReference<RrPanel>? dotNetReference;
 
         private void InitializePanel()
         {
-            InitializePanelModel();
-            InitializeFields();
-        }
-
-        private void InitializePanelModel()
-        {
-            if (!string.IsNullOrEmpty(Id))
-            {
-                panelFromService = RrStateService.GetComponentById<Models.RrPanel>(Id);
-            }
-            else if (Panel is not null)
-            {
-                panelFromService = RrStateService.GetComponent<Models.RrPanel>(Panel);
-                if (panelFromService is not null)
-                {
-                    Id = panelFromService.Identifier;
-                }
-            }
-            if (panelFromService is null)
-            {
-                if (!string.IsNullOrEmpty(Id))
-                {
-                    RrStateService.RegisterComponentById<Models.RrPanel>(Id);
-                    panelFromService = RrStateService.GetComponentById<Models.RrPanel>(Id);
-                    RrStateService.RefreshAllComponents += StateHasChanged;
-                    RrStateService.RefreshSpecificComponentsById += (ids) => { if (ids is not null && ids.Contains(Id)) StateHasChanged(); };
-                    if (panelFromService is not null)
-                        RrStateService.RefreshSpecificComponentsByTag += (tags) => { if (tags is not null && tags.Contains(Tag ?? panelFromService.Tag ?? string.Empty)) StateHasChanged(); };
-                }
-                else
-                {
-                    exceptionMessage = "ERROR:id_is_required";
-                }
-            }
-            if (panelFromService is not null)
-            {
-                if (string.IsNullOrEmpty(panelFromService?.Tag))
-                {
-                    if (!string.IsNullOrEmpty(Tag))
-                    {
-                        RrStateService.SetComponentProperty<Models.RrPanel, string>(panelFromService, c => c.Tag, Tag);
-                    }
-                }
-            }
-        }
-
-        private void InitializeFields()
-        {
-            // PanelType
-            panelType = panelFromService is not null ? panelFromService.Type ?? PType : PType;
-
-            // Latching
-            if (LatchingType == LatchingTypes.Vertical && (panelType == PanelTypes.Left || panelType == PanelTypes.Right))
-            {
-                latching = true;
-            }
-            else if (LatchingType == LatchingTypes.Horizontal && (panelType == PanelTypes.Top || panelType == PanelTypes.Bottom))
-            {
-                latching = true;
-            }
-            else
-            {
-                latching = false;
-            }
-
-
-            if (panelFromService is not null)
-            {
-                if (panelFromService.State == UIStates.Neutral)
-                {
-                    panelUIState = InitialState;
-                }
-                else
-                {
-                    panelUIState = panelFromService.State;
-                }
-            }
-            else
-            {
-                panelUIState = InitialState;
-            }
-
-
-
-            // PanelSize
-            panelSize = panelFromService is not null ? panelFromService.Size ?? PanelSize : PanelSize;
-
-            // PanelStateCssClass
-            panelStateCssClass = GetStateCssClass(panelUIState);
-
-            // PanelPositioningAndDimensions
-            InitializePanelPositioningAndDimensions(panelType);
-
+            if (string.IsNullOrEmpty(Id)) throw new Exception($"The \"Id\" parameter must be defined and set as it is required for the {this.GetType().ToString()} component to function.");
+            Id = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.Id, Id);
+            Tag = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.Tag, Tag);
+            Visible = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.Visible, Visible);
+            Size = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.Size, Size);
+            PType = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.PType, PType);
+            Latching = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.Latching, Latching);
+            LatchingType = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.LatchingType, LatchingType);
+            LatchingPanelInitialSize = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.LatchingPanelInitialSize, LatchingPanelInitialSize);
+            LatchingPanelsMininmumAdjustmentSize = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.LatchingPanelsMininmumAdjustmentSize, LatchingPanelsMininmumAdjustmentSize);
+            State = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.State, State);
             // PanelHeightOffset
-            if (Header is null && Footer is null)
-            {
-                panelBodyOffsetHeight = "0px";
-            }
-            else if (Header is not null && Footer is not null)
-            {
-                panelBodyOffsetHeight = "70px";
-            }
-            else
-            {
-                panelBodyOffsetHeight = "35px";
-            }
+            panelBodyOffsetHeight = GetBodySizeOffset();
+            // Set DotNetReference
+            dotNetReference = DotNetObjectReference.Create(this);
+            InitializePanelPositioningAndDimensions(PType);
         }
 
         private void InitializePanelPositioningAndDimensions(PanelTypes typeOfPanel)
@@ -220,92 +121,58 @@ namespace IPeople.Roadrunner.Razor.Components
 
             if (typeOfPanel == PanelTypes.Bottom || typeOfPanel == PanelTypes.Top)
             {
-                panelLeft = $"{RrStateService.AppGlobalVariables.BodyBounds.LeftPosition}px";
-                panelWidth = $"{RrStateService.AppGlobalVariables.BodyBounds.Width}px";
-                panelHeight = panelSize;
-                stateChangerWidth = panelWidth;
-                stateChangerHeight = "10px";
-
-                if (panelType == PanelTypes.Bottom)
+                if (PType == PanelTypes.Bottom)
                 {
-                    if (panelUIState == UIStates.Expanded)
-                        panelBottom = panelSize;
+                    if (State == UIStates.Expanded)
+                        panelBottom = Size;
 
-                    if (panelUIState == UIStates.Collapsed)
+                    if (State == UIStates.Collapsed)
                         panelBottom = "0px";
-
-                    stateChangerPosition = "0px";
                 }
 
-                if (panelType == PanelTypes.Top)
+                if (PType == PanelTypes.Top)
                 {
-                    if (panelUIState == UIStates.Expanded)
+                    if (State    == UIStates.Expanded)
                         panelTop = $"0px";
 
-                    if (panelUIState == UIStates.Collapsed)
-                        panelTop = $"-{panelSize}";
-
-                    stateChangerPosition = $"{panelSize}";
+                    if (State == UIStates.Collapsed)
+                        panelTop = $"-{Size}";
                 }
             }
             else if (typeOfPanel == PanelTypes.Left || typeOfPanel == PanelTypes.Right)
             {
-                int heightOffset = (SidePanelOffset == SidePanelOffsets.Both) ? 20 : 10;
-                int topOffset = (SidePanelOffset == SidePanelOffsets.Top || SidePanelOffset == SidePanelOffsets.Both) ? 10 : 0;
-
-                if (!latching)
-                    panelWidth = panelSize;      
-
-                stateChangerWidth = "10px";
-                stateChangerHeight = panelHeight;
-                panelTop = $"{topOffset}px";
-                panelHeight = (SidePanelOffset == SidePanelOffsets.Bottom || SidePanelOffset == SidePanelOffsets.Top || SidePanelOffset == SidePanelOffsets.Both)
-                    ? $"calc({RrStateService.AppGlobalVariables.BodyBounds.Height}px - {heightOffset}px)"
-                    : $"{RrStateService.AppGlobalVariables.BodyBounds.Height}px";
-
-                if (panelType == PanelTypes.Left)
+                if (PType == PanelTypes.Left)
                 {
-                    if (latching)
-                    {
+                    if (State == UIStates.Expanded)
                         panelLeft = $"{RrStateService.AppGlobalVariables.BodyBounds.LeftPosition}";
 
-                        if (string.IsNullOrEmpty(adjustedLatchedPanelSize))
-                            panelSize = LatchingPanelInitialSize;
-
-                        panelWidth = $"{panelSize}";
-                    }
-                    else
-                    {
-                        if (panelUIState == UIStates.Expanded)
-                            panelLeft = $"{RrStateService.AppGlobalVariables.BodyBounds.LeftPosition}";
-
-                        if (panelUIState == UIStates.Collapsed)
-                            panelLeft = $"-{panelSize}";
-
-                    }
-                    stateChangerPosition = panelWidth;
+                    if (State == UIStates.Collapsed)
+                        panelLeft = $"-{Size}";
                 }
-                if (panelType == PanelTypes.Right)
+                if (PType == PanelTypes.Right)
                 {
-                    if (latching)
-                    {
-                        if (string.IsNullOrEmpty(adjustedLatchedPanelSize))
-                            panelSize = LatchingPanelInitialSize;
-                        
-                        panelRight = $"calc({RrStateService.AppGlobalVariables.BodyBounds.Width - 20}px - {panelSize})";
-                        panelWidth = $"calc({RrStateService.AppGlobalVariables.BodyBounds.Width - 20}px - {panelSize})";
+                    if (State == UIStates.Expanded)
+                        panelRight = Size;
 
-                    }
-                    else
-                    {
-                        if (panelUIState == UIStates.Expanded)
-                            panelRight = panelSize;
-
-                        if (panelUIState == UIStates.Collapsed)
-                            panelRight = $"0px";
-                    }
-                    stateChangerPosition = "0px";
+                    if (State == UIStates.Collapsed)
+                        panelRight = $"0px";
                 }
+            }
+        }
+
+        private string GetBodySizeOffset()
+        {
+            if (Header is null && Footer is null)
+            {
+                return "0px";
+            }
+            else if (Header is not null && Footer is not null)
+            {
+                return "70px";
+            }
+            else
+            {
+                return "35px";
             }
         }
 
@@ -316,24 +183,24 @@ namespace IPeople.Roadrunner.Razor.Components
 
         private void TogglePanelState()
         {
-            if (panelUIState == Models.UIStates.Expanded)
+            if (State == Models.UIStates.Expanded)
             {
-                RrStateService.SetComponentProperty<Models.RrPanel, UIStates>(panelFromService, s=> s.State, Models.UIStates.Collapsed);
+                RrStateService.SetComponentPropertyById<RrPanel, UIStates>(Id, s=> s.State, Models.UIStates.Collapsed);
             }
-            else if (panelUIState == Models.UIStates.Collapsed)
+            else if (State == Models.UIStates.Collapsed)
             {
-                RrStateService.SetComponentProperty<Models.RrPanel, UIStates>(panelFromService, s => s.State, panelUIState = Models.UIStates.Expanded);
+                RrStateService.SetComponentPropertyById<RrPanel, UIStates>(Id, s => s.State, State = Models.UIStates.Expanded);
             }
             StateHasChanged();
         }
 
         private void CollapsePanelState()
         {
-            if (!latching)
+            if (!Latching)
             {
-                if (panelUIState == Models.UIStates.Expanded)
+                if (State == Models.UIStates.Expanded)
                 {
-                    RrStateService.SetComponentProperty<Models.RrPanel, UIStates>(panelFromService, s => s.State, Models.UIStates.Collapsed);
+                    RrStateService.SetComponentPropertyById<RrPanel, UIStates>(Id, s => s.State, Models.UIStates.Collapsed);
                 }
                 StateHasChanged();
             }
@@ -341,8 +208,8 @@ namespace IPeople.Roadrunner.Razor.Components
 
         private string GetStateCssClass(Models.UIStates currentState)
         {
-            if (latching && LatchingType == LatchingTypes.Vertical) return "latching-vertical";
-            if (latching && LatchingType == LatchingTypes.Horizontal) return "latching-horizontal";
+            if (Latching && LatchingType == LatchingTypes.Vertical) return "latching-vertical";
+            if (Latching && LatchingType == LatchingTypes.Horizontal) return "latching-horizontal";
             if (currentState == Models.UIStates.Expanded)
             {
                 return "expanded";
@@ -360,19 +227,19 @@ namespace IPeople.Roadrunner.Razor.Components
 
         private string GetPanelTypeCssClass()
         {
-            if (panelType == PanelTypes.Left)
+            if (PType == PanelTypes.Left)
             {
                 return "left";
             }
-            else if (panelType == PanelTypes.Right)
+            else if (PType == PanelTypes.Right)
             {
                 return "right";
             }
-            else if (panelType == PanelTypes.Top)
+            else if (PType == PanelTypes.Top)
             {
                 return "top";
             }
-            else if (panelType == PanelTypes.Bottom)
+            else if (PType == PanelTypes.Bottom)
             {
                 return "bottom";
             }
@@ -382,42 +249,26 @@ namespace IPeople.Roadrunner.Razor.Components
         private string GetCenterStateChangerCssClass()
         {
 
-            if (panelType == PanelTypes.Left)
+            if (PType == PanelTypes.Left)
             {
                 return "center-left";
             }
-            else if (panelType == PanelTypes.Right)
+            else if (PType == PanelTypes.Right)
             {
                 return "center-right";
             }
             return "";
         }
 
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            if (firstRender)
-            {
-                await JS.InvokeVoidAsync("registerPanels", Id, DotNetObjectReference.Create(this), panelType.ToString(), LatchingType.ToString(), LatchingPanelsMininmumAdjustmentSize);
-            }
-        }
-
         [JSInvokable]
-        public void FinishedDragging(int newSize, string latchedPanelId1 = "", string latchedPanelId2 = "")
+        public void FinishedDragging(int newSize)
         {
             string newPanelSize;
-
-            if (!string.IsNullOrEmpty(latchedPanelId1) && !string.IsNullOrEmpty(latchedPanelId2) && newSize >= 0)
-            {
-                string adjustedLatchedSize = $"{newSize}px";
-                adjustedLatchedPanelSize = $"{newSize}px";
-                RrStateService.SetComponentPropertyById<Models.RrPanel, string>(latchedPanelId1, s => s.Size, adjustedLatchedSize);
-                RrStateService.SetComponentPropertyById<Models.RrPanel, string>(latchedPanelId2, s => s.Size, adjustedLatchedSize);
-            }
-            else if (newSize >= 0)
+            if (newSize >= 0)
             {
                 if (newSize < 100)
                 {
-                    newPanelSize = PanelSize ?? "350px";
+                    newPanelSize = Size ?? "350px";
                     TogglePanelState();
                 }
                 else
@@ -425,7 +276,7 @@ namespace IPeople.Roadrunner.Razor.Components
                     newPanelSize = $"{newSize}px";
 
                 }
-                RrStateService.SetComponentProperty<Models.RrPanel, string>(panelFromService, s => s.Size, newPanelSize);
+                RrStateService.SetComponentPropertyById<RrPanel, string>(Id, s => s.Size, newPanelSize);
             }
             StateHasChanged();
         }

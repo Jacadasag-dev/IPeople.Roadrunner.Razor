@@ -4,22 +4,22 @@
 {
     InitializeDropdown();
     <div class="Rr-dropdown-container" @onclick="HandleDropdownClicked">
-        @if (!string.IsNullOrEmpty(label))
+        @if (!string.IsNullOrEmpty(Label))
         {
             <div class="Rr-dropdown-label-container">
-                <span class="Rr-dropdown-label" style="@($"{LabelStyling}")">@label</span>
+                <span class="Rr-dropdown-label" style="@($"{LabelStyling}")">@Label</span>
             </div>
         }
-        <div id="@Id" class="Rr-dropdown @dropdownCssClass @(selectedItem is null && Flashing ? "fade-red" : "")"
+        <div id="@Id" class="Rr-dropdown @dropdownCssClass @(SelectedItem is null && Flashing ? "fade-red" : "")"
              style="@($"--dropdown-width: {calculatedWidth}; min-width: {MinWidth}; --max-height: {MaxHeight};")
-                    @(!string.IsNullOrEmpty(label) ? "margin-left: -5px; box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);" : "") @Style">
+                    @(!string.IsNullOrEmpty(Label) ? "margin-left: -5px; box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);" : "") @Style">
             <span class="Rr-dropdown-selectiontext">
-                @(selectedItem is null ? placeholder : RrStateService.GetDisplayValue(selectedItem))
+                @(SelectedItem is null ? Placeholder : RrStateService.GetDisplayValue(SelectedItem))
             </span>
             <span class="Rr-dropdown-arrow"></span>
             <div class="Rr-dropdown-content">
                 <ul class="item-list">
-                    @if (processedItems is not null && processedItems.Any() && exceptionMessage is null)
+                    @if (processedItems is not null && processedItems.Any())
                     {
                         foreach (var item in processedItems)
                         {
@@ -30,13 +30,7 @@
                     }
                     else
                     {
-                        if (exceptionMessage is not null)
-                        {
-                            <li class="no-items">
-                                <span>@exceptionMessage</span>
-                            </li>
-                        }
-                        else if (processedItems is null || !processedItems.Any())
+                        if (processedItems is null || !processedItems.Any())
                         {
                             <li class="no-items">
                                 <span>empty</span>

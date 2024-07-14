@@ -1,5 +1,6 @@
 ﻿
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 
 namespace IPeople.Roadrunner.Razor.Models
 {
@@ -16,27 +17,27 @@ namespace IPeople.Roadrunner.Razor.Models
     #region RrComponent Instance Models
     public interface IRrComponentBase
     {
-        public string Identifier { get; set; }
+        public string Id { get; set; }
         public bool Visible { get; set; }
         public string Tag { get; set; }
     }
 
     public class RrCheckbox : IRrComponentBase
     {
-        public string Identifier { get; set; }
+        public string Id { get; set; }
         public bool Visible { get; set; }
         public string? Text { get; set; }
         public string? Tag { get; set; }
         public bool IsChecked { get; set; }
         public RrCheckbox(string id)
         {
-            Identifier = id;
+            Id = id;
         }
     }
 
     public class RrInput : IRrComponentBase
     {
-        public string Identifier { get; set; }
+        public string Id { get; set; }
         public bool Visible { get; set; }
         public string? Text { get; set; }
         public string? Tag { get; set; }
@@ -44,13 +45,13 @@ namespace IPeople.Roadrunner.Razor.Models
         public bool DoDeBounce { get; set; } = true;
         public RrInput(string id)
         {
-            Identifier = id;
+            Id = id;
         }
     }
 
     public class RrDropdown : IRrComponentBase
     {
-        public string Identifier { get; set; }
+        public string Id { get; set; }
         public bool Visible { get; set; }
         public string? Tag { get; set; }
         public string? Label { get; set; }
@@ -59,18 +60,18 @@ namespace IPeople.Roadrunner.Razor.Models
         public string PlaceHolder { get; set; } = "Select";
         public RrDropdown(string id)
         {
-            Identifier = id;
+            Id = id;
         }
         public RrDropdown(string id, string tag)
         {
-            Identifier = id;
+            Id = id;
             Tag = tag;
         }
     }
 
     public class RrPopup : IRrComponentBase
     {
-        public string Identifier { get; set; }
+        public string Id { get; set; }
         public bool Visible { get; set; }
         public string Text { get; set; }
         public string Tag { get; set; }
@@ -78,22 +79,30 @@ namespace IPeople.Roadrunner.Razor.Models
         public List<dynamic> Items { get; set; } = [];
         public RrPopup(string id)
         {
-            Identifier = id;
+            Id = id;
         }
     }
 
-    public class RrPanel : IRrComponentBase
+    public class RrPanel<T> : IRrComponentBase where T : class
     {
-        public string Identifier { get; set; }
+        public string Id { get; set; }
         public bool Visible { get; set; }
-        public string Size { get; set; }
+        public string? Size { get; set; }
         public string Tag { get; set; }
         public UIStates State { get; set; } = UIStates.Neutral;
         public PanelTypes? Type { get; set; }
         public bool Transition { get; set; }
-        public RrPanel(string id)
+        public DotNetObjectReference<T> DotNetReference { get; set; }
+
+        public RrPanel(string id, T instance)
         {
-            Identifier = id;
+            Id = id;
+            DotNetReference = DotNetObjectReference.Create(instance);
+        }
+
+        public void Dispose()
+        {
+            DotNetReference?.Dispose();
         }
     }
 

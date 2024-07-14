@@ -1,10 +1,20 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using IPeople.Roadrunner.Razor.Models;
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
 namespace IPeople.Roadrunner.Razor.Components
 {
-    public partial class RrPopup
+    public partial class RrPopup : IRrComponentBase
     {
+        [Parameter]
+        public string? Id { get; set; }
+
+        [Parameter]
+        public string? Tag { get; set; }
+
+        [Parameter]
+        public bool Visible { get; set; } = true;
+
         [Parameter]
         public string Style { get; set; } = "";
         [Parameter]
@@ -20,7 +30,7 @@ namespace IPeople.Roadrunner.Razor.Components
                 if (Popup is null)
                     return;
 
-                await JS.InvokeVoidAsync("makeDraggable", Popup.Identifier);
+                await JS.InvokeVoidAsync("makeDraggable", Popup.Id);
             }
         }
 
@@ -29,7 +39,7 @@ namespace IPeople.Roadrunner.Razor.Components
             if (Popup is null)
                 return;
 
-            RrStateService.RemoveComponent(Popup);
+            RrStateService.RemoveComponent<RrPopup>(Popup.Id);
             RrStateService.RefreshComponents();
         }
     }

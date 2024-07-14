@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using IPeople.Roadrunner.Razor.Models;
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
@@ -9,11 +10,17 @@ using System.Threading.Tasks;
 
 namespace IPeople.Roadrunner.Razor.Components
 {
-    public partial class RrDynamicTable<TItem> : ComponentBase
+    public partial class RrDynamicTable<TItem> : IRrComponentBase
     {
         #region Parameters
         [Parameter]
         public string? Id { get; set; } = $"dynamicTable_{Guid.NewGuid()}"; // Default ID value with unique identifier
+
+        [Parameter]
+        public string? Tag { get; set; }
+
+        [Parameter]
+        public bool Visible { get; set; } = true;
 
         [Parameter]
         public IEnumerable<TItem>? Items { get; set; }

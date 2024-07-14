@@ -99,50 +99,40 @@ window.makeDraggable = function (id) {
     }
 };
 
-function getElementBounds(elementId) {
-    var element = document.getElementById(elementId);
-    if (element) {
-        var rect = element.getBoundingClientRect();
-        return {
-            top: rect.top,
-            left: rect.left,
-            width: rect.width,
-            height: rect.height,
-            right: rect.right,
-            bottom: rect.bottom
-        };
-    }
-    return null;
+window.getElementBounds = function (elementId) {
+    const element = document.getElementById(elementId);
+    if (!element) return null;
+    const rect = element.getBoundingClientRect();
+    return {
+        top: rect.top + window.scrollY,
+        left: rect.left + window.scrollX,
+        right: rect.right + window.scrollX,
+        bottom: rect.bottom + window.scrollY,
+        width: rect.width,
+        height: rect.height,
+    };
 }
 
-window.setupResizeListener = function (elementId, dotNetHelper) {
-    var element = document.getElementById(elementId);
-    if (element) {
-        var updateBounds = function () {
-            var bounds = window.getElementBounds(elementId);
-            dotNetHelper.invokeMethodAsync('UpdateBounds', bounds);
-        };
-        window.addEventListener('resize', updateBounds);
-        if (element) {
-            new ResizeObserver(updateBounds).observe(element);
-        }
+class RrPage {
+    constructor(id, bounds, panels) {
+        this.id = id;
+        this.bounds = bounds;
+        this.panels = panels;
     }
-};
+}
 
-class Panel {
-    constructor(id, panelElement, dotNetHelper, type, latchingType, container, stateChanger, minLatchingWidth) {
+class RrPanel {
+    constructor(id, panelElement, dotNetHelper, type, latchingType, container, stateChanger, minLatchingWidth, latching, size) {
         this.id = id;
         this.element = panelElement;
-        this.initialWidth = 0;
-        this.initialHeight = 0;
         this.container = container;
         this.stateChanger = stateChanger;
-        this.initialStateChangerLeft = "";
-        this.initialStateChangerTop = "";
         this.type = type;
         this.latchingType = latchingType;
         this.dotNetHelper = dotNetHelper;
-        this.minLatchingWidth = minLatchingWidth
+        this.minLatchingWidth = minLatchingWidth;
+        this.latching = latching;
+        this.size = size;
     }
 
     disableTransitions() {
@@ -158,192 +148,200 @@ class Panel {
     }
 }
 
-window.panels = {};
+window.RrPage = {};
 
-window.registerPanels = (id, dotNetHelper, panelType, latchingType, minLatchingWidth) => {
-    const panelElement = document.getElementById(`${id}-panel`);
-    if (!panelElement) return;
-
-    if (!window.panels[id]) {
-        const container = document.getElementById(`${id}-panel-container`);
-        const stateChanger = document.getElementById(`${id}-panel-statechanger`);
-        window.panels[id] = new Panel(id, panelElement, dotNetHelper, panelType, latchingType, container, stateChanger, minLatchingWidth);
+window.registerPageAndPanels = function (pageId, panelDtos) {
+    // Register Page
+    if (!window.RrPage[pageId]) {
+        window.RrPage[pageId] = new RrPage(pageId, null, []);
     }
-    const handleLeft = document.getElementById(`${id}-dots-container-left`);
-    const handleRight = document.getElementById(`${id}-dots-container-right`);
-    const handleTop = document.getElementById(`${id}-dots-container-top`);
-    const handleBottom = document.getElementById(`${id}-dots-container-bottom`);
-    let leftPanel = null;
-    let rightPanel = null;
-    let startY;
-    let startX;
+    var bounds = window.getElementBounds(pageId);
+    window.RrPage[pageId].bounds = bounds;
 
-    if (window.panels[id].latchingType === 'Vertical') {
-        for (const key in window.panels) {
-            let panel = window.panels[key];
-            if (panel.type === 'Left') leftPanel = panel;
-            if (panel.type === 'Right') rightPanel = panel;
-        }
-    }
+    // Register Panels
+    var panels = [];
+    panelDtos.forEach(function (dto) {
+        const panelElement = document.getElementById(`${dto.id}-panel`);
+        const container = document.getElementById(`${dto.id}-panel-container`);
+        const stateChanger = document.getElementById(`${dto.id}-panel-statechanger`);
+        const panel = new RrPanel(dto.id, panelElement, dto.dotNetObjectReference, dto.pType, dto.latchingType, container, stateChanger, dto.minLatchingWidth, dto.latching, dto.size);
+        panels.push(panel);
 
-    const onMouseMove = (event) => {
-        const diffX = event.clientX - startX;
-        const diffY = event.clientY - startY;
-        
-        if (window.panels[id].latchingType === 'Vertical' && leftPanel && rightPanel) {
-            const minWidth = leftPanel.minLatchingWidth;
-            const newLeftWidth = leftPanel.initialWidth + diffX;
-            const newRightWidth = rightPanel.initialWidth - diffX;
+        const onMouseDown = (event) => {
+            let startY = event.clientY;
+            let startX = event.clientX;
+            const initialHieght = panel.element.offsetHeight;
+            const initialWidth = panel.element.offsetWidth
+            const initialStateChangerLeft = panel.stateChanger.offsetLeft;
+            const initialStateChangerTop = panel.stateChanger.offsetTop;
 
-            if (newLeftWidth >= minWidth && newRightWidth >= minWidth) {
-                leftPanel.element.style.width = `${newLeftWidth}px`;
-                leftPanel.stateChanger.style.setProperty('--state-changer-position', `${leftPanel.initialStateChangerLeft + diffX}px`);
-                rightPanel.element.style.width = `${newRightWidth}px`;
-                rightPanel.container.style.right = `${newRightWidth}px`;
-            }
-        } else {
-            const panel = window.panels[id];
-            if (panel.type === 'Left') {
-                panel.element.style.width = `${panel.initialWidth + diffX}px`;
-                panel.stateChanger.style.setProperty('--state-changer-position', `${panel.initialStateChangerLeft + diffX}px`);
-            } else if (panel.type === 'Right') {
-                panel.element.style.width = `${panel.initialWidth - diffX}px`;
-                panel.container.style.right = `${panel.initialWidth - diffX}px`;
-            } else if (panel.type === 'Top') {
-                panel.element.style.height = `${panel.initialHeight + diffY}px`;
-                panel.stateChanger.style.setProperty('--state-changer-position', `${panel.initialStateChangerTop + diffY}px`);
-            } else if (panel.type === 'Bottom') {
-                panel.element.style.height = `${panel.initialHeight - diffY}px`;
-                panel.container.style.bottom = `${panel.initialHeight - diffY}px`;
-            }
-        }
-    };
-
-    const onMouseUp = () => {
-        document.removeEventListener('mousemove', onMouseMove);
-        document.removeEventListener('mouseup', onMouseUp);
-
-        const panel = window.panels[id];
-        let newSize = -1;
-
-        let rightPanelId;
-        let leftSize = -1;
-        let leftPanelId;
-
-        if (panel.latchingType === 'Vertical' && leftPanel && rightPanel) {
-            leftPanelId = leftPanel.id;
-            leftSize = parseFloat(leftPanel.element.style.width);
-            if (leftSize < 100) {
-                leftPanel.element.style.width = `${leftPanel.initialWidth}px`;
-                leftPanel.stateChanger.style.setProperty('--state-changer-position', `${leftPanel.initialStateChangerLeft}px`);
-            }
-            rightSize = parseFloat(rightPanel.element.style.width);
-            rightPanelId = rightPanel.id;
-            if (rightSize < 100) {
-                rightPanel.element.style.width = `${rightPanel.initialWidth}px`;
-            }
-            leftPanel.enableTransitions();
-            rightPanel.enableTransitions();
-            newSize = leftSize;
-            leftPanel.dotNetHelper.invokeMethodAsync('FinishedDragging', newSize, leftPanelId, rightPanelId).catch(err => console.error(err));
-            rightPanel.dotNetHelper.invokeMethodAsync('FinishedDragging', newSize, leftPanelId, rightPanelId).catch(err => console.error(err));
-        } else {
-            if (handleTop && handleBottom) {
-                newSize = parseFloat(panel.element.style.width);
-                if (newSize < 100) {
-                    panel.element.style.width = `${panel.initialWidth}px`;
+            const onMouseMove = (event) => {
+                const diffX = event.clientX - startX;
+                const diffY = event.clientY - startY;
+                if (panel.latching && panel.latchingType === 'Vertical') {
+                    const minWidth = panel.minLatchingWidth;
                     if (panel.type === 'Left') {
-                        panel.stateChanger.style.setProperty('--state-changer-position', `${panel.initialStateChangerLeft}px`);
+                        const newWidth = initialWidth + diffX;
+                        if (newWidth >= minWidth) {
+                            panel.element.style.width = `${newWidth}px`;
+                            panel.stateChanger.style.left = `${initialStateChangerLeft + diffX}px`;
+                        }
+                    } else if (panel.type === 'Right') {
+                        const newWidth = initialWidth - diffX;
+                        if (newWidth >= minWidth) {
+                            panel.element.style.width = `${newWidth}px`;
+                            panel.container.style.right = `${newWidth}px`;
+                        }
+                    }
+                } else {
+                    console.log(`diffX: ${diffX}, diffY: ${diffY}`);
+                    console.log(`offsetWidth ${initialWidth}`);
+                    console.log(`offsetHeight ${initialHieght}`);
+                    if (panel.type === 'Left') {
+                        panel.element.style.width = `${initialWidth + diffX}px`;
+                        panel.stateChanger.style.left = `${initialStateChangerLeft + diffX}px`;
+                    } else if (panel.type === 'Right') {
+                        panel.element.style.width = `${initialWidth - diffX}px`;
+                        panel.container.style.right = `${initialWidth - diffX}px`;
+                    } else if (panel.type === 'Top') {
+                        panel.element.style.height = `${initialHieght + diffY}px`;
+                        panel.stateChanger.style.top = `${initialStateChangerTop + diffY}px`;
+                    } else if (panel.type === 'Bottom') {
+                        panel.element.style.height = `${initialHieght - diffY}px`;
+                        panel.container.style.bottom = `${initialHieght - diffY}px`;
                     }
                 }
-            }
-            if (handleLeft && handleRight) {
-                newSize = parseFloat(panel.element.style.height);
-                if (newSize < 100) {
-                    panel.element.style.height = `${panel.initialHeight}px`;
-                    if (panel.type === 'Top') {
-                        panel.stateChanger.style.setProperty('--state-changer-position', `${panel.initialStateChangerTop}px`);
+            };
+
+            const onMouseUp = () => {
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
+                let size = -1;
+                if (panel.latching && panel.latchingType === 'Vertical') {
+                    size = parseFloat(panel.element.style.width);
+                    if (size < 100) {
+                        panel.element.style.width = `${panel.element.offsetWidth}px`;
+                        if (panel.type === 'Left')
+                            panel.stateChanger.style.left = `${panel.stateChanger.offsetLeft}px`;
                     }
+                    panel.enableTransitions();
+                    panel.dotNetHelper.invokeMethodAsync('FinishedDragging', size).catch(err => console.error(err));
+                } else {
+                    if (panel.type === 'Left' || panel.type === 'Right') {
+                        size = parseFloat(panel.element.style.width);
+                        if (size < 100) {
+                            panel.element.style.width = `${panel.element.offsetWidth}px`;
+                            if (panel.type === 'Left')
+                                panel.stateChanger.style.left = `${panel.stateChanger.offsetLeft}px`;
+                        }
+                    } else if (panel.type === 'Top' || panel.type === 'Bottom') {
+                        size = parseFloat(panel.element.style.height);
+                        if (size < 100) {
+                            panel.element.style.height = `${panel.element.offsetHeight}px`;
+                            if (panel.type === 'Top')
+                                panel.stateChanger.style.top = `${panel.stateChanger.offsetTop}px`;
+                        }
+                    }
+                    panel.enableTransitions();
+                    panel.dotNetHelper.invokeMethodAsync('FinishedDragging', size).catch(err => console.error(err));
                 }
-            }
-            panel.enableTransitions();
-            panel.dotNetHelper.invokeMethodAsync('FinishedDragging', newSize, leftPanelId, rightPanelId).catch(err => console.error(err));
-        }
+            };
 
-        
-    };
-
-    function initializePanelState(panel) {
-        if (!panel || !panel.stateChanger || !panel.element) {
-            console.error('Invalid panel object');
-            return;
-        }
-
-        panel.initialStateChangerLeft = panel.stateChanger.offsetLeft;
-        panel.initialStateChangerTop = panel.stateChanger.offsetTop;
-        panel.initialWidth = panel.element.offsetWidth;
-        panel.initialHeight = panel.element.offsetHeight;
-    }
-
-    const onMouseDown = (event) => {
-        startY = event.clientY;
-        startX = event.clientX;
-        const panel = window.panels[id];
-
-        if (panel.latchingType === 'Vertical' && leftPanel && rightPanel) {
-            leftPanel.disableTransitions();
-            rightPanel.disableTransitions();
-            initializePanelState(leftPanel);
-            initializePanelState(rightPanel);
-        } else {
             panel.disableTransitions();
-            initializePanelState(panel);
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
+        };
+
+        if (panel.latching && panel.latchingType === 'Vertical') {
+            panel.stateChanger.addEventListener('mousedown', onMouseDown);
+        } else {
+            if (panel.type === 'Left' || panel.type === 'Right') {
+                document.getElementById(`${panel.id}-dots-container-top`).addEventListener('mousedown', onMouseDown);
+                document.getElementById(`${panel.id}-dots-container-bottom`).addEventListener('mousedown', onMouseDown);
+            } else if (panel.type === 'Top' || panel.type === 'Bottom') {
+                document.getElementById(`${panel.id}-dots-container-left`).addEventListener('mousedown', onMouseDown);
+                document.getElementById(`${panel.id}-dots-container-right`).addEventListener('mousedown', onMouseDown);
+            }
         }
 
-        focusPanel();
+        panel.element.addEventListener('mousedown', () => focusPanel(panel));
+        panel.stateChanger.addEventListener('mousedown', () => focusPanel(panel));
+    });
 
-        document.addEventListener('mousemove', onMouseMove);
-        document.addEventListener('mouseup', onMouseUp);
-    };
+    window.RrPage[pageId].panels = panels;
 
-    const focusPanel = () => {
-        for (const key in window.panels) {
-            const panel = window.panels[key];
+    const focusPanel = (panel) => {
+        window.RrPage[pageId].panels.forEach(p => {
             let action = "";
-            if (window.panels[id].latchingType === 'Vertical' && leftPanel && rightPanel) {
+            if (p.latching && p.latchingType === 'Vertical') {
                 action = "latching-collapse";
-            }
-            else
-            {
+            } else {
                 action = "panel-focused";
             }
-            panel.dotNetHelper.invokeMethodAsync('PanelClickedOnScriptHandler', id, action).catch(err => console.error(err));
-        }
+            panel.dotNetHelper.invokeMethodAsync('PanelClickedOnScriptHandler', panel.id, action).catch(err => console.error(err));
+        });
     };
 
-    console.log(window.panels[id].latchingType);
+    const updateBounds = () => {
+        window.RrPage[pageId].bounds = window.getElementBounds(pageId);
+        window.RrPage[pageId].panels.forEach(panel => {
+            if (panel.latching) {
+                if (panel.latchingType === 'Vertical') {
+                    panel.stateChanger.style.height = `${window.RrPage[pageId].bounds.height}px`;
+                    if (panel.type === 'Left') {
+                        panel.container.style.left = `${window.RrPage[pageId].bounds.left}px`;
+                    }
+                    if (panel.type === 'Right') {
+                        panel.container.style.right = `${window.RrPage[pageId].bounds.right - panel.element.offsetWidth - 20}px`;
+                        panel.element.style.width = `${window.RrPage[pageId].bounds.right - panel.element.offsetWidth - 20}px`;
+                    }
+                } else if (panel.latchingType === 'Horizontal') {
+                    panel.stateChanger.style.width = `${window.RrPage[pageId].bounds.width}px`;
+                }
+            } else {
+                if (panel.type === 'Top') {
+                    panel.container.style.top = `0px`;
+                    panel.container.style.left = `${window.RrPage[pageId].bounds.left}px`;
+                    panel.element.style.width = `${window.RrPage[pageId].bounds.width}px`;
+                    panel.element.style.height = panel.size;
+                    panel.stateChanger.style.width = `${window.RrPage[pageId].bounds.width}px`;
+                    panel.stateChanger.style.height = "10px";
+                    panel.stateChanger.style.top = panel.size;
+                } else if (panel.type === 'Bottom') {
+                    panel.container.style.bottom = panel.size;
+                    panel.container.style.left = `${window.RrPage[pageId].bounds.left}px`;
+                    panel.element.style.width = `${window.RrPage[pageId].bounds.width}px`;
+                    panel.element.style.height = panel.size;
+                    panel.stateChanger.style.width = `${window.RrPage[pageId].bounds.width}px`;
+                    panel.stateChanger.style.height = "10px";
+                    panel.stateChanger.style.bottom = "0px";
+                } else if (panel.type === 'Left') {
+                    panel.container.style.top = "0px";
+                    panel.element.style.height = `${window.RrPage[pageId].bounds.height}px`;
+                    panel.element.style.width = panel.size;
+                    panel.stateChanger.style.height = `${window.RrPage[pageId].bounds.height}px`;
+                    panel.stateChanger.style.width = "10px";
+                    panel.stateChanger.style.left = panel.size;
+                } else if (panel.type === 'Right') {
+                    panel.container.style.top = "0px";
+                    panel.container.style.right = panel.size;
+                    panel.element.style.height = `${window.RrPage[pageId].bounds.height}px`;
+                    panel.element.style.width = panel.size;
+                    panel.stateChanger.style.height = `${window.RrPage[pageId].bounds.height}px`;
+                    panel.stateChanger.style.width = "10px";
+                    panel.stateChanger.style.right = "0px";
+                }
+            }
+        });
+    };
 
-    if (window.panels[id].latchingType === 'Vertical' && leftPanel && rightPanel) {
-        leftPanel.stateChanger.addEventListener('mousedown', onMouseDown);
-        rightPanel.stateChanger.addEventListener('mousedown', onMouseDown);
-        leftPanel.element.addEventListener('mousedown', () => focusPanel(leftPanel));
-        rightPanel.element.addEventListener('mousedown', () => focusPanel(rightPanel));
-    }
-    else {
-        if (handleLeft && handleRight) {
-            handleLeft.addEventListener('mousedown', onMouseDown);
-            handleRight.addEventListener('mousedown', onMouseDown);
-            window.panels[id].element.addEventListener('mousedown', () => focusPanel(window.panels[id]));
-            window.panels[id].stateChanger.addEventListener('mousedown', () => focusPanel(window.panels[id]));
-        }
-        if (handleTop && handleBottom) {
-            handleTop.addEventListener('mousedown', onMouseDown);
-            handleBottom.addEventListener('mousedown', onMouseDown);
-            window.panels[id].element.addEventListener('mousedown', () => focusPanel(window.panels[id]));
-            window.panels[id].stateChanger.addEventListener('mousedown', () => focusPanel(window.panels[id]));
-        }
+    window.addEventListener('resize', updateBounds);
+    var pageElement = document.getElementById(pageId);
+    if (pageElement) {
+        new ResizeObserver(updateBounds).observe(pageElement);
     }
 };
+
 
 
 

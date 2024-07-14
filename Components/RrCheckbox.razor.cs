@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace IPeople.Roadrunner.Razor.Components
 {
-    public partial class RrCheckbox
+    public partial class RrCheckbox : IRrComponentBase
     {
         #region Parameters
         [Parameter]
@@ -16,10 +16,10 @@ namespace IPeople.Roadrunner.Razor.Components
         [Parameter]
         public string Style { get; set; } = "";
         [Parameter]
-        public string Label { get; set; } = "";
+        public string? Label { get; set; } = "";
 
         [Parameter]
-        public string Tag { get; set; } = "";
+        public string? Tag { get; set; } = "";
 
         [Parameter]
         public bool Visible { get; set; } = true;
@@ -31,56 +31,28 @@ namespace IPeople.Roadrunner.Razor.Components
         public bool InitiallyChecked { get; set; } = false;
 
         [Parameter]
-        public Models.RrCheckbox? Checkbox { get; set; }
+        public bool Checked { get; set; }
+
         #endregion
 
         #region Private Fields
-        private Models.RrCheckbox? checkboxFromService;
-        private bool visible;
-        private string? label;
-        private string? exceptionMessage;
         private bool isChecked;
         #endregion
 
         private void InitializeCheckbox()
         {
-            if (!string.IsNullOrEmpty(Id))
-            {
-                checkboxFromService = RrStateService.GetComponentById<Models.RrCheckbox>(Id);
-            }
-            else if (Checkbox is not null)
-            {
-                checkboxFromService = RrStateService.GetComponent<Models.RrCheckbox>(Checkbox);
-                if (checkboxFromService is not null)
-                {
-                    Id = checkboxFromService.Identifier;
-                }
-            }
-            if (checkboxFromService is null)
-            {
-                if (!string.IsNullOrEmpty(Id))
-                {
-                    RrStateService.RegisterComponentById<Models.RrCheckbox>(Id);
-                    checkboxFromService = RrStateService.GetComponentById<Models.RrCheckbox>(Id);
-                    RrStateService.RefreshAllComponents += StateHasChanged;
-                    RrStateService.RefreshSpecificComponentsById += (ids) => { if (ids is not null && ids.Contains(Id)) StateHasChanged(); };
-                    if (checkboxFromService is not null)
-                        RrStateService.RefreshSpecificComponentsByTag += (tags) => { if (tags is not null && tags.Contains(Tag ?? checkboxFromService.Tag ?? string.Empty)) StateHasChanged(); };
-
-                }
-                else
-                {
-                    exceptionMessage = "ERROR:id_is_required";
-                }
-            }
-            visible = checkboxFromService is not null ? checkboxFromService?.Visible ?? Visible : Visible;
-            label = checkboxFromService is not null ? checkboxFromService?.Text ?? Label : Label;
-            isChecked = checkboxFromService is not null ? checkboxFromService?.IsChecked ?? InitiallyChecked : InitiallyChecked;
+            if (string.IsNullOrEmpty(Id)) throw new Exception($"The \"Id\" parameter must be defined and set as it is required for the {this.GetType().ToString()} component to function.");
+            Id = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue<RrCheckbox, string>(this, p => p.Id, Id);
+            Tag = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue<RrCheckbox, string>(this, p => p.Tag, Tag);
+            Visible = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue<RrCheckbox, bool>(this, p => p.Visible, Visible);
+            Label = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue<RrCheckbox, string>(this, p => p.Label, Label);
+            InitiallyChecked = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue<RrCheckbox, bool>(this, p => p.InitiallyChecked, InitiallyChecked);
+            isChecked = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue<RrCheckbox, bool> (this, p => p.Checked, isChecked);
         }
 
         private void HandleOnCheckboxClick()
         {
-            RrStateService.SetComponentProperty<Models.RrCheckbox, bool>(checkboxFromService, s => s.IsChecked, !isChecked);
+            RrStateService.SetComponentPropertyById<RrCheckbox, bool>(Id, p => p.Checked, !isChecked);
             OnCheckboxClicked.InvokeAsync();
         }
     }
