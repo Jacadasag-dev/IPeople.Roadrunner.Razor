@@ -2,9 +2,8 @@
 @if (Visible)
 {
     InitializePanel();
-    <div id="@($"{Id}-panel-container")" class="Rr-panel-container @GetPanelTypeCssClass() @panelStateCssClass"
-         style="@($"--panel-top: {panelTop}; --panel-bottom: {panelBottom}; --panel-left: {panelLeft}; --panel-right: {panelRight};") @GetFocusedZIndexStyling()">
-        <div id="@($"{Id}-panel")" class="Rr-panel @GetPanelTypeCssClass() @panelStateCssClass"
+    <div id="@($"{Id}-panel-container")" class="Rr-panel-container @GetPanelTypeCssClass() @GetInitialStateCssClass()">
+        <div id="@($"{Id}-panel")" class="Rr-panel @GetPanelTypeCssClass() @GetInitialStateCssClass()"
              style="@Style">
             @if (Header is not null)
             {
@@ -26,7 +25,7 @@
                 </div>
             }
         </div>
-        <div id="@($"{Id}-panel-statechanger")" class="Rr-panel-statechanger @GetPanelTypeCssClass() @panelStateCssClass">
+        <div id="@($"{Id}-panel-statechanger")" class="Rr-panel-statechanger @GetPanelTypeCssClass() @GetInitialStateCssClass()">
             @if (Latching && LatchingType == LatchingTypes.Vertical)
             {
                 <div id="@($"{Id}-dots-container-center")" class="Rr-panel-statechanger-dots-container @GetCenterStateChangerCssClass()">
@@ -40,7 +39,7 @@
                     <div id="@($"{Id}-dots-container-top")" class="Rr-panel-statechanger-dots-container top">
                         <span class="Rr-panel-statechanger-dots vertical"></span>
                     </div>
-                    <div class="Rr-panel-statechanger-arrow-container vertical" @onclick="HandleStateChangerClicked">
+                    <div id="@($"{Id}-panel-arrow-container")" class="Rr-panel-statechanger-arrow-container vertical">
                         <span class="Rr-panel-statechanger-arrow @GetPanelTypeCssClass()"></span>
                     </div>
                     <div id="@($"{Id}-dots-container-bottom")" class="Rr-panel-statechanger-dots-container bottom">
@@ -54,7 +53,7 @@
                     </div>
                     <div>
                     </div>
-                    <div class="Rr-panel-statechanger-arrow-container horizontal" @onclick="HandleStateChangerClicked">
+                    <div id="@($"{Id}-panel-arrow-container")" class="Rr-panel-statechanger-arrow-container horizontal">
                         <span class="Rr-panel-statechanger-arrow @GetPanelTypeCssClass()"></span>
                     </div>
                     <div id="@($"{Id}-dots-container-right")" class="Rr-panel-statechanger-dots-container right">

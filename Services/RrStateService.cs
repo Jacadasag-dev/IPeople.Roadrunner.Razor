@@ -13,7 +13,6 @@ namespace IPeople.Roadrunner.Razor.Services
         public class GlobalVariables
         {
             public RrLoading? Loading { get; set; }
-            public PageBodyBounds? BodyBounds { get; set; }
         }
 
         public GlobalVariables AppGlobalVariables { get; set; } = new();

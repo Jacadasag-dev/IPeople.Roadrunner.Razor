@@ -26,14 +26,6 @@
         z-index: 1;
     }
 
-    .Rr-panel-container.latching-vertical {
-        transition: none;
-    }
-
-    .Rr-panel-container.minimized {
-        transition: none;
-    }
-
 .Rr-panel {
     position: absolute;
     background: white;

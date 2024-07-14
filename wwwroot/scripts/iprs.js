@@ -122,7 +122,7 @@ class RrPage {
 }
 
 class RrPanel {
-    constructor(id, panelElement, dotNetHelper, type, latchingType, container, stateChanger, minLatchingWidth, latching, size) {
+    constructor(id, panelElement, dotNetHelper, type, latchingType, container, stateChanger, minLatchingWidth, latching, size, state, dots1, dots2, stateToggler) {
         this.id = id;
         this.element = panelElement;
         this.container = container;
@@ -133,6 +133,10 @@ class RrPanel {
         this.minLatchingWidth = minLatchingWidth;
         this.latching = latching;
         this.size = size;
+        this.state = state;
+        this.dots1 = dots1;
+        this.dots2 = dots2;
+        this.arrow = stateToggler;
     }
 
     disableTransitions() {
@@ -145,6 +149,24 @@ class RrPanel {
         this.stateChanger.classList.remove('no-transition');
         this.element.classList.remove('no-transition');
         this.container.classList.remove('no-transition');
+    }
+
+    makeExpanded() {
+        if (this.stateChanger.classList.contains('minimized')) this.stateChanger.classList.remove('minimized');
+        if (this.container.classList.contains('minimized')) this.container.classList.remove('minimized');
+        if (this.element.classList.contains('minimized')) this.element.classList.remove('minimized');
+        this.stateChanger.classList.add('expanded');
+        this.container.classList.add('expanded');
+        this.element.classList.add('expanded');
+    }
+
+    makeMinimized() {
+        if (this.stateChanger.classList.contains('expanded')) this.stateChanger.classList.remove('expanded');
+        if (this.container.classList.contains('expanded')) this.container.classList.remove('expanded');
+        if (this.element.classList.contains('expanded')) this.element.classList.remove('expanded');
+        this.stateChanger.classList.add('minimized');
+        this.container.classList.add('minimized');
+        this.element.classList.add('minimized');
     }
 }
 
@@ -164,7 +186,17 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
         const panelElement = document.getElementById(`${dto.id}-panel`);
         const container = document.getElementById(`${dto.id}-panel-container`);
         const stateChanger = document.getElementById(`${dto.id}-panel-statechanger`);
-        const panel = new RrPanel(dto.id, panelElement, dto.dotNetObjectReference, dto.pType, dto.latchingType, container, stateChanger, dto.minLatchingWidth, dto.latching, dto.size);
+        const stateToggler = document.getElementById(`${dto.id}-panel-arrow-container`);
+        let dots1;
+        let dots2;
+        if (dto.pType === 'Left' || dto.pType === 'Right') {
+            dots1 = document.getElementById(`${dto.id}-dots-container-top`);
+            dots2 = document.getElementById(`${dto.id}-dots-container-bottom`);
+        } else if (dto.pType === 'Top' || dto.pType === 'Bottom') {
+            dots1 = document.getElementById(`${dto.id}-dots-container-left`);
+            dots2 = document.getElementById(`${dto.id}-dots-container-right`);
+        }
+        const panel = new RrPanel(dto.id, panelElement, dto.dotNetObjectReference, dto.pType, dto.latchingType, container, stateChanger, dto.minLatchingWidth, dto.latching, dto.size, dto.state, dots1, dots2, stateToggler);
         panels.push(panel);
 
         const onMouseDown = (event) => {
@@ -194,9 +226,6 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
                         }
                     }
                 } else {
-                    console.log(`diffX: ${diffX}, diffY: ${diffY}`);
-                    console.log(`offsetWidth ${initialWidth}`);
-                    console.log(`offsetHeight ${initialHieght}`);
                     if (panel.type === 'Left') {
                         panel.element.style.width = `${initialWidth + diffX}px`;
                         panel.stateChanger.style.left = `${initialStateChangerLeft + diffX}px`;
@@ -224,6 +253,7 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
                         if (panel.type === 'Left')
                             panel.stateChanger.style.left = `${panel.stateChanger.offsetLeft}px`;
                     }
+                    panel.size = `${size}px`;
                     panel.enableTransitions();
                     panel.dotNetHelper.invokeMethodAsync('FinishedDragging', size).catch(err => console.error(err));
                 } else {
@@ -242,6 +272,7 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
                                 panel.stateChanger.style.top = `${panel.stateChanger.offsetTop}px`;
                         }
                     }
+                    panel.size = `${size}px`;
                     panel.enableTransitions();
                     panel.dotNetHelper.invokeMethodAsync('FinishedDragging', size).catch(err => console.error(err));
                 }
@@ -255,17 +286,13 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
         if (panel.latching && panel.latchingType === 'Vertical') {
             panel.stateChanger.addEventListener('mousedown', onMouseDown);
         } else {
-            if (panel.type === 'Left' || panel.type === 'Right') {
-                document.getElementById(`${panel.id}-dots-container-top`).addEventListener('mousedown', onMouseDown);
-                document.getElementById(`${panel.id}-dots-container-bottom`).addEventListener('mousedown', onMouseDown);
-            } else if (panel.type === 'Top' || panel.type === 'Bottom') {
-                document.getElementById(`${panel.id}-dots-container-left`).addEventListener('mousedown', onMouseDown);
-                document.getElementById(`${panel.id}-dots-container-right`).addEventListener('mousedown', onMouseDown);
-            }
+            panel.dots1.addEventListener('mousedown', onMouseDown);
+            panel.dots2.addEventListener('mousedown', onMouseDown);
         }
 
         panel.element.addEventListener('mousedown', () => focusPanel(panel));
         panel.stateChanger.addEventListener('mousedown', () => focusPanel(panel));
+        panel.arrow.addEventListener('mousedown', () => toggleUIState(panel));
     });
 
     window.RrPage[pageId].panels = panels;
@@ -280,6 +307,66 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
             }
             panel.dotNetHelper.invokeMethodAsync('PanelClickedOnScriptHandler', panel.id, action).catch(err => console.error(err));
         });
+    };
+
+    const toggleUIState = (panel) => {
+        if (panel.type === 'Left') {
+            if (panel.state === 'Collapsed') {
+                panel.state = 'Expanded';
+                panel.container.style.left = `0px`;
+                panel.dots1.style.display = 'block';
+                panel.dots2.style.display = 'block';
+                panel.makeExpanded();
+            } else if (panel.state === 'Expanded') {
+                panel.state = 'Collapsed';
+                panel.container.style.left = `-${panel.size}`;
+                panel.dots1.style.display = 'none';
+                panel.dots2.style.display = 'none';
+                panel.makeMinimized();
+            }
+        } else if (panel.type === 'Right') {
+            if (panel.state === 'Collapsed') {
+                panel.state = 'Expanded';
+                panel.container.style.right = `${panel.size}`;
+                panel.dots1.style.display = 'block';
+                panel.dots2.style.display = 'block';
+                panel.makeExpanded();
+            } else if (panel.state === 'Expanded') {
+                panel.state = 'Collapsed';
+                panel.container.style.right = `0px`;
+                panel.dots1.style.display = 'none';
+                panel.dots2.style.display = 'none';
+                panel.makeMinimized();
+            }
+        } else if (panel.type === 'Top') {
+            if (panel.state === 'Collapsed') {
+                panel.state = 'Expanded';
+                panel.container.style.top = `0px`;
+                panel.dots1.style.display = 'block';
+                panel.dots2.style.display = 'block';
+                panel.makeExpanded();
+            } else if (panel.state === 'Expanded') {
+                panel.state = 'Collapsed';
+                panel.container.style.top = `-${panel.size}`;
+                panel.dots1.style.display = 'none';
+                panel.dots2.style.display = 'none';
+                panel.makeMinimized();
+            }
+        } else if (panel.type === 'Bottom') {
+            if (panel.state === 'Collapsed') {
+                panel.state = 'Expanded';
+                panel.container.style.bottom = `${panel.size}`;
+                panel.dots1.style.display = 'block';
+                panel.dots2.style.display = 'block';
+                panel.makeExpanded();
+            } else if (panel.state === 'Expanded') {
+                panel.state = 'Collapsed';
+                panel.container.style.bottom = `0px`;
+                panel.dots1.style.display = 'none';
+                panel.dots2.style.display = 'none';
+                panel.makeMinimized();
+            }
+        }
     };
 
     const updateBounds = () => {
@@ -317,6 +404,7 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
                     panel.stateChanger.style.bottom = "0px";
                 } else if (panel.type === 'Left') {
                     panel.container.style.top = "0px";
+                    panel.container.style.left = "0px";
                     panel.element.style.height = `${window.RrPage[pageId].bounds.height}px`;
                     panel.element.style.width = panel.size;
                     panel.stateChanger.style.height = `${window.RrPage[pageId].bounds.height}px`;

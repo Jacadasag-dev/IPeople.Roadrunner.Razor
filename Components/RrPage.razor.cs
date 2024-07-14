@@ -47,21 +47,6 @@ namespace IPeople.Roadrunner.Razor.Components
         public LatchingTypes LatchingType { get; set; }
         #endregion
 
-        /// <summary>
-        /// Used for interfacing with javascript for sizing the body
-        /// </summary>
-        public class Bounds
-        {
-            public double Top { get; set; }
-            public double Left { get; set; }
-            public double Width { get; set; }
-            public double Height { get; set; }
-            public double Right { get; set; }
-            public double Bottom { get; set; }
-        }
-
-        private Bounds? bounds;
-
         private class RrPanelDto
         {
             public string? Id { get; set; }
@@ -70,6 +55,7 @@ namespace IPeople.Roadrunner.Razor.Components
             public bool Latching { get; set; }
             public string? LatchingType { get; set; }
             public int MinLatchingWidth { get; set; }
+            public string? State { get; set; }
             public DotNetObjectReference<RrPanel>? DotNetObjectReference { get; set; }
         }
 
@@ -77,18 +63,6 @@ namespace IPeople.Roadrunner.Razor.Components
         {
             if (firstRender)
             {
-
-                //String Array of panelIds
-                //string?[]? panelIds = RrStateService.GetComponentsByTag<RrPanel>("Panel")?.Select(panel => panel.Id).ToArray();
-                //string?[]? panelInitialSizes = RrStateService.GetComponentsByTag<RrPanel>("Panel")?.Select(panel => panel.Size).ToArray();
-
-                //if (panelIds is null || panelInitialSizes is null)
-                //    return;
-
-                //var combinedIdsAndSizes = panelIds?.Zip(panelInitialSizes, (id, size) => new { Id = id, Size = size }).ToArray();
-
-
-
                 List<RrPanel>? panels = RrStateService.GetComponentsByTag<RrPanel>("Panel");
                         if (panels is null)
                             return;
@@ -101,29 +75,12 @@ namespace IPeople.Roadrunner.Razor.Components
                     Latching = panel.Latching,
                     LatchingType = panel.LatchingType.ToString(),
                     MinLatchingWidth = panel.LatchingPanelsMininmumAdjustmentSize,
+                    State = panel.InitialState.ToString(),
                     DotNetObjectReference = panel.dotNetReference
                 }).ToList();
 
-
-
                 await JS.InvokeVoidAsync("registerPageAndPanels", $"{Id}-body", panelDtos);
-
             }
-        }
-
-        [JSInvokable]
-        public void UpdateBounds(Bounds newBounds)
-        {
-            bounds = newBounds;
-            RrStateService.AppGlobalVariables.BodyBounds = new();
-            RrStateService.AppGlobalVariables.BodyBounds.TopPosition = (int)bounds.Top;
-            RrStateService.AppGlobalVariables.BodyBounds.BottomPosition = (int)bounds.Bottom;
-            RrStateService.AppGlobalVariables.BodyBounds.LeftPosition = (int)bounds.Left;
-            RrStateService.AppGlobalVariables.BodyBounds.RightPosition = (int)bounds.Right;
-            RrStateService.AppGlobalVariables.BodyBounds.Width = (int)bounds.Width;
-            RrStateService.AppGlobalVariables.BodyBounds.Height = (int)bounds.Height;
-            //StateHasChanged();
-            //RrStateService.RefreshComponentsByTag("Panel");
         }
 
         private string GetBodyHeight()
