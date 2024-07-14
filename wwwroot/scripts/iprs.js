@@ -120,7 +120,6 @@ class RrPage {
         this.panels = panels;
     }
 }
-
 class RrPanel {
     constructor(id, panelElement, dotNetHelper, type, latchingType, container, stateChanger, minLatchingWidth, latching, size, state, dots1, dots2, stateToggler) {
         this.id = id;
@@ -171,7 +170,6 @@ class RrPanel {
 }
 
 window.RrPage = {};
-
 window.registerPageAndPanels = function (pageId, panelDtos) {
     // Register Page
     if (!window.RrPage[pageId]) {
@@ -387,7 +385,9 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
                 }
             } else {
                 if (panel.type === 'Top') {
-                    panel.container.style.top = `0px`;
+                    if (panel.state === 'Expanded')
+                        panel.container.style.top = `0px`;
+                    
                     panel.container.style.left = `${window.RrPage[pageId].bounds.left}px`;
                     panel.element.style.width = `${window.RrPage[pageId].bounds.width}px`;
                     panel.element.style.height = panel.size;
@@ -395,7 +395,9 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
                     panel.stateChanger.style.height = "10px";
                     panel.stateChanger.style.top = panel.size;
                 } else if (panel.type === 'Bottom') {
-                    panel.container.style.bottom = panel.size;
+                    if (panel.state === 'Expanded')
+                        panel.container.style.bottom = panel.size;
+
                     panel.container.style.left = `${window.RrPage[pageId].bounds.left}px`;
                     panel.element.style.width = `${window.RrPage[pageId].bounds.width}px`;
                     panel.element.style.height = panel.size;
@@ -403,16 +405,20 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
                     panel.stateChanger.style.height = "10px";
                     panel.stateChanger.style.bottom = "0px";
                 } else if (panel.type === 'Left') {
+                    if (panel.state === 'Expanded')
+                        panel.container.style.left = "0px";
+
                     panel.container.style.top = "0px";
-                    panel.container.style.left = "0px";
                     panel.element.style.height = `${window.RrPage[pageId].bounds.height}px`;
                     panel.element.style.width = panel.size;
                     panel.stateChanger.style.height = `${window.RrPage[pageId].bounds.height}px`;
                     panel.stateChanger.style.width = "10px";
                     panel.stateChanger.style.left = panel.size;
                 } else if (panel.type === 'Right') {
+                    if (panel.state === 'Expanded')
+                        panel.container.style.right = panel.size;
+                        
                     panel.container.style.top = "0px";
-                    panel.container.style.right = panel.size;
                     panel.element.style.height = `${window.RrPage[pageId].bounds.height}px`;
                     panel.element.style.width = panel.size;
                     panel.stateChanger.style.height = `${window.RrPage[pageId].bounds.height}px`;

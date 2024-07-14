@@ -72,19 +72,6 @@ namespace IPeople.Roadrunner.Razor.Components
         #endregion
 
         #region Private Fields
-        private string? panelWidth;
-        private string? panelHeight;
-        private string? panelTop;
-        private string? panelLeft;
-        private string? panelRight;
-        private string? panelBottom;
-        private string? stateChangerWidth;
-        private string? stateChangerHeight;
-        private string? stateChangerPosition;
-        private string? stateChangerRight;
-        private string? panelStateCssClass;
-        private string? panelBodyOffsetHeight;
-        private string? adjustedLatchedPanelSize;
 
         #endregion
 
@@ -103,8 +90,6 @@ namespace IPeople.Roadrunner.Razor.Components
             LatchingPanelInitialSize = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.LatchingPanelInitialSize, LatchingPanelInitialSize);
             LatchingPanelsMininmumAdjustmentSize = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.LatchingPanelsMininmumAdjustmentSize, LatchingPanelsMininmumAdjustmentSize);
             InitialState = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.InitialState, InitialState);
-            // PanelHeightOffset
-            panelBodyOffsetHeight = GetBodySizeOffset();
             // Set DotNetReference
             dotNetReference = DotNetObjectReference.Create(this);
         }
