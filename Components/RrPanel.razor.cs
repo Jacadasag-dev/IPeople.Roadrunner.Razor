@@ -59,20 +59,10 @@ namespace IPeople.Roadrunner.Razor.Components
         public bool HeaderDefaultStyling { get; set; } = false;
 
         [CascadingParameter]
-        public string? LatchingPanelInitialSize { get; set; }
-
-        [CascadingParameter]
-        public int LatchingPanelsMininmumAdjustmentSize { get; set; }
-
-        [CascadingParameter]
         public bool Latching { get; set; }
 
         [CascadingParameter]
         public LatchingTypes LatchingType { get; set; }
-        #endregion
-
-        #region Private Fields
-
         #endregion
 
         public DotNetObjectReference<RrPanel>? dotNetReference;
@@ -87,13 +77,10 @@ namespace IPeople.Roadrunner.Razor.Components
             PType = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.PType, PType);
             Latching = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.Latching, Latching);
             LatchingType = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.LatchingType, LatchingType);
-            LatchingPanelInitialSize = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.LatchingPanelInitialSize, LatchingPanelInitialSize);
-            LatchingPanelsMininmumAdjustmentSize = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.LatchingPanelsMininmumAdjustmentSize, LatchingPanelsMininmumAdjustmentSize);
             InitialState = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.InitialState, InitialState);
             // Set DotNetReference
             dotNetReference = DotNetObjectReference.Create(this);
         }
-
         private string GetBodySizeOffset()
         {
             if (Header is null && Footer is null)
@@ -109,7 +96,6 @@ namespace IPeople.Roadrunner.Razor.Components
                 return "35px";
             }
         }
-
         private string GetInitialStateCssClass()
         {
             if (Latching && LatchingType == LatchingTypes.Vertical) return "latching-vertical";
@@ -128,7 +114,6 @@ namespace IPeople.Roadrunner.Razor.Components
             }
             return "invalid-state";
         }
-
         private string GetPanelTypeCssClass()
         {
             if (PType == PanelTypes.Left)
@@ -149,7 +134,6 @@ namespace IPeople.Roadrunner.Razor.Components
             }
             return "invalid-type";
         }
-
         private string GetCenterStateChangerCssClass()
         {
 
@@ -162,38 +146,6 @@ namespace IPeople.Roadrunner.Razor.Components
                 return "center-right";
             }
             return "";
-        }
-
-        [JSInvokable]
-        public void FinishedDragging(int newSize)
-        {
-            string newPanelSize;
-            if (newSize >= 0)
-            {
-                if (newSize < 100)
-                {
-                    newPanelSize = Size ?? "350px";
-                }
-                else
-                {
-                    newPanelSize = $"{newSize}px";
-
-                }
-                RrStateService.SetComponentPropertyById<RrPanel, string>(Id, s => s.Size, newPanelSize);
-            }
-            StateHasChanged();
-        }
-
-        [JSInvokable]
-        public void PanelClickedOnScriptHandler(string id, string action)
-        {
-            if (action == "latching-collapse" && id != Id)
-            
-            if (action == "panel-focused")
-            {
-                StateHasChanged();
-            }
-
         }
         private string GetAllowedScrolling()
         {
@@ -214,7 +166,6 @@ namespace IPeople.Roadrunner.Razor.Components
             }
             return "";
         }
-
         private string GetHeaderStylingCssClass()
         {
             if (HeaderDefaultStyling)

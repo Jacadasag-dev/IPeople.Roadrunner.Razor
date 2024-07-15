@@ -406,8 +406,6 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
         // panel.dotNetHelper.invokeMethodAsync('PanelClickedOnScriptHandler', panel.id, action).catch(err => console.error(err));
     };
 
-
-
     const toggleUIState = (panel) => {
         if (panel.type === 'Left') {
             if (panel.state === 'Collapsed') {
@@ -544,9 +542,6 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
         new ResizeObserver(updateBounds).observe(pageElement);
     }
 };
-
-
-
 
 
 window.tables = {};

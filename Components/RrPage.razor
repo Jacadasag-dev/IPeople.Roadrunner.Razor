@@ -8,19 +8,26 @@
         </div>
     }
 
-    @if (Body != null)
+    @if (Panels != null)
     {
         <CascadingValue Value="@LatchingType">
             <CascadingValue Value="@LatchingPanelsMininmumAdjustmentSize">
                 <CascadingValue Value="@LatchingPanelInitialSize">
-                    <div id="@($"{Id}-body")" class="Rr-page-body-container" style="@GetBodyHeight()">
-                        <div class="Rr-page-body">
-                            @Body
-                        </div>
+                    <div id="@($"{Id}-panels")" class="Rr-page-panels-container" style="@GetBodyHeight()">
+                        @Panels
                     </div>
                 </CascadingValue>
             </CascadingValue>
         </CascadingValue>
+    }
+
+    @if (Body != null)
+    {
+        <div id="@($"{Id}-body")" class="Rr-page-body-container" style="@GetBodyHeight()">
+            <div class="Rr-page-body">
+                @Body
+            </div>
+        </div>
     }
 
     @if (Footer != null)

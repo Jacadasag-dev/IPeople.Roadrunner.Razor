@@ -1,12 +1,6 @@
 ﻿using IPeople.Roadrunner.Razor.Models;
-using IPeople.Roadrunner.Razor.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace IPeople.Roadrunner.Razor.Components
 {
@@ -18,6 +12,9 @@ namespace IPeople.Roadrunner.Razor.Components
 
         [Parameter]
         public RenderFragment Header { get; set; }
+
+        [Parameter]
+        public RenderFragment Panels { get; set; }
 
         [Parameter]
         public string? Tag { get; set; }
@@ -74,12 +71,12 @@ namespace IPeople.Roadrunner.Razor.Components
                     PType = panel.PType.ToString(),
                     Latching = panel.Latching,
                     LatchingType = panel.LatchingType.ToString(),
-                    MinLatchingWidth = panel.LatchingPanelsMininmumAdjustmentSize,
+                    MinLatchingWidth = LatchingPanelsMininmumAdjustmentSize,
                     State = panel.InitialState.ToString(),
                     DotNetObjectReference = panel.dotNetReference
                 }).ToList();
 
-                await JS.InvokeVoidAsync("registerPageAndPanels", $"{Id}-body", panelDtos);
+                await JS.InvokeVoidAsync("registerPageAndPanels", $"{Id}-panels", panelDtos);
             }
         }
 

@@ -7,34 +7,10 @@
     opacity: 1; /* Default fully visible */
 }
 
-
-    .Rr-panel-container.left {
-        top: var(--panel-top);
-        left: var(--panel-left);
-    }
-
-    .Rr-panel-container.right {
-        top: var(--panel-top);
-        right: var(--panel-right);
-    }
-
-    .Rr-panel-container.top {
-        top: var(--panel-top);
-        z-index: 1;
-    }
-
-    .Rr-panel-container.bottom {
-        bottom: var(--panel-bottom);
-        z-index: 1;
-    }
-
 .Rr-panel {
     position: absolute;
     background: white;
     overflow: hidden;
-    height: var(--panel-height);
-    width: var(--panel-width);
-
 }
 
     .Rr-panel.left {
@@ -58,7 +34,6 @@
     height: 35px;
     align-content: center;
     background: #E8E8E8;
-    /*box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);*/
     border-bottom: 2px solid rgba(0, 0, 0, 0.1); /* Adjust thickness and color as needed */
     opacity: 1;
     transition: opacity 0.5s linear;
@@ -89,7 +64,6 @@
     bottom: 0px;
     background: #E8E8E8;
     border-top: 2px solid rgba(0, 0, 0, 0.1); /* Adjust thickness and color as needed */
-    /*box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1), 0 -2px 4px -1px rgba(0, 0, 0, 0.06);*/
     opacity: 1;
     transition: opacity 0.5s linear;
 }
@@ -104,7 +78,6 @@
     .Rr-panel-statechanger.left {
         border-right: thin solid #c8c6c6;
         border-left: thin solid #c8c6c6;
-        left: var(--state-changer-position);
         box-shadow: 4px 0 6px -1px rgba(0, 0, 0, 0.1), 2px 0 4px -1px rgba(0, 0, 0, 0.06);
         transition: left 0.3s ease, right 0.3s ease;
         background: linear-gradient(#E8E8E8, #d0d0d0, #E8E8E8);
@@ -113,7 +86,6 @@
     .Rr-panel-statechanger.right {
         border-right: thin solid #c8c6c6;
         border-left: thin solid #c8c6c6;
-        right: var(--state-changer-position);
         box-shadow: -4px 0 6px -1px rgba(0, 0, 0, 0.1), -2px 0 4px -1px rgba(0, 0, 0, 0.06);
         transition: left 0.3s ease, right 0.3s ease;
         background: linear-gradient(#E8E8E8, #d0d0d0, #E8E8E8);
@@ -122,7 +94,6 @@
     .Rr-panel-statechanger.top {
         border-top: thin solid #c8c6c6;
         border-bottom: thin solid #c8c6c6;
-        top: var(--state-changer-position);
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         transition: top 0.3s ease, bottom 0.3s ease;
         display: flex;
@@ -133,7 +104,6 @@
     .Rr-panel-statechanger.bottom {
         border-top: thin solid #c8c6c6;
         border-bottom: thin solid #c8c6c6;
-        bottom: var(--state-changer-position);
         box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1), 0 -2px 4px -1px rgba(0, 0, 0, 0.06);
         transition: top 0.3s ease, bottom 0.3s ease;
         display: flex;
@@ -144,7 +114,6 @@
     .Rr-panel-statechanger.left.latching-vertical {
         border-right: none;
         border-left: thin solid #c8c6c6;
-        left: var(--state-changer-position);
         box-shadow: none;
         transition: left 0.3s ease, right 0.3s ease;
         background: linear-gradient(#E8E8E8, #d0d0d0, #E8E8E8);
@@ -154,7 +123,6 @@
     .Rr-panel-statechanger.right.latching-vertical {
         border-right: thin solid #c8c6c6;
         border-left: none;
-        right: var(--state-changer-position);
         box-shadow: none;
         transition: left 0.3s ease, right 0.3s ease;
         background: linear-gradient(#E8E8E8, #d0d0d0, #E8E8E8);
