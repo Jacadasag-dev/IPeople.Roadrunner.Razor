@@ -118,6 +118,8 @@ class RrPage {
         this.id = id;
         this.bounds = bounds;
         this.panels = panels;
+        this.sidePanelHeightOffset = 0;
+        this.sidePanelTopOffset = 0;
     }
 }
 class RrPanel {
@@ -243,6 +245,7 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
             const onMouseUp = () => {
                 document.removeEventListener('mousemove', onMouseMove);
                 document.removeEventListener('mouseup', onMouseUp);
+
                 let size = -1;
                 if (panel.latching && panel.latchingType === 'Vertical') {
                     size = parseFloat(panel.element.style.width);
@@ -258,21 +261,36 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
                     if (panel.type === 'Left' || panel.type === 'Right') {
                         size = parseFloat(panel.element.style.width);
                         if (size < 100) {
-                            panel.element.style.width = `${panel.element.offsetWidth}px`;
-                            if (panel.type === 'Left')
-                                panel.stateChanger.style.left = `${panel.stateChanger.offsetLeft}px`;
+                            toggleUIState(panel);
+                            if (panel.type === 'Left') {
+                                panel.stateChanger.style.left = panel.size;
+                                setTimeout(function () {
+                                    panel.element.style.width = panel.size;
+                                }, 200);
+                                
+                            } else {
+                                panel.element.style.width = panel.size;
+                            }
                         }
                     } else if (panel.type === 'Top' || panel.type === 'Bottom') {
                         size = parseFloat(panel.element.style.height);
                         if (size < 100) {
-                            panel.element.style.height = `${panel.element.offsetHeight}px`;
-                            if (panel.type === 'Top')
-                                panel.stateChanger.style.top = `${panel.stateChanger.offsetTop}px`;
+                            toggleUIState(panel);
+                            if (panel.type === 'Top') {
+                                panel.stateChanger.style.top = panel.size;
+                                setTimeout(function () {
+                                    panel.element.style.height = panel.size;
+                                }, 200);
+                            } else {
+                                panel.element.style.height = panel.size;
+                            }    
                         }
                     }
-                    panel.size = `${size}px`;
                     panel.enableTransitions();
-                    panel.dotNetHelper.invokeMethodAsync('FinishedDragging', size).catch(err => console.error(err));
+                    if (size >= 100) {
+                        panel.size = `${size}px`;
+                        panel.dotNetHelper.invokeMethodAsync('FinishedDragging', size).catch(err => console.error(err));
+                    }
                 }
             };
 
@@ -292,6 +310,21 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
         panel.stateChanger.addEventListener('mousedown', () => focusPanel(panel));
         panel.arrow.addEventListener('mousedown', () => toggleUIState(panel));
     });
+
+    // Adjust the side panel offsets based on existence of top and bottom panels
+    const adjustSidePanelOffsets = () => {
+        var containsBottom = panels.some(function (panel) { return panel.type === 'Bottom'; });
+        var containsTop = panels.some(function (panel) { return panel.type === 'Top'; });
+        if (containsTop)
+            window.RrPage[pageId].sidePanelTopOffset += 10;
+
+        if (containsBottom) {
+            window.RrPage[pageId].sidePanelHeightOffset -= 10;
+            if (containsTop)
+                window.RrPage[pageId].sidePanelHeightOffset -= 10;
+        }
+    }
+    adjustSidePanelOffsets();
 
     window.RrPage[pageId].panels = panels;
 
@@ -408,20 +441,20 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
                     if (panel.state === 'Expanded')
                         panel.container.style.left = "0px";
 
-                    panel.container.style.top = "0px";
-                    panel.element.style.height = `${window.RrPage[pageId].bounds.height}px`;
+                    panel.container.style.top = `${0 + window.RrPage[pageId].sidePanelTopOffset}px`;
+                    panel.element.style.height = `${window.RrPage[pageId].bounds.height + window.RrPage[pageId].sidePanelHeightOffset}px`;
                     panel.element.style.width = panel.size;
-                    panel.stateChanger.style.height = `${window.RrPage[pageId].bounds.height}px`;
+                    panel.stateChanger.style.height = `${window.RrPage[pageId].bounds.height + window.RrPage[pageId].sidePanelHeightOffset}px`;
                     panel.stateChanger.style.width = "10px";
                     panel.stateChanger.style.left = panel.size;
                 } else if (panel.type === 'Right') {
                     if (panel.state === 'Expanded')
                         panel.container.style.right = panel.size;
                         
-                    panel.container.style.top = "0px";
-                    panel.element.style.height = `${window.RrPage[pageId].bounds.height}px`;
+                    panel.container.style.top = `${0 + window.RrPage[pageId].sidePanelTopOffset}px`;
+                    panel.element.style.height = `${window.RrPage[pageId].bounds.height + window.RrPage[pageId].sidePanelHeightOffset}px`;
                     panel.element.style.width = panel.size;
-                    panel.stateChanger.style.height = `${window.RrPage[pageId].bounds.height}px`;
+                    panel.stateChanger.style.height = `${window.RrPage[pageId].bounds.height + window.RrPage[pageId].sidePanelHeightOffset}px`;
                     panel.stateChanger.style.width = "10px";
                     panel.stateChanger.style.right = "0px";
                 }
