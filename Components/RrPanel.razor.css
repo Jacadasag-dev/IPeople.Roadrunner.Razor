@@ -4,7 +4,9 @@
     padding: 0px;
     margin: 0px;
     transition: 0.3s ease;
+    opacity: 1; /* Default fully visible */
 }
+
 
     .Rr-panel-container.left {
         top: var(--panel-top);

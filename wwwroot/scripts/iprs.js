@@ -118,8 +118,6 @@ class RrPage {
         this.id = id;
         this.bounds = bounds;
         this.panels = panels;
-        this.sidePanelHeightOffset = 0;
-        this.sidePanelTopOffset = 0;
     }
 }
 class RrPanel {
@@ -138,6 +136,11 @@ class RrPanel {
         this.dots1 = dots1;
         this.dots2 = dots2;
         this.arrow = stateToggler;
+        this.isFocused = false;
+        this.wasFocused1 = false;
+        this.wasFocused2 = false;
+        this.wasFocused3 = false;
+        this.clickOrder = 0;
     }
 
     disableTransitions() {
@@ -294,7 +297,6 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
                 }
             };
 
-            panel.disableTransitions();
             document.addEventListener('mousemove', onMouseMove);
             document.addEventListener('mouseup', onMouseUp);
         };
@@ -312,33 +314,99 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
     });
 
     // Adjust the side panel offsets based on existence of top and bottom panels
-    const adjustSidePanelOffsets = () => {
-        var containsBottom = panels.some(function (panel) { return panel.type === 'Bottom'; });
-        var containsTop = panels.some(function (panel) { return panel.type === 'Top'; });
-        if (containsTop)
-            window.RrPage[pageId].sidePanelTopOffset += 10;
+    function getVerticalPanelHeightOffsets(panel) {
+        var offset = 0;
+        var bottomPanel = window.RrPage[pageId].panels.find(p => p.type === 'Bottom');
+        var topPanel = window.RrPage[pageId].panels.find(p => p.type === 'Top');
+        if (bottomPanel && bottomPanel.state === 'Expanded' && topPanel && topPanel.state === 'Expanded') 
+            offset = 0;
 
-        if (containsBottom) {
-            window.RrPage[pageId].sidePanelHeightOffset -= 10;
-            if (containsTop)
-                window.RrPage[pageId].sidePanelHeightOffset -= 10;
-        }
+        if (bottomPanel && bottomPanel.state === 'Collapsed' && topPanel && topPanel.state === 'Collapsed') 
+            offset = -20;
+        
+        if (bottomPanel && bottomPanel.state === 'Collapsed' && topPanel && topPanel.state === 'Expanded') 
+            offset = -10;
+        
+        if (bottomPanel && bottomPanel.state === 'Expanded' && topPanel && topPanel.state === 'Collapsed') 
+            offset = -10;
+
+        console.log(offset);
+        return offset;
     }
-    adjustSidePanelOffsets();
+
+    function getHorizontalPanelWidthOffsets(panel) {
+        var offset = 0;
+        if (panel && panel.state === 'Expanded') {
+            offset = 0;
+        }
+        if (panel && panel.state === 'Collapsed') {
+            offset = 0;
+        }
+
+        return offset;
+    }
+
+    function getVerticalPanelTopOffsets(panel) {
+        var offset = 0;
+        var bottomPanel = window.RrPage[pageId].panels.find(p => p.type === 'Bottom');
+        var topPanel = window.RrPage[pageId].panels.find(p => p.type === 'Top');
+        if (bottomPanel && bottomPanel.state === 'Expanded' && topPanel && topPanel.state === 'Expanded') 
+            offset = 0;
+        
+        if (bottomPanel && bottomPanel.state === 'Collapsed' && topPanel && topPanel.state === 'Collapsed') 
+            offset = 10;
+        
+        if (bottomPanel && bottomPanel.state === 'Expanded' && topPanel && topPanel.state === 'Collapsed') 
+            offset = 10;
+        
+        return offset;
+    }
+
+    function getHorizontalPanelLeftOffsets(panel) {
+        var offset = 0;
+        if (panel && panel.state === 'Expanded') 
+            offset = 0;
+        
+        if (panel && panel.state === 'Collapsed') 
+            offset = 0;
+        
+        return offset;
+    }
 
     window.RrPage[pageId].panels = panels;
 
     const focusPanel = (panel) => {
-        window.RrPage[pageId].panels.forEach(p => {
-            let action = "";
-            if (p.latching && p.latchingType === 'Vertical') {
-                action = "latching-collapse";
-            } else {
-                action = "panel-focused";
-            }
-            panel.dotNetHelper.invokeMethodAsync('PanelClickedOnScriptHandler', panel.id, action).catch(err => console.error(err));
+
+        const panels = window.RrPage[pageId].panels;
+
+        panels.forEach(p => {
+            p.isFocused = (p.id === panel.id);
         });
+
+        panels.sort((a, b) => {
+            if (a.isFocused && !b.isFocused) return -1;
+            if (!a.isFocused && b.isFocused) return 1;
+            return 0;
+        });
+
+        // Update zIndex based on the sorted order
+        panels.forEach((p, i) => {
+            p.container.style.zIndex = `${20 + (panels.length - i)}`; // Ensure highest z-index for the top panel
+        });
+
+
+        panels.forEach((p, i) => {
+            setPanelBounds(p);
+        });
+
+        if (panel.state === 'Collapsed') {
+            panel.container.style.zIndex = 20;
+        }
+        // If you need to invoke the PanelClickedOnScriptHandler, uncomment the line below
+        // panel.dotNetHelper.invokeMethodAsync('PanelClickedOnScriptHandler', panel.id, action).catch(err => console.error(err));
     };
+
+
 
     const toggleUIState = (panel) => {
         if (panel.type === 'Left') {
@@ -400,65 +468,73 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
         }
     };
 
+    function setPanelBounds(panel) {
+        if (panel.latching) {
+            if (panel.latchingType === 'Vertical') {
+                panel.stateChanger.style.height = `${window.RrPage[pageId].bounds.height}px`;
+                if (panel.type === 'Left') {
+                    panel.container.style.left = `${window.RrPage[pageId].bounds.left}px`;
+                }
+                if (panel.type === 'Right') {
+                    panel.container.style.right = `${window.RrPage[pageId].bounds.right - panel.element.offsetWidth - 20}px`;
+                    panel.element.style.width = `${window.RrPage[pageId].bounds.right - panel.element.offsetWidth - 20}px`;
+                }
+            } else if (panel.latchingType === 'Horizontal') {
+                panel.stateChanger.style.width = `${window.RrPage[pageId].bounds.width}px`;
+            }
+        } else {
+            if (panel.type === 'Top') {
+                if (panel.state === 'Expanded')
+                    panel.container.style.top = `0px`;
+
+                panel.container.style.left = `${window.RrPage[pageId].bounds.left + getHorizontalPanelLeftOffsets(panel)}px`;
+                panel.element.style.width = `${window.RrPage[pageId].bounds.width + getHorizontalPanelWidthOffsets(panel)}px`;
+                panel.element.style.height = panel.size;
+                panel.stateChanger.style.width = `${window.RrPage[pageId].bounds.width + getHorizontalPanelWidthOffsets(panel)}px`;
+                panel.stateChanger.style.height = "10px";
+                panel.stateChanger.style.top = panel.size;
+            } else if (panel.type === 'Bottom') {
+                if (panel.state === 'Expanded')
+                    panel.container.style.bottom = panel.size;
+
+                panel.container.style.left = `${window.RrPage[pageId].bounds.left + getHorizontalPanelLeftOffsets(panel)}px`;
+                panel.element.style.width = `${window.RrPage[pageId].bounds.width + getHorizontalPanelWidthOffsets(panel)}px`;
+                panel.element.style.height = panel.size;
+                panel.stateChanger.style.width = `${window.RrPage[pageId].bounds.width + getHorizontalPanelWidthOffsets(panel)}px`;
+                panel.stateChanger.style.height = "10px";
+                panel.stateChanger.style.bottom = "0px";
+            } else if (panel.type === 'Left') {
+                if (panel.state === 'Expanded')
+                    panel.container.style.left = "0px";
+
+                panel.container.style.top = `${0 + getVerticalPanelTopOffsets(panel)}px`;
+                panel.element.style.height = `${window.RrPage[pageId].bounds.height + getVerticalPanelHeightOffsets(panel)}px`;
+                panel.element.style.width = panel.size;
+                panel.stateChanger.style.height = `${window.RrPage[pageId].bounds.height + getVerticalPanelHeightOffsets(panel)}px`;
+                panel.stateChanger.style.width = "10px";
+                panel.stateChanger.style.left = panel.size;
+            } else if (panel.type === 'Right') {
+                if (panel.state === 'Expanded')
+                    panel.container.style.right = panel.size;
+
+                panel.container.style.top = `${0 + getVerticalPanelTopOffsets(panel)}px`;
+                panel.element.style.height = `${window.RrPage[pageId].bounds.height + getVerticalPanelHeightOffsets(panel)}px`;
+                panel.element.style.width = panel.size;
+                panel.stateChanger.style.height = `${window.RrPage[pageId].bounds.height + getVerticalPanelHeightOffsets(panel)}px`;
+                panel.stateChanger.style.width = "10px";
+                panel.stateChanger.style.right = "0px";
+            }
+        }
+    }
+
     const updateBounds = () => {
         window.RrPage[pageId].bounds = window.getElementBounds(pageId);
         window.RrPage[pageId].panels.forEach(panel => {
-            if (panel.latching) {
-                if (panel.latchingType === 'Vertical') {
-                    panel.stateChanger.style.height = `${window.RrPage[pageId].bounds.height}px`;
-                    if (panel.type === 'Left') {
-                        panel.container.style.left = `${window.RrPage[pageId].bounds.left}px`;
-                    }
-                    if (panel.type === 'Right') {
-                        panel.container.style.right = `${window.RrPage[pageId].bounds.right - panel.element.offsetWidth - 20}px`;
-                        panel.element.style.width = `${window.RrPage[pageId].bounds.right - panel.element.offsetWidth - 20}px`;
-                    }
-                } else if (panel.latchingType === 'Horizontal') {
-                    panel.stateChanger.style.width = `${window.RrPage[pageId].bounds.width}px`;
-                }
-            } else {
-                if (panel.type === 'Top') {
-                    if (panel.state === 'Expanded')
-                        panel.container.style.top = `0px`;
-                    
-                    panel.container.style.left = `${window.RrPage[pageId].bounds.left}px`;
-                    panel.element.style.width = `${window.RrPage[pageId].bounds.width}px`;
-                    panel.element.style.height = panel.size;
-                    panel.stateChanger.style.width = `${window.RrPage[pageId].bounds.width}px`;
-                    panel.stateChanger.style.height = "10px";
-                    panel.stateChanger.style.top = panel.size;
-                } else if (panel.type === 'Bottom') {
-                    if (panel.state === 'Expanded')
-                        panel.container.style.bottom = panel.size;
-
-                    panel.container.style.left = `${window.RrPage[pageId].bounds.left}px`;
-                    panel.element.style.width = `${window.RrPage[pageId].bounds.width}px`;
-                    panel.element.style.height = panel.size;
-                    panel.stateChanger.style.width = `${window.RrPage[pageId].bounds.width}px`;
-                    panel.stateChanger.style.height = "10px";
-                    panel.stateChanger.style.bottom = "0px";
-                } else if (panel.type === 'Left') {
-                    if (panel.state === 'Expanded')
-                        panel.container.style.left = "0px";
-
-                    panel.container.style.top = `${0 + window.RrPage[pageId].sidePanelTopOffset}px`;
-                    panel.element.style.height = `${window.RrPage[pageId].bounds.height + window.RrPage[pageId].sidePanelHeightOffset}px`;
-                    panel.element.style.width = panel.size;
-                    panel.stateChanger.style.height = `${window.RrPage[pageId].bounds.height + window.RrPage[pageId].sidePanelHeightOffset}px`;
-                    panel.stateChanger.style.width = "10px";
-                    panel.stateChanger.style.left = panel.size;
-                } else if (panel.type === 'Right') {
-                    if (panel.state === 'Expanded')
-                        panel.container.style.right = panel.size;
-                        
-                    panel.container.style.top = `${0 + window.RrPage[pageId].sidePanelTopOffset}px`;
-                    panel.element.style.height = `${window.RrPage[pageId].bounds.height + window.RrPage[pageId].sidePanelHeightOffset}px`;
-                    panel.element.style.width = panel.size;
-                    panel.stateChanger.style.height = `${window.RrPage[pageId].bounds.height + window.RrPage[pageId].sidePanelHeightOffset}px`;
-                    panel.stateChanger.style.width = "10px";
-                    panel.stateChanger.style.right = "0px";
-                }
-            }
+            if (panel.type === 'Left') panel.container.zIndex = 21;
+            if (panel.type === 'Right') panel.container.zIndex = 22;
+            if (panel.type === 'Top') panel.container.zIndex = 23;
+            if (panel.type === 'Bottom') panel.container.zIndex = 24;
+            setPanelBounds(panel);
         });
     };
 
