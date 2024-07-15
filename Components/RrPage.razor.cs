@@ -69,7 +69,8 @@ namespace IPeople.Roadrunner.Razor.Components
                     Id = panel.Id,
                     Size = panel.Size,
                     PType = panel.PType.ToString(),
-                    Latching = panel.Latching,
+                    Latching = (LatchingType == LatchingTypes.Vertical && (panel.PType == PanelTypes.Left || panel.PType == PanelTypes.Right)
+                    || (LatchingType == LatchingTypes.Horizontal && (panel.PType == PanelTypes.Top || panel.PType == PanelTypes.Bottom))),
                     LatchingType = panel.LatchingType.ToString(),
                     MinLatchingWidth = LatchingPanelsMininmumAdjustmentSize,
                     State = panel.InitialState.ToString(),

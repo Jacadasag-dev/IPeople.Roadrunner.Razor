@@ -209,6 +209,7 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
             const initialWidth = panel.element.offsetWidth
             const initialStateChangerLeft = panel.stateChanger.offsetLeft;
             const initialStateChangerTop = panel.stateChanger.offsetTop;
+            panel.disableTransitions();
 
             const onMouseMove = (event) => {
                 const diffX = event.clientX - startX;

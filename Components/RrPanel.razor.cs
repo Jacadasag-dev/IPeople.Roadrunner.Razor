@@ -59,9 +59,6 @@ namespace IPeople.Roadrunner.Razor.Components
         public bool HeaderDefaultStyling { get; set; } = false;
 
         [CascadingParameter]
-        public bool Latching { get; set; }
-
-        [CascadingParameter]
         public LatchingTypes LatchingType { get; set; }
         #endregion
 
@@ -75,7 +72,6 @@ namespace IPeople.Roadrunner.Razor.Components
             Visible = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.Visible, Visible);
             Size = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.Size, Size);
             PType = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.PType, PType);
-            Latching = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.Latching, Latching);
             LatchingType = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.LatchingType, LatchingType);
             InitialState = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.InitialState, InitialState);
             // Set DotNetReference
@@ -98,8 +94,8 @@ namespace IPeople.Roadrunner.Razor.Components
         }
         private string GetInitialStateCssClass()
         {
-            if (Latching && LatchingType == LatchingTypes.Vertical) return "latching-vertical";
-            if (Latching && LatchingType == LatchingTypes.Horizontal) return "latching-horizontal";
+            if (LatchingType == LatchingTypes.Vertical && (PType == PanelTypes.Left || PType == PanelTypes.Right)) return "latching-vertical";
+            if (LatchingType == LatchingTypes.Horizontal && (PType == PanelTypes.Top || PType == PanelTypes.Bottom)) return "latching-horizontal";
             if (InitialState == Models.UIStates.Expanded)
             {
                 return "expanded";
