@@ -121,7 +121,7 @@ class RrPage {
     }
 }
 class RrPanel {
-    constructor(id, panelElement, dotNetHelper, type, latchingType, container, stateChanger, minLatchingWidth, latching, size, state, dots1, dots2, stateToggler) {
+    constructor(id, panelElement, dotNetHelper, type, latchingType, container, stateChanger, minLatchingWidth, latching, size, state, dots1, dots2, stateToggler, latchingStateToggler) {
         this.id = id;
         this.element = panelElement;
         this.container = container;
@@ -136,6 +136,7 @@ class RrPanel {
         this.dots1 = dots1;
         this.dots2 = dots2;
         this.arrow = stateToggler;
+        this.centerDots = latchingStateToggler;
         this.isFocused = false;
         this.wasFocused1 = false;
         this.wasFocused2 = false;
@@ -190,6 +191,7 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
         const container = document.getElementById(`${dto.id}-panel-container`);
         const stateChanger = document.getElementById(`${dto.id}-panel-statechanger`);
         const stateToggler = document.getElementById(`${dto.id}-panel-arrow-container`);
+        const latchingStateToggler = document.getElementById(`${dto.id}-panel-dots-container-center`);
         let dots1;
         let dots2;
         if (dto.pType === 'Left' || dto.pType === 'Right') {
@@ -199,7 +201,7 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
             dots1 = document.getElementById(`${dto.id}-dots-container-left`);
             dots2 = document.getElementById(`${dto.id}-dots-container-right`);
         }
-        const panel = new RrPanel(dto.id, panelElement, dto.dotNetObjectReference, dto.pType, dto.latchingType, container, stateChanger, dto.minLatchingWidth, dto.latching, dto.size, dto.state, dots1, dots2, stateToggler);
+        const panel = new RrPanel(dto.id, panelElement, dto.dotNetObjectReference, dto.pType, dto.latchingType, container, stateChanger, dto.minLatchingWidth, dto.latching, dto.size, dto.state, dots1, dots2, stateToggler, latchingStateToggler);
         panels.push(panel);
 
         const onMouseDown = (event) => {
@@ -209,24 +211,46 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
             const initialWidth = panel.element.offsetWidth
             const initialStateChangerLeft = panel.stateChanger.offsetLeft;
             const initialStateChangerTop = panel.stateChanger.offsetTop;
+            const leftPanelInitialWidth = leftPanel.element.offsetWidth
+            if (panel.latching) {
+                if (panel.latchingType === 'Vertical') {
+                    leftPanel = window.RrPage[pageId].panels.find(p => p.type === 'Left');
+                    rightPanel = window.RrPage[pageId].panels.find(p => p.type === 'Right');
+                    if (leftPanel && rightPanel) {
+                        leftPanel.disableTransitions();
+                        rightPanel.disableTransitions();
+                    }
+                }
+            }
             panel.disableTransitions();
 
             const onMouseMove = (event) => {
                 const diffX = event.clientX - startX;
                 const diffY = event.clientY - startY;
-                if (panel.latching && panel.latchingType === 'Vertical') {
-                    const minWidth = panel.minLatchingWidth;
-                    if (panel.type === 'Left') {
-                        const newWidth = initialWidth + diffX;
-                        if (newWidth >= minWidth) {
-                            panel.element.style.width = `${newWidth}px`;
-                            panel.stateChanger.style.left = `${initialStateChangerLeft + diffX}px`;
-                        }
-                    } else if (panel.type === 'Right') {
-                        const newWidth = initialWidth - diffX;
-                        if (newWidth >= minWidth) {
-                            panel.element.style.width = `${newWidth}px`;
-                            panel.container.style.right = `${newWidth}px`;
+                if (panel.latching) {
+                    if (panel.latchingType === 'Vertical') {
+                        leftPanel = window.RrPage[pageId].panels.find(p => p.type === 'Left');
+                        rightPanel = window.RrPage[pageId].panels.find(p => p.type === 'Right');
+                        if (leftPanel && rightPanel) {
+                            // Calculate the new width while respecting the minimum latching width
+                            let newLeftPanelWidth = leftPanelInitialWidth + diffX;
+                            let newRightPanelWidth = window.RrPage[pageId].bounds.width - 20 - newLeftPanelWidth;
+
+                            if (newLeftPanelWidth < leftPanel.minLatchingWidth) {
+                                newLeftPanelWidth = leftPanel.minLatchingWidth;
+                                newRightPanelWidth = window.RrPage[pageId].bounds.width - 20 - newLeftPanelWidth;
+                            }
+
+                            if (newRightPanelWidth < rightPanel.minLatchingWidth) {
+                                newRightPanelWidth = rightPanel.minLatchingWidth;
+                                newLeftPanelWidth = window.RrPage[pageId].bounds.width - 20 - newRightPanelWidth;
+                            }
+
+                            // Apply the new widths
+                            leftPanel.element.style.width = `${newLeftPanelWidth}px`;
+                            leftPanel.stateChanger.style.left = `${newLeftPanelWidth}px`;
+                            rightPanel.container.style.right = `calc(${window.RrPage[pageId].bounds.width - 20}px - ${newLeftPanelWidth}px)`;
+                            rightPanel.element.style.width = `calc(${window.RrPage[pageId].bounds.width - 20}px - ${newLeftPanelWidth}px)`;
                         }
                     }
                 } else {
@@ -250,18 +274,23 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
                 document.removeEventListener('mousemove', onMouseMove);
                 document.removeEventListener('mouseup', onMouseUp);
 
-                let size = -1;
-                if (panel.latching && panel.latchingType === 'Vertical') {
-                    size = parseFloat(panel.element.style.width);
-                    if (size < 100) {
-                        panel.element.style.width = `${panel.element.offsetWidth}px`;
-                        if (panel.type === 'Left')
-                            panel.stateChanger.style.left = `${panel.stateChanger.offsetLeft}px`;
+                
+                if (panel.latching) {
+                    if (panel.latchingType === 'Vertical') {
+                        let leftSize = -1;
+                        let rightSize = -1;
+                        leftPanel = window.RrPage[pageId].panels.find(p => p.type === 'Left');
+                        rightPanel = window.RrPage[pageId].panels.find(p => p.type === 'Right');
+                        if (leftPanel && rightPanel) {
+                            leftSize = parseFloat(leftPanel.element.style.width);
+                            rightSize = parseFloat(rightPanel.element.style.width);
+                            panel.enableTransitions();
+                            leftPanel.size = `${leftSize}px`;
+                            rightPanel.size = `${rightSize}px`;
+                        }
                     }
-                    panel.size = `${size}px`;
-                    panel.enableTransitions();
-                    panel.dotNetHelper.invokeMethodAsync('FinishedDragging', size).catch(err => console.error(err));
                 } else {
+                    let size = -1;
                     if (panel.type === 'Left' || panel.type === 'Right') {
                         size = parseFloat(panel.element.style.width);
                         if (size < 100) {
@@ -293,7 +322,6 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
                     panel.enableTransitions();
                     if (size >= 100) {
                         panel.size = `${size}px`;
-                        panel.dotNetHelper.invokeMethodAsync('FinishedDragging', size).catch(err => console.error(err));
                     }
                 }
             };
@@ -302,20 +330,23 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
             document.addEventListener('mouseup', onMouseUp);
         };
 
-        if (panel.latching && panel.latchingType === 'Vertical') {
-            panel.stateChanger.addEventListener('mousedown', onMouseDown);
-        } else {
+        if (!panel.latching) {
+            panel.arrow.addEventListener('mousedown', () => toggleUIState(panel));
             panel.dots1.addEventListener('mousedown', onMouseDown);
             panel.dots2.addEventListener('mousedown', onMouseDown);
+        } else {
+            panel.stateChanger.addEventListener('mousedown', onMouseDown);
         }
-
         panel.element.addEventListener('mousedown', () => focusPanel(panel));
         panel.stateChanger.addEventListener('mousedown', () => focusPanel(panel));
-        panel.arrow.addEventListener('mousedown', () => toggleUIState(panel));
+        
     });
 
     // Adjust the side panel offsets based on existence of top and bottom panels
     function getVerticalPanelHeightOffsets(panel) {
+        if (panel.latching)
+            return -20;
+
         var offset = 0;
         var bottomPanel = window.RrPage[pageId].panels.find(p => p.type === 'Bottom');
         var topPanel = window.RrPage[pageId].panels.find(p => p.type === 'Top');
@@ -348,6 +379,9 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
     }
 
     function getVerticalPanelTopOffsets(panel) {
+        if (panel.latching) 
+            return 10;
+        
         var offset = 0;
         var bottomPanel = window.RrPage[pageId].panels.find(p => p.type === 'Bottom');
         var topPanel = window.RrPage[pageId].panels.find(p => p.type === 'Top');
@@ -377,34 +411,50 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
     window.RrPage[pageId].panels = panels;
 
     const focusPanel = (panel) => {
-
         const panels = window.RrPage[pageId].panels;
+        if (!panel.latching) {
+            panels.forEach(p => {
+                p.isFocused = (p.id === panel.id);
+            });
 
-        panels.forEach(p => {
-            p.isFocused = (p.id === panel.id);
-        });
+            panels.sort((a, b) => {
+                if (a.isFocused && !b.isFocused) return -1;
+                if (!a.isFocused && b.isFocused) return 1;
+                return 0;
+            });
 
-        panels.sort((a, b) => {
-            if (a.isFocused && !b.isFocused) return -1;
-            if (!a.isFocused && b.isFocused) return 1;
-            return 0;
-        });
-
-        // Update zIndex based on the sorted order
-        panels.forEach((p, i) => {
-            p.container.style.zIndex = `${20 + (panels.length - i)}`; // Ensure highest z-index for the top panel
-        });
+            panels.forEach((p, i) => {
+                p.container.style.zIndex = `${20 + (panels.length - i)}`;
+            });
 
 
-        panels.forEach((p, i) => {
-            setPanelBounds(p);
-        });
+            panels.forEach((p, i) => {
+                setPanelBounds(p);
+            });
 
-        if (panel.state === 'Collapsed') {
-            panel.container.style.zIndex = 20;
+            if (panel.state === 'Collapsed') {
+                panel.container.style.zIndex = 20;
+            }
+        } else {
+            if (panel.latchingType === 'Vertical') {
+                panels.forEach(p => {
+                    if (p.latching) {
+                        if (p.latchingType === 'Vertical') {
+                            leftPanel = window.RrPage[pageId].panels.find(p => p.type === 'Left');
+                            rightPanel = window.RrPage[pageId].panels.find(p => p.type === 'Right');
+                            if (leftPanel && rightPanel) {
+                                leftPanel.container.style.zIndex = 20;
+                                rightPanel.container.style.zIndex = 19;
+                            }
+                        }
+                    } else {
+                        p.container.style.zIndex = 21;
+                    }
+                });
+            }
         }
-        // If you need to invoke the PanelClickedOnScriptHandler, uncomment the line below
-        // panel.dotNetHelper.invokeMethodAsync('PanelClickedOnScriptHandler', panel.id, action).catch(err => console.error(err));
+
+        
     };
 
     const toggleUIState = (panel) => {
@@ -470,16 +520,23 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
     function setPanelBounds(panel) {
         if (panel.latching) {
             if (panel.latchingType === 'Vertical') {
-                panel.stateChanger.style.height = `${window.RrPage[pageId].bounds.height}px`;
-                if (panel.type === 'Left') {
-                    panel.container.style.left = `${window.RrPage[pageId].bounds.left}px`;
+                leftPanel = window.RrPage[pageId].panels.find(p => p.type === 'Left');
+                rightPanel = window.RrPage[pageId].panels.find(p => p.type === 'Right');
+                if (leftPanel && rightPanel) {
+                    panel.container.style.top = `${0 + getVerticalPanelTopOffsets(panel)}px`;
+                    panel.stateChanger.style.height = `${window.RrPage[pageId].bounds.height + getVerticalPanelHeightOffsets(panel)}px`;
+                    panel.centerDots.style.height = `${window.RrPage[pageId].bounds.height + getVerticalPanelHeightOffsets(panel)}px`;
+                    panel.element.style.height = `${window.RrPage[pageId].bounds.height + getVerticalPanelHeightOffsets(panel)}px`;
+                    panel.stateChanger.style.width = "10px";
+                    leftPanel.container.style.left = "0px";
+                    leftPanel.element.style.width = panel.size;
+                    leftPanel.stateChanger.style.left = panel.size;
+                    rightPanel.container.style.right = `calc(${window.RrPage[pageId].bounds.width - 20}px - ${panel.size})`;
+                    rightPanel.element.style.width = `calc(${window.RrPage[pageId].bounds.width - 20}px - ${panel.size})`;
+                    rightPanel.stateChanger.style.right = `0px`;
+                    leftPanel.container.style.zIndex = 20;
+                    rightPanel.container.style.zIndex = 19;
                 }
-                if (panel.type === 'Right') {
-                    panel.container.style.right = `${window.RrPage[pageId].bounds.right - panel.element.offsetWidth - 20}px`;
-                    panel.element.style.width = `${window.RrPage[pageId].bounds.right - panel.element.offsetWidth - 20}px`;
-                }
-            } else if (panel.latchingType === 'Horizontal') {
-                panel.stateChanger.style.width = `${window.RrPage[pageId].bounds.width}px`;
             }
         } else {
             if (panel.type === 'Top') {
@@ -492,6 +549,7 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
                 panel.stateChanger.style.width = `${window.RrPage[pageId].bounds.width + getHorizontalPanelWidthOffsets(panel)}px`;
                 panel.stateChanger.style.height = "10px";
                 panel.stateChanger.style.top = panel.size;
+                panel.container.style.zIndex = 24;
             } else if (panel.type === 'Bottom') {
                 if (panel.state === 'Expanded')
                     panel.container.style.bottom = panel.size;
@@ -502,6 +560,7 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
                 panel.stateChanger.style.width = `${window.RrPage[pageId].bounds.width + getHorizontalPanelWidthOffsets(panel)}px`;
                 panel.stateChanger.style.height = "10px";
                 panel.stateChanger.style.bottom = "0px";
+                panel.container.style.zIndex = 23;
             } else if (panel.type === 'Left') {
                 if (panel.state === 'Expanded')
                     panel.container.style.left = "0px";
@@ -512,6 +571,7 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
                 panel.stateChanger.style.height = `${window.RrPage[pageId].bounds.height + getVerticalPanelHeightOffsets(panel)}px`;
                 panel.stateChanger.style.width = "10px";
                 panel.stateChanger.style.left = panel.size;
+                panel.container.style.zIndex = 22;
             } else if (panel.type === 'Right') {
                 if (panel.state === 'Expanded')
                     panel.container.style.right = panel.size;
@@ -522,6 +582,7 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
                 panel.stateChanger.style.height = `${window.RrPage[pageId].bounds.height + getVerticalPanelHeightOffsets(panel)}px`;
                 panel.stateChanger.style.width = "10px";
                 panel.stateChanger.style.right = "0px";
+                panel.container.style.zIndex = 21;
             }
         }
     }
@@ -529,10 +590,6 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
     const updateBounds = () => {
         window.RrPage[pageId].bounds = window.getElementBounds(pageId);
         window.RrPage[pageId].panels.forEach(panel => {
-            if (panel.type === 'Left') panel.container.zIndex = 21;
-            if (panel.type === 'Right') panel.container.zIndex = 22;
-            if (panel.type === 'Top') panel.container.zIndex = 23;
-            if (panel.type === 'Bottom') panel.container.zIndex = 24;
             setPanelBounds(panel);
         });
     };
