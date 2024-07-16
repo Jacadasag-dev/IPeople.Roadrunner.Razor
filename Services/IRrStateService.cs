@@ -18,6 +18,7 @@ namespace IPeople.Roadrunner.Razor.Services
         void RefreshComponentsById(List<string> componentIds);
         void RefreshComponentsById(string componentId);
         void RefreshComponentsByTag(List<string> componentTags);
+        void RefreshComponentsByTag(string componentTag);
         T? GetComponent<T>(T component) where T : class, IRrComponentBase;
         T? GetComponentById<T>(string? id) where T : class, IRrComponentBase;
         List<T>? GetComponentsByTag<T>(string? tag) where T : IRrComponentBase;

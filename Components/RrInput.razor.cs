@@ -38,14 +38,13 @@ namespace IPeople.Roadrunner.Razor.Components
         public EventCallback<string> OnChangedText { get; set; }
 
         [Parameter]
-        public EventCallback<(KeyboardEventArgs, string, Models.RrInput)> OnKeyDown { get; set; }
+        public EventCallback<(KeyboardEventArgs, string, string)> OnKeyDown { get; set; }
 
         [Parameter]
         public EventCallback OnInputClick { get; set; }
         #endregion
 
         #region Private Fields
-        private Models.RrInput? inputFromService;
         private string? exceptionMessage;
         private bool visible;
         private bool deBounce;
@@ -69,7 +68,7 @@ namespace IPeople.Roadrunner.Razor.Components
         private async void HandleOnKeyDown(KeyboardEventArgs e)
         {
             if (string.IsNullOrEmpty(inputText)) return;
-            await OnKeyDown.InvokeAsync((e, inputText, inputFromService));
+            await OnKeyDown.InvokeAsync((e, inputText, Id));
         }
 
         private async void OnTextChanged(ChangeEventArgs e)
@@ -89,13 +88,13 @@ namespace IPeople.Roadrunner.Razor.Components
                     return;
                 }
                 inputText = newText;
-                RrStateService.SetComponentPropertyById<Models.RrInput, string>(Id, c => c.Text, inputText);
+                RrStateService.SetComponentPropertyById<Components.RrInput, string>(Id, c => c.Text, inputText);
                 await OnChangedText.InvokeAsync(inputText);
             }
             else
             {
                 inputText = newText;
-                RrStateService.SetComponentPropertyById<Models.RrInput, string>(Id, c => c.Text, inputText);
+                RrStateService.SetComponentPropertyById<Components.RrInput, string>(Id, c => c.Text, inputText);
                 await OnChangedText.InvokeAsync(inputText);
             }
         }

@@ -73,11 +73,11 @@ namespace IPeople.Roadrunner.Razor.Components
                     || (LatchingType == LatchingTypes.Horizontal && (panel.PType == PanelTypes.Top || panel.PType == PanelTypes.Bottom))),
                     LatchingType = panel.LatchingType.ToString(),
                     MinLatchingWidth = LatchingPanelsMininmumAdjustmentSize,
-                    State = panel.InitialState.ToString(),
+                    State = panel.State.ToString(),
                     DotNetObjectReference = panel.dotNetReference
                 }).ToList();
 
-                await JS.InvokeVoidAsync("registerPageAndPanels", $"{Id}-panels", panelDtos);
+                await JS.InvokeVoidAsync("registerPageAndPanels", Id, panelDtos);
             }
         }
 

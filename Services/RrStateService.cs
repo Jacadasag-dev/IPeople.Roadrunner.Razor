@@ -210,12 +210,27 @@ namespace IPeople.Roadrunner.Razor.Services
         }
         private List<string> GetPropertyPath(Expression? expression)
         {
-            List<string>? path = [];
-            while (expression is MemberExpression memberExpression)
+            List<string>? path = new List<string>();
+
+            while (expression != null)
             {
-                path.Insert(0, memberExpression.Member.Name);
-                expression = memberExpression.Expression;
+                if (expression is MemberExpression memberExpression)
+                {
+                    path.Insert(0, memberExpression.Member.Name);
+                    expression = memberExpression.Expression;
+                }
+                else if (expression is UnaryExpression unaryExpression)
+                {
+                    // Handle the conversion and extract the operand
+                    expression = unaryExpression.Operand;
+                }
+                else
+                {
+                    // If the expression is not a MemberExpression or UnaryExpression, break out of the loop
+                    break;
+                }
             }
+
             if (expression is ParameterExpression)
                 return path;
 

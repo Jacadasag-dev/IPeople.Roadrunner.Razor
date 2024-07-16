@@ -83,6 +83,7 @@ class RrPanel {
 }
 
 window.RrPage = {};
+
 window.registerPageAndPanels = function (pageId, panelDtos) {
     // Register Page
     if (!window.RrPage[pageId]) {
@@ -117,7 +118,7 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
             const initialWidth = panel.element.offsetWidth
             const initialStateChangerLeft = panel.stateChanger.offsetLeft;
             const initialStateChangerTop = panel.stateChanger.offsetTop;
-            const leftPanelInitialWidth = leftPanel.element.offsetWidth
+            const leftPanelInitialWidth = window.RrPage[pageId].panels.find(p => p.type === 'Left').element.offsetWidth
             if (panel.latching) {
                 if (panel.latchingType === 'Vertical') {
                     leftPanel = window.RrPage[pageId].panels.find(p => p.type === 'Left');
@@ -249,6 +250,13 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
     });
     window.RrPage[pageId].panels = panels;
 
+    window.setPanelUIState = function (pageId, panelId, desiredState) {
+        const panel = window.RrPage[pageId].panels.find(p => p.id === panelId);
+        if (panel) {
+            toggleUIState(panel, desiredState);
+        }
+    };
+
     function getPageElementBounds(elementId) {
         const element = document.getElementById(elementId);
         if (!element) return null;
@@ -281,7 +289,6 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
         if (bottomPanel && bottomPanel.state === 'Expanded' && topPanel && topPanel.state === 'Collapsed') 
             offset = -10;
 
-        console.log(offset);
         return offset;
     }
     function getHorizontalPanelWidthOffsets(panel) {
@@ -350,15 +357,19 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
             }
         }
     };
-    function toggleUIState(panel) {
+    function toggleUIState(panel, desiredState) {
+        const stateToSet = desiredState || (panel.state === 'Collapsed' ? 'Expanded' : 'Collapsed');
+        if (panel.latching)
+            return;
+
         if (panel.type === 'Left') {
-            if (panel.state === 'Collapsed') {
+            if (stateToSet === 'Expanded') {
                 panel.state = 'Expanded';
                 panel.container.style.left = `0px`;
                 panel.dots1.style.display = 'block';
                 panel.dots2.style.display = 'block';
                 panel.makeExpanded();
-            } else if (panel.state === 'Expanded') {
+            } else if (stateToSet === 'Collapsed') {
                 panel.state = 'Collapsed';
                 panel.container.style.left = `-${panel.size}`;
                 panel.dots1.style.display = 'none';
@@ -366,13 +377,13 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
                 panel.makeMinimized();
             }
         } else if (panel.type === 'Right') {
-            if (panel.state === 'Collapsed') {
+            if (stateToSet === 'Expanded') {
                 panel.state = 'Expanded';
                 panel.container.style.right = `${panel.size}`;
                 panel.dots1.style.display = 'block';
                 panel.dots2.style.display = 'block';
                 panel.makeExpanded();
-            } else if (panel.state === 'Expanded') {
+            } else if (stateToSet === 'Collapsed') {
                 panel.state = 'Collapsed';
                 panel.container.style.right = `0px`;
                 panel.dots1.style.display = 'none';
@@ -380,13 +391,13 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
                 panel.makeMinimized();
             }
         } else if (panel.type === 'Top') {
-            if (panel.state === 'Collapsed') {
+            if (stateToSet === 'Expanded') {
                 panel.state = 'Expanded';
                 panel.container.style.top = `0px`;
                 panel.dots1.style.display = 'block';
                 panel.dots2.style.display = 'block';
                 panel.makeExpanded();
-            } else if (panel.state === 'Expanded') {
+            } else if (stateToSet === 'Collapsed') {
                 panel.state = 'Collapsed';
                 panel.container.style.top = `-${panel.size}`;
                 panel.dots1.style.display = 'none';
@@ -394,13 +405,13 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
                 panel.makeMinimized();
             }
         } else if (panel.type === 'Bottom') {
-            if (panel.state === 'Collapsed') {
+            if (stateToSet === 'Expanded') {
                 panel.state = 'Expanded';
                 panel.container.style.bottom = `${panel.size}`;
                 panel.dots1.style.display = 'block';
                 panel.dots2.style.display = 'block';
                 panel.makeExpanded();
-            } else if (panel.state === 'Expanded') {
+            } else if (stateToSet === 'Collapsed') {
                 panel.state = 'Collapsed';
                 panel.container.style.bottom = `0px`;
                 panel.dots1.style.display = 'none';
@@ -408,7 +419,7 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
                 panel.makeMinimized();
             }
         }
-    };
+    }
     function setPanelBounds(panel) {
         if (panel.latching) {
             if (panel.latchingType === 'Vertical') {
@@ -434,6 +445,8 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
             if (panel.type === 'Top') {
                 if (panel.state === 'Expanded')
                     panel.container.style.top = `0px`;
+                else
+                    panel.container.style.top = `-${panel.size}`;
 
                 panel.container.style.left = `${window.RrPage[pageId].bounds.left + getHorizontalPanelLeftOffsets(panel)}px`;
                 panel.element.style.width = `${window.RrPage[pageId].bounds.width + getHorizontalPanelWidthOffsets(panel)}px`;
@@ -445,6 +458,8 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
             } else if (panel.type === 'Bottom') {
                 if (panel.state === 'Expanded')
                     panel.container.style.bottom = panel.size;
+                else
+                    panel.container.style.bottom = `0px`;
 
                 panel.container.style.left = `${window.RrPage[pageId].bounds.left + getHorizontalPanelLeftOffsets(panel)}px`;
                 panel.element.style.width = `${window.RrPage[pageId].bounds.width + getHorizontalPanelWidthOffsets(panel)}px`;
@@ -456,6 +471,8 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
             } else if (panel.type === 'Left') {
                 if (panel.state === 'Expanded')
                     panel.container.style.left = "0px";
+                else
+                    panel.container.style.left = `-${panel.size}`;
 
                 panel.container.style.top = `${0 + getVerticalPanelTopOffsets(panel)}px`;
                 panel.element.style.height = `${window.RrPage[pageId].bounds.height + getVerticalPanelHeightOffsets(panel)}px`;
@@ -467,6 +484,8 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
             } else if (panel.type === 'Right') {
                 if (panel.state === 'Expanded')
                     panel.container.style.right = panel.size;
+                else
+                    panel.container.style.right = `0px`;
 
                 panel.container.style.top = `${0 + getVerticalPanelTopOffsets(panel)}px`;
                 panel.element.style.height = `${window.RrPage[pageId].bounds.height + getVerticalPanelHeightOffsets(panel)}px`;

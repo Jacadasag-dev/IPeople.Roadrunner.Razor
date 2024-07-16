@@ -52,19 +52,24 @@ namespace IPeople.Roadrunner.Razor.Components
         [Parameter]
         public bool AllowLoading { get; set; } = false;
 
-        [Parameter]
-        public UIStates InitialState { get; set; } = UIStates.Expanded;
+        [Parameter] 
+        public UIStates State { get; set; } = UIStates.Collapsed;
 
         [Parameter]
         public bool HeaderDefaultStyling { get; set; } = false;
 
         [CascadingParameter]
         public LatchingTypes LatchingType { get; set; }
+
+        [CascadingParameter(Name = "PageId")]
+        public string? PageId { get; set; }
         #endregion
 
         public DotNetObjectReference<RrPanel>? dotNetReference;
 
-        private void InitializePanel()
+        private bool afterFirstRender = false;
+
+        private async void InitializePanel()
         {
             if (string.IsNullOrEmpty(Id)) throw new Exception($"The \"Id\" parameter must be defined and set as it is required for the {this.GetType().ToString()} component to function.");
             Id = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.Id, Id);
@@ -73,10 +78,23 @@ namespace IPeople.Roadrunner.Razor.Components
             Size = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.Size, Size);
             PType = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.PType, PType);
             LatchingType = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.LatchingType, LatchingType);
-            InitialState = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.InitialState, InitialState);
+            State = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.State, State);
+            await SetPannelState(State);
             // Set DotNetReference
             dotNetReference = DotNetObjectReference.Create(this);
         }
+
+        protected override void OnAfterRender(bool firstRender)
+        {
+            afterFirstRender = true;
+        }
+
+        private async Task SetPannelState(UIStates state)
+        {
+            if (afterFirstRender)
+                await JS.InvokeVoidAsync("setPanelUIState", PageId, Id, state.ToString());
+        }
+
         private string GetBodySizeOffset()
         {
             if (Header is null && Footer is null)
@@ -96,15 +114,15 @@ namespace IPeople.Roadrunner.Razor.Components
         {
             if (LatchingType == LatchingTypes.Vertical && (PType == PanelTypes.Left || PType == PanelTypes.Right)) return "latching-vertical";
             if (LatchingType == LatchingTypes.Horizontal && (PType == PanelTypes.Top || PType == PanelTypes.Bottom)) return "latching-horizontal";
-            if (InitialState == Models.UIStates.Expanded)
+            if (State == Models.UIStates.Expanded)
             {
                 return "expanded";
             }
-            else if (InitialState == Models.UIStates.Collapsed)
+            else if (State == Models.UIStates.Collapsed)
             {
                 return "minimized";
             }
-            else if (InitialState == Models.UIStates.Neutral)
+            else if (State == Models.UIStates.Neutral)
             {
                 return "";
             }

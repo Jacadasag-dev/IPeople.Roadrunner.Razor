@@ -10,15 +10,16 @@
 
     @if (Panels != null)
     {
-        <CascadingValue Value="@LatchingType">
-            <CascadingValue Value="@LatchingPanelsMininmumAdjustmentSize">
-                <CascadingValue Value="@LatchingPanelInitialSize">
-                    <div id="@($"{Id}-panels")" class="Rr-page-panels-container" style="@GetBodyHeight()">
+        <CascadingValue Value="@Id" Name="PageId">
+            <CascadingValue Value="@LatchingType">
+                <CascadingValue Value="@LatchingPanelsMininmumAdjustmentSize">
+                    <div id="@Id" class="Rr-page-panels-container" style="@GetBodyHeight()">
                         @Panels
                     </div>
                 </CascadingValue>
             </CascadingValue>
         </CascadingValue>
+
     }
 
     @if (Body != null)
