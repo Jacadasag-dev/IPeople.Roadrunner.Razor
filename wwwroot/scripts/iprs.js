@@ -345,8 +345,10 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
 
             panels.forEach((p, i) => {
                 p.container.style.zIndex = `${20 + (panels.length - i)}`;
+                console.log(`${p.type}:  ${20 + (panels.length - i)}`);
             });
 
+            
 
             panels.forEach((p, i) => {
                 setPanelBounds(p);
@@ -454,7 +456,6 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
                 panel.stateChanger.style.width = `${window.RrPage[pageId].bounds.width + getHorizontalPanelWidthOffsets(panel)}px`;
                 panel.stateChanger.style.height = "10px";
                 panel.stateChanger.style.top = panel.size;
-                panel.container.style.zIndex = 24;
             } else if (panel.type === 'Bottom') {
                 if (panel.state === 'Expanded')
                     panel.container.style.bottom = panel.size;
@@ -467,7 +468,6 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
                 panel.stateChanger.style.width = `${window.RrPage[pageId].bounds.width + getHorizontalPanelWidthOffsets(panel)}px`;
                 panel.stateChanger.style.height = "10px";
                 panel.stateChanger.style.bottom = "0px";
-                panel.container.style.zIndex = 23;
             } else if (panel.type === 'Left') {
                 if (panel.state === 'Expanded')
                     panel.container.style.left = "0px";
@@ -480,7 +480,6 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
                 panel.stateChanger.style.height = `${window.RrPage[pageId].bounds.height + getVerticalPanelHeightOffsets(panel)}px`;
                 panel.stateChanger.style.width = "10px";
                 panel.stateChanger.style.left = panel.size;
-                panel.container.style.zIndex = 22;
             } else if (panel.type === 'Right') {
                 if (panel.state === 'Expanded')
                     panel.container.style.right = panel.size;
@@ -493,7 +492,6 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
                 panel.stateChanger.style.height = `${window.RrPage[pageId].bounds.height + getVerticalPanelHeightOffsets(panel)}px`;
                 panel.stateChanger.style.width = "10px";
                 panel.stateChanger.style.right = "0px";
-                panel.container.style.zIndex = 21;
             }
         }
     }
@@ -502,6 +500,10 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
         window.RrPage[pageId].bounds = getPageElementBounds(pageId);
         window.RrPage[pageId].panels.forEach(panel => {
             setPanelBounds(panel);
+            window.RrPage[pageId].panels.find(p => p.type === 'Left').container.style.zIndex = 15;
+            window.RrPage[pageId].panels.find(p => p.type === 'Right').container.style.zIndex = 16;
+            window.RrPage[pageId].panels.find(p => p.type === 'Bottom').container.style.zIndex = 17;
+            window.RrPage[pageId].panels.find(p => p.type === 'Top').container.style.zIndex = 18;
         });
     };
 
