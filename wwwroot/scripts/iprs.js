@@ -1,9 +1,7 @@
 ﻿window.dropdownInstances = {};
-
 window.registerDropdown = function (id, dotNetObjectRef) {
     window.dropdownInstances[id] = dotNetObjectRef;
 };
-
 window.invokeHandleDropdownClicked = function (excludeId = null) {
     for (const id in window.dropdownInstances) {
         if (id !== excludeId) {
@@ -22,97 +20,6 @@ document.addEventListener('click', function (event) {
     }
     window.invokeHandleDropdownClicked();
 });
-
-function observeElementWidth(elementId, narrowClassName, longClassName, narrowThresholdWidth, longThreshholdWidth) {
-    const element = document.getElementById(elementId);
-
-    if (!element) {
-        console.error(`Element with ID ${elementId} not found.`);
-        return;
-    }
-
-    function checkWidth() {
-        if (element.offsetWidth <= narrowThresholdWidth) {
-            console.log(`${elementId}: add narrow class.`);
-            element.classList.add(narrowClassName);
-            element.classList.remove(longClassName);
-        } else if (element.offsetWidth >= longThreshholdWidth) {
-            console.log(`${elementId}: add long class.`);
-            element.classList.add(longClassName);
-            element.classList.remove(narrowClassName);
-        } else {
-            console.log(`${elementId}: remove both classes.`);
-            element.classList.remove(narrowClassName);
-            element.classList.remove(longClassName);
-        }
-    }
-
-    const resizeObserver = new ResizeObserver(checkWidth);
-    resizeObserver.observe(element);
-
-    // Initial check
-    checkWidth();
-}
-
-// Expose the function to be callable from Blazor
-window.observeElementWidth = observeElementWidth;
-
-
-window.makeDraggable = function (id) {
-    const draggableElement = document.getElementById(id);
-
-    if (!draggableElement) {
-        return;
-    }
-
-    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-
-    if (document.getElementById(id + "-header")) {
-        document.getElementById(id + "-header").onmousedown = dragMouseDown;
-    } else {
-        draggableElement.onmousedown = dragMouseDown;
-    }
-
-    function dragMouseDown(e) {
-        e = e || window.event;
-        e.preventDefault();
-        pos3 = e.clientX;
-        pos4 = e.clientY;
-        document.onmouseup = closeDragElement;
-        document.onmousemove = elementDrag;
-    }
-
-    function elementDrag(e) {
-        e = e || window.event;
-        e.preventDefault();
-        pos1 = pos3 - e.clientX;
-        pos2 = pos4 - e.clientY;
-        pos3 = e.clientX;
-        pos4 = e.clientY;
-        draggableElement.style.top = (draggableElement.offsetTop - pos2) + "px";
-        draggableElement.style.left = (draggableElement.offsetLeft - pos1) + "px";
-    }
-
-    function closeDragElement() {
-        document.onmouseup = null;
-        document.onmousemove = null;
-    }
-};
-
-window.getElementBounds = function (elementId) {
-    const element = document.getElementById(elementId);
-    if (!element) return null;
-    const rect = element.getBoundingClientRect();
-    return {
-        top: rect.top + window.scrollY,
-        left: rect.left + window.scrollX,
-        right: rect.right + window.scrollX,
-        bottom: rect.bottom + window.scrollY,
-        width: rect.width,
-        height: rect.height,
-    };
-}
-
 class RrPage {
     constructor(id, bounds, panels) {
         this.id = id;
@@ -180,9 +87,8 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
     // Register Page
     if (!window.RrPage[pageId]) {
         window.RrPage[pageId] = new RrPage(pageId, null, []);
+        window.RrPage[pageId].bounds = getPageElementBounds(pageId);
     }
-    var bounds = window.getElementBounds(pageId);
-    window.RrPage[pageId].bounds = bounds;
 
     // Register Panels
     var panels = [];
@@ -341,8 +247,21 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
         panel.stateChanger.addEventListener('mousedown', () => focusPanel(panel));
         
     });
+    window.RrPage[pageId].panels = panels;
 
-    // Adjust the side panel offsets based on existence of top and bottom panels
+    function getPageElementBounds(elementId) {
+        const element = document.getElementById(elementId);
+        if (!element) return null;
+        const rect = element.getBoundingClientRect();
+        return {
+            top: rect.top + window.scrollY,
+            left: rect.left + window.scrollX,
+            right: rect.right + window.scrollX,
+            bottom: rect.bottom + window.scrollY,
+            width: rect.width,
+            height: rect.height,
+        };
+    }
     function getVerticalPanelHeightOffsets(panel) {
         if (panel.latching)
             return -20;
@@ -365,7 +284,6 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
         console.log(offset);
         return offset;
     }
-
     function getHorizontalPanelWidthOffsets(panel) {
         var offset = 0;
         if (panel && panel.state === 'Expanded') {
@@ -377,7 +295,6 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
 
         return offset;
     }
-
     function getVerticalPanelTopOffsets(panel) {
         if (panel.latching) 
             return 10;
@@ -396,7 +313,6 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
         
         return offset;
     }
-
     function getHorizontalPanelLeftOffsets(panel) {
         var offset = 0;
         if (panel && panel.state === 'Expanded') 
@@ -407,10 +323,7 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
         
         return offset;
     }
-
-    window.RrPage[pageId].panels = panels;
-
-    const focusPanel = (panel) => {
+    function focusPanel(panel) {
         const panels = window.RrPage[pageId].panels;
         if (!panel.latching) {
             panels.forEach(p => {
@@ -435,29 +348,9 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
             if (panel.state === 'Collapsed') {
                 panel.container.style.zIndex = 20;
             }
-        } else {
-            if (panel.latchingType === 'Vertical') {
-                panels.forEach(p => {
-                    if (p.latching) {
-                        if (p.latchingType === 'Vertical') {
-                            leftPanel = window.RrPage[pageId].panels.find(p => p.type === 'Left');
-                            rightPanel = window.RrPage[pageId].panels.find(p => p.type === 'Right');
-                            if (leftPanel && rightPanel) {
-                                leftPanel.container.style.zIndex = 20;
-                                rightPanel.container.style.zIndex = 19;
-                            }
-                        }
-                    } else {
-                        p.container.style.zIndex = 21;
-                    }
-                });
-            }
         }
-
-        
     };
-
-    const toggleUIState = (panel) => {
+    function toggleUIState(panel) {
         if (panel.type === 'Left') {
             if (panel.state === 'Collapsed') {
                 panel.state = 'Expanded';
@@ -516,7 +409,6 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
             }
         }
     };
-
     function setPanelBounds(panel) {
         if (panel.latching) {
             if (panel.latchingType === 'Vertical') {
@@ -534,8 +426,8 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
                     rightPanel.container.style.right = `calc(${window.RrPage[pageId].bounds.width - 20}px - ${panel.size})`;
                     rightPanel.element.style.width = `calc(${window.RrPage[pageId].bounds.width - 20}px - ${panel.size})`;
                     rightPanel.stateChanger.style.right = `0px`;
-                    leftPanel.container.style.zIndex = 20;
-                    rightPanel.container.style.zIndex = 19;
+                    leftPanel.container.style.zIndex = 19;
+                    rightPanel.container.style.zIndex = 18;
                 }
             }
         } else {
@@ -588,7 +480,7 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
     }
 
     const updateBounds = () => {
-        window.RrPage[pageId].bounds = window.getElementBounds(pageId);
+        window.RrPage[pageId].bounds = getPageElementBounds(pageId);
         window.RrPage[pageId].panels.forEach(panel => {
             setPanelBounds(panel);
         });
