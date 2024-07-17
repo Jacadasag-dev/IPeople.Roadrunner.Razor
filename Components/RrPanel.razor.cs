@@ -77,7 +77,7 @@ namespace IPeople.Roadrunner.Razor.Components
             PType = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.PType, PType);
             LatchingType = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.LatchingType, LatchingType);
             State = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.State, State);
-            await SetPannelState(State);
+            await SetPannelState();
             // Set DotNetReference
             dotNetReference = DotNetObjectReference.Create(this);
         }
@@ -88,7 +88,7 @@ namespace IPeople.Roadrunner.Razor.Components
             RrStateService.RefreshSpecificComponentsByTag += (tags) => { if (tags is not null && tags.Contains(Tag ?? "")) { StateHasChanged(); } };
             RrStateService.LoadingStateChangeRequestById += (id, loading) => { if (id == Id) { this.loading = loading; StateHasChanged(); } };
             RrStateService.LoadingStateChangeRequestByTag += (tag, loading) => { if (tag == Tag) { this.loading = loading; StateHasChanged(); } };
-            RrStateService.StopAllLoading += () => loading = new();
+            RrStateService.StopAllLoading += () => { loading = new(); StateHasChanged(); };
         }
 
         protected override void OnAfterRender(bool firstRender)
@@ -96,10 +96,10 @@ namespace IPeople.Roadrunner.Razor.Components
             afterFirstRender = true;
         }
 
-        private async Task SetPannelState(UIStates state)
+        private async Task SetPannelState()
         {
             if (afterFirstRender)
-                await JS.InvokeVoidAsync("setPanelUIState", PageId, Id, state.ToString());
+                await JS.InvokeVoidAsync("setPanelUIState", PageId, Id, State.ToString());
         }
 
         [JSInvokable]

@@ -250,9 +250,10 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
     });
     window.RrPage[pageId].panels = panels;
 
-    window.setPanelUIState = function (pageId, panelId, desiredState) {
-        const panel = window.RrPage[pageId].panels.find(p => p.id === panelId);
+    window.setPanelUIState = function (myPageId, panelId, desiredState) {
+        const panel = window.RrPage[myPageId].panels.find(p => p.id === panelId);
         if (panel) {
+            console.log(`Setting ${panel.type} state to ${desiredState}`);
             toggleUIState(panel, desiredState);
         }
     };

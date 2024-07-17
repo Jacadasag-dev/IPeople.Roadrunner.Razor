@@ -1,6 +1,7 @@
 ﻿using IPeople.Roadrunner.Razor.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using System.Runtime.CompilerServices;
 
 namespace IPeople.Roadrunner.Razor.Components
 {
@@ -87,6 +88,13 @@ namespace IPeople.Roadrunner.Razor.Components
                 processedItems = Items?.Cast<T>().ToList();
 
             dropdownCssClass = GetDropdownCssClassAndWidth(dropdownUIState);
+        }
+
+        protected override void OnInitialized()
+        {
+            RrStateService.RefreshAllComponents += StateHasChanged;
+            RrStateService.RefreshSpecificComponentsById += (ids) => { if (ids is not null && ids.Contains(Id ?? "")) { StateHasChanged(); } };
+            RrStateService.RefreshSpecificComponentsByTag += (tags) => { if (tags is not null && tags.Contains(Tag ?? "")) { StateHasChanged(); } };
         }
 
         /// <summary>

@@ -10,14 +10,22 @@ namespace IPeople.Roadrunner.Razor.Components
 {
     public partial class RrLoading
     {
+        #region Parameters
         [Parameter]
         public string? Id { get; set; }
+
         [Parameter]
         public string Style { get; set; } = "";
+
+        [Parameter]
+        public bool FullScreen { get; set; } = false;
+
         [Parameter]
         public Models.RrLoadingBase? Loading { get; set; }
+
         [Parameter]
         public EventCallback<Models.RrLoadingBase> LoadingChange { get; set; }
+        #endregion
 
         protected override async Task OnParametersSetAsync()
         {

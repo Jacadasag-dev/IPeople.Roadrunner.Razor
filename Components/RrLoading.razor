@@ -4,7 +4,7 @@
     {
         case Razor.Models.RrLoadingType.Loading:
         case Razor.Models.RrLoadingType.Authenticating:
-            <div class="container">
+            <div class="container @(FullScreen ? "full" : "")">
                 <div class="spinner">
                     <div class="brush brush1"></div>
                     <div class="brush brush2"></div>
