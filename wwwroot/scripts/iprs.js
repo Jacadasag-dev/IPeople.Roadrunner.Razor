@@ -345,7 +345,6 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
 
             panels.forEach((p, i) => {
                 p.container.style.zIndex = `${20 + (panels.length - i)}`;
-                console.log(`${p.type}:  ${20 + (panels.length - i)}`);
             });
 
             
@@ -421,6 +420,7 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
                 panel.makeMinimized();
             }
         }
+        panel.dotNetHelper.invokeMethodAsync('UpdateStateServicePanelState', panel.state).catch(err => console.error(err));
     }
     function setPanelBounds(panel) {
         if (panel.latching) {

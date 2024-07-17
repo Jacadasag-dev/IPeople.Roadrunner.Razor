@@ -95,6 +95,19 @@ namespace IPeople.Roadrunner.Razor.Components
                 await JS.InvokeVoidAsync("setPanelUIState", PageId, Id, state.ToString());
         }
 
+        [JSInvokable]
+        public void UpdateStateServicePanelState(string state)
+        {
+            if (state == "Expanded")
+            {
+                RrStateService.SetComponentPropertyById<RrPanel, UIStates>(Id, p => p.State, UIStates.Expanded);
+            }
+            else if (state == "Collapsed")
+            {
+                RrStateService.SetComponentPropertyById<RrPanel, UIStates>(Id, p => p.State, UIStates.Collapsed);
+            }
+        }
+
         private string GetBodySizeOffset()
         {
             if (Header is null && Footer is null)
