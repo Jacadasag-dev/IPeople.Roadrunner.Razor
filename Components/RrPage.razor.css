@@ -6,6 +6,19 @@
     margin: 0px;
     top: var(--top-offset);
     left: var(--left-offset);
+    opacity: 0; /* Start with opacity 0 */
+    animation: fadeIn 1s forwards; /* Apply the fadeIn animation */
+    animation-delay: 0.3s; /* Delay the animation start by 0.5 seconds */
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
 }
 
 .Rr-page-header-container {

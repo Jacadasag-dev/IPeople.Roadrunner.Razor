@@ -253,7 +253,6 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
     window.setPanelUIState = function (myPageId, panelId, desiredState) {
         const panel = window.RrPage[myPageId].panels.find(p => p.id === panelId);
         if (panel) {
-            console.log(`Setting ${panel.type} state to ${desiredState}`);
             toggleUIState(panel, desiredState);
         }
     };
