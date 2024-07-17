@@ -65,7 +65,7 @@ namespace IPeople.Roadrunner.Razor.Components
         public DotNetObjectReference<RrPanel>? dotNetReference;
 
         private bool afterFirstRender = false;
-        private RrLoadingBase loading = new RrLoadingBase();
+        private RrLoadingBase? loading;
 
         private async void InitializePanel()
         {
@@ -86,9 +86,14 @@ namespace IPeople.Roadrunner.Razor.Components
             RrStateService.RefreshAllComponents += StateHasChanged;
             RrStateService.RefreshSpecificComponentsById += (ids) => { if (ids is not null && ids.Contains(Id ?? "")) { StateHasChanged(); } };
             RrStateService.RefreshSpecificComponentsByTag += (tags) => { if (tags is not null && tags.Contains(Tag ?? "")) { StateHasChanged(); } };
-            RrStateService.LoadingStateChangeRequestById += (id, loading) => { if (id == Id) { this.loading = loading; StateHasChanged(); } };
-            RrStateService.LoadingStateChangeRequestByTag += (tag, loading) => { if (tag == Tag) { this.loading = loading; StateHasChanged(); } };
-            RrStateService.StopAllLoading += () => { loading = new(); StateHasChanged(); };
+            RrStateService.LoadingStateChangeRequestById += (id , newLoading) => { if (id == Id) { loading = newLoading; StateHasChanged(); } };
+            RrStateService.LoadingStateChangeRequestByTag += (tag, newLoading) => { if (tag == Tag) { loading = newLoading; StateHasChanged(); } };
+            RrStateService.StopAllLoading += () => { if (loading is not null && loading.IsLoading) { loading = new(); StateHasChanged(); } };
+        }
+
+        private void HandleTag(string id, RrLoadingBase newLoading)
+        {
+
         }
 
         protected override void OnAfterRender(bool firstRender)

@@ -28,13 +28,14 @@
                 </tr>
             </thead>
             <tbody>
+                <RrLoading Loading="@loading"></RrLoading>
                 @if (Virtualize)
                 {
                     <Virtualize TItem="TItem" Items="@Items.ToList()" Context="item" OverscanCount="50" SpacerElement="tr">
                         <tr>
-                            @foreach (Object value in GetPropertyValues(item))
+                            @foreach (object? value in GetPropertyValues(item) ?? new List<object>())
                             {
-                                <td>@value</td>
+                                <td>@(value ?? "null")</td>
                             }
                             @if (Action != null)
                             {
@@ -50,7 +51,7 @@
                     @foreach (TItem item in Items)
                     {
                         <tr>
-                            @foreach (Object value in GetPropertyValues(item))
+                            @foreach (object? value in GetPropertyValues(item) ?? new List<object>())
                             {
                                 <td>@value</td>
                             }

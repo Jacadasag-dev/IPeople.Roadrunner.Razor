@@ -14,7 +14,7 @@ namespace IPeople.Roadrunner.Razor.Components
     {
         #region Parameters
         [Parameter]
-        public string? Id { get; set; } = $"dynamicTable_{Guid.NewGuid()}"; // Default ID value with unique identifier
+        public string? Id { get; set; }
 
         [Parameter]
         public string? Tag { get; set; }
@@ -47,30 +47,25 @@ namespace IPeople.Roadrunner.Razor.Components
         public bool Virtualize { get; set; } = false;
         #endregion
 
-        private bool isTableRegistered;
+        private RrLoadingBase? loading;
 
-        protected override async Task OnAfterRenderAsync(bool firstRender)
+        protected override void OnInitialized()
         {
-
-            if (Items != null && Items.Any() && !isTableRegistered)
-            {
-                await JS.InvokeVoidAsync("registerTables", Id, DotNetObjectReference.Create(this));
-                isTableRegistered = true;
-            }
-
-        }
-
-        [JSInvokable]
-        public void OnColumnResized(string columnName, double newWidth)
-        {
-            Console.WriteLine($"Column '{columnName}' resized to {newWidth}px");
+            RrStateService.RefreshAllComponents += StateHasChanged;
+            RrStateService.RefreshSpecificComponentsById += (ids) => { if (ids is not null && ids.Contains(Id ?? "")) { StateHasChanged(); } };
+            RrStateService.RefreshSpecificComponentsByTag += (tags) => { if (tags is not null && tags.Contains(Tag ?? "")) { StateHasChanged(); } };
+            RrStateService.LoadingStateChangeRequestById += (id, newLoading) => { if (id == Id) { loading = newLoading; StateHasChanged(); } };
+            RrStateService.LoadingStateChangeRequestByTag += (tag, newLoading) => { if (tag == Tag) { loading = newLoading; StateHasChanged(); } };
+            RrStateService.StopAllLoading += () => { if (loading is not null && loading.IsLoading) { loading = new(); StateHasChanged(); } };
         }
 
         private IEnumerable<(string Name, string Width)> GetColumnInfo(object item)
         {
             List<string>? propertyNames = GetPropertyNames(item)?.ToList();
+            if (propertyNames is null)
+                return Enumerable.Empty<(string Name, string Width)>();
+            
             List<string> columnWidths = ColumnWidths ?? new List<string>();
-
             return propertyNames.Select((name, index) =>
             {
                 string width = index < columnWidths.Count ? columnWidths[index] : "auto";
@@ -173,7 +168,7 @@ namespace IPeople.Roadrunner.Razor.Components
             return properties.Select(propName => FormatValue(propName, itemType.GetProperty(propName)?.GetValue(item)));
         }
 
-        private object FormatValue(string propertyName, object value)
+        private object? FormatValue(string propertyName, object? value)
         {
             if (propertyName.StartsWith("is", StringComparison.OrdinalIgnoreCase))
             {
@@ -182,7 +177,7 @@ namespace IPeople.Roadrunner.Razor.Components
                     return intValue == 1 ? true : intValue == 0 ? false : (object)intValue;
                 }
             }
-            return value;
+            return value ?? null;
         }
 
         private void HandleColumnHeaderClicked((string Name, string Width) columnInfo)

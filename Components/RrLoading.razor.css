@@ -3,16 +3,35 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 100%; /* Set width to 90% of the parent container */
-    height: 100%; /* Set height to 90% of the parent container */
+    width: 100%; /* Set width to 100% of the parent container */
+    height: 100%; /* Set height to 100% of the parent container */
     flex-direction: column;
     text-align: center;
+    animation: fadeInOut 3s forwards; /* Apply the fadeInOut animation */
 }
 
-.container.full {
-    position: fixed;
-    height: 100vh;
-    width: 100vw;
+    .container.full {
+        position: fixed;
+        height: 100vh;
+        width: 100vw;
+    }
+
+@keyframes fadeInOut {
+    0% {
+        opacity: 0;
+    }
+
+    16.67% {
+        opacity: 1;
+    }
+
+    83.33% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
 }
 
 /* Spinner container */

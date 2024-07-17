@@ -180,8 +180,6 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
             const onMouseUp = () => {
                 document.removeEventListener('mousemove', onMouseMove);
                 document.removeEventListener('mouseup', onMouseUp);
-
-                
                 if (panel.latching) {
                     if (panel.latchingType === 'Vertical') {
                         let leftSize = -1;
@@ -200,21 +198,23 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
                     let size = -1;
                     if (panel.type === 'Left' || panel.type === 'Right') {
                         size = parseFloat(panel.element.style.width);
-                        if (size < 100) {
+                        if (size < 100 || size > window.RrPage[pageId].bounds.width - 20) {
                             toggleUIState(panel);
                             if (panel.type === 'Left') {
                                 panel.stateChanger.style.left = panel.size;
                                 setTimeout(function () {
                                     panel.element.style.width = panel.size;
                                 }, 200);
-                                
+
                             } else {
                                 panel.element.style.width = panel.size;
                             }
+                        } else {
+                            panel.size = `${size}px`;
                         }
                     } else if (panel.type === 'Top' || panel.type === 'Bottom') {
                         size = parseFloat(panel.element.style.height);
-                        if (size < 100) {
+                        if (size < 100 || size > window.RrPage[pageId].bounds.height - 20) {
                             toggleUIState(panel);
                             if (panel.type === 'Top') {
                                 panel.stateChanger.style.top = panel.size;
@@ -223,16 +223,14 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
                                 }, 200);
                             } else {
                                 panel.element.style.height = panel.size;
-                            }    
+                            }
+                        } else {
+                            panel.size = `${size}px`;
                         }
                     }
                     panel.enableTransitions();
-                    if (size >= 100) {
-                        panel.size = `${size}px`;
-                    }
                 }
             };
-
             document.addEventListener('mousemove', onMouseMove);
             document.addEventListener('mouseup', onMouseUp);
         };
