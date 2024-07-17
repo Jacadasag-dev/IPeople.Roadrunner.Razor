@@ -45,10 +45,6 @@ namespace IPeople.Roadrunner.Razor.Components
         #endregion
 
         #region Private Fields
-        private string? exceptionMessage;
-        private bool visible;
-        private bool deBounce;
-        private string? placeholder;
         private string? inputText;
         private string? instantInputText;
         private CancellationTokenSource debounceCts = new CancellationTokenSource();
@@ -56,26 +52,34 @@ namespace IPeople.Roadrunner.Razor.Components
 
         private void InitializeInput()
         {
-            Id = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue<RrInput, string>(this, p => p.Id, Id);
-            Visible = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue<RrInput, bool>(this, p => p.Visible, Visible);
-            Tag = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue<RrInput, string>(this, p => p.Tag, Tag);
-            Placeholder = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue<RrInput, string>(this, p => p.Placeholder, Placeholder);
-            DeBounce = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue<RrInput, bool>(this, p => p.DeBounce, DeBounce);
-            inputText = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue<RrInput, string>(this, p => p.Text, Text);
+            if (string.IsNullOrEmpty(Id)) throw new Exception($"The \"Id\" parameter must be defined and set as it is required for the {this.GetType().ToString()} component to function.");
+            Id = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.Id, Id);
+            Visible = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.Visible, Visible);
+            Tag = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.Tag, Tag);
+            Placeholder = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.Placeholder, Placeholder);
+            DeBounce = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.DeBounce, DeBounce);
+            inputText = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.Text, Text);
             instantInputText = inputText;
+        }
+
+        protected override void OnInitialized()
+        {
+            RrStateService.RefreshAllComponents += StateHasChanged;
+            RrStateService.RefreshSpecificComponentsById += (ids) => { if (ids is not null && ids.Contains(Id ?? "")) { StateHasChanged(); } };
+            RrStateService.RefreshSpecificComponentsByTag += (tags) => { if (tags is not null && tags.Contains(Tag ?? "")) { StateHasChanged(); } };
         }
 
         private async void HandleOnKeyDown(KeyboardEventArgs e)
         {
             if (string.IsNullOrEmpty(inputText)) return;
-            await OnKeyDown.InvokeAsync((e, inputText, Id));
+            await OnKeyDown.InvokeAsync((e, inputText, Id!));
         }
 
         private async void OnTextChanged(ChangeEventArgs e)
         {
             string? newText = e.Value?.ToString();
             if (string.IsNullOrEmpty(newText)) return;
-            if (deBounce)
+            if (DeBounce)
             {
                 debounceCts.Cancel();
                 debounceCts = new CancellationTokenSource();
@@ -88,13 +92,13 @@ namespace IPeople.Roadrunner.Razor.Components
                     return;
                 }
                 inputText = newText;
-                RrStateService.SetComponentPropertyById<Components.RrInput, string>(Id, c => c.Text, inputText);
+                RrStateService.SetComponentPropertyById<RrInput, string>(Id, c => c.Text, inputText);
                 await OnChangedText.InvokeAsync(inputText);
             }
             else
             {
                 inputText = newText;
-                RrStateService.SetComponentPropertyById<Components.RrInput, string>(Id, c => c.Text, inputText);
+                RrStateService.SetComponentPropertyById<RrInput, string>(Id, c => c.Text, inputText);
                 await OnChangedText.InvokeAsync(inputText);
             }
         }
