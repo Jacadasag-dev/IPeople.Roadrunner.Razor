@@ -10,7 +10,7 @@
                 <span class="Rr-dropdown-label" style="@($"{LabelStyling}")">@Label</span>
             </div>
         }
-        <div id="@Id" class="Rr-dropdown @dropdownCssClass @(SelectedItem is null && Flashing ? "fade-red" : "")"
+        <div id="@Id" class="Rr-dropdown @dropdownCssClass @GetDropdownSizeClasses() @(SelectedItem is null && Flashing ? "fade-red" : "")"
              style="@($"--dropdown-width: {calculatedWidth}; min-width: {MinWidth}; --max-height: {MaxHeight};")
                     @(!string.IsNullOrEmpty(Label) ? "margin-left: -5px; box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);" : "") @Style">
             <span class="Rr-dropdown-selectiontext">

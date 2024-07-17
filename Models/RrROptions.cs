@@ -23,7 +23,8 @@
         Vertical,
         Horizontal,
     }
-    public enum ButtonSizes
+
+    public enum ComponentSizes
     {
         Small,
         Medium,
@@ -48,6 +49,7 @@
 
     public enum RrLoadingType
     {
+        None,
         Awaiting,
         Loading,
         Querying,

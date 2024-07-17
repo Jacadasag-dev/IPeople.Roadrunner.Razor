@@ -13,7 +13,7 @@
             }
             @if (Body is not null)
             {
-                <RrLoading AllowLoading="AllowLoading" Loading="@RrStateService.AppGlobalVariables.Loading"></RrLoading>
+                <RrLoading Loading="@loading"></RrLoading>
                 <div class="Rr-panel-body" style="@($"height: calc(100% - {GetBodySizeOffset()});") @GetAllowedScrolling()">
                     @Body
                 </div>

@@ -49,9 +49,6 @@ namespace IPeople.Roadrunner.Razor.Components
         [Parameter]
         public bool Visible { get; set; } = true;
 
-        [Parameter]
-        public bool AllowLoading { get; set; } = false;
-
         [Parameter] 
         public UIStates State { get; set; } = UIStates.Collapsed;
 
@@ -68,6 +65,7 @@ namespace IPeople.Roadrunner.Razor.Components
         public DotNetObjectReference<RrPanel>? dotNetReference;
 
         private bool afterFirstRender = false;
+        private RrLoadingBase loading = new RrLoadingBase();
 
         private async void InitializePanel()
         {
@@ -82,6 +80,15 @@ namespace IPeople.Roadrunner.Razor.Components
             await SetPannelState(State);
             // Set DotNetReference
             dotNetReference = DotNetObjectReference.Create(this);
+        }
+        protected override void OnInitialized()
+        {
+            RrStateService.RefreshAllComponents += StateHasChanged;
+            RrStateService.RefreshSpecificComponentsById += (ids) => { if (ids is not null && ids.Contains(Id ?? "")) { StateHasChanged(); } };
+            RrStateService.RefreshSpecificComponentsByTag += (tags) => { if (tags is not null && tags.Contains(Tag ?? "")) { StateHasChanged(); } };
+            RrStateService.LoadingStateChangeRequestById += (id, loading) => { if (id == Id) { this.loading = loading; StateHasChanged(); } };
+            RrStateService.LoadingStateChangeRequestByTag += (tag, loading) => { if (tag == Tag) { this.loading = loading; StateHasChanged(); } };
+            RrStateService.StopAllLoading += () => loading = new();
         }
 
         protected override void OnAfterRender(bool firstRender)

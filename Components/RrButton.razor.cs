@@ -22,7 +22,7 @@ namespace IPeople.Roadrunner.Razor.Components
         public EventCallback OnClick { get; set; }
 
         [Parameter]
-        public ButtonSizes Size { get; set; } = ButtonSizes.Medium;
+        public ComponentSizes Size { get; set; } = ComponentSizes.Medium;
 
         [Parameter]
         public RenderFragment? ChildContent { get; set; }

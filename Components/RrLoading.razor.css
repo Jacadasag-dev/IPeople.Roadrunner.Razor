@@ -3,8 +3,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 90%; /* Set width to 90% of the parent container */
-    height: 90%; /* Set height to 90% of the parent container */
+    width: 100%; /* Set width to 90% of the parent container */
+    height: 100%; /* Set height to 90% of the parent container */
     flex-direction: column;
     text-align: center;
 }

@@ -7,14 +7,19 @@ namespace IPeople.Roadrunner.Razor.Services
 {
     public interface IRrStateService
     {
-        RrStateService.GlobalVariables AppGlobalVariables { get; set; }
         Dictionary<Type, Dictionary<string, IRrComponentBase>> Components { get; set; }
         event Action? RefreshAllComponents;
         event Action<List<string>?>? RefreshSpecificComponentsById;
         event Action<List<string>?>? RefreshSpecificComponentsByTag;
+        event Action<string, RrLoadingBase>? LoadingStateChangeRequestById;
+        event Action<string, RrLoadingBase>? LoadingStateChangeRequestByTag;
+        event Action? StopAllLoading;
         void RegisterComponent<T>(T component) where T : IRrComponentBase;
         void RemoveComponent<T>(string id) where T : IRrComponentBase;
         void RefreshComponents();
+        void SetComponentLoadStatusById(string id, RrLoadingBase loading);
+        void SetComponentLoadStatusByTag(string tag, RrLoadingBase loading);
+        void StopAllComponentLoading();
         void RefreshComponentsById(List<string> componentIds);
         void RefreshComponentsById(string componentId);
         void RefreshComponentsByTag(List<string> componentTags);

@@ -14,6 +14,9 @@ namespace IPeople.Roadrunner.Razor.Components
         public string? Tag { get; set; }
 
         [Parameter]
+        public ComponentSizes Size { get; set; } = ComponentSizes.Medium;
+
+        [Parameter]
         public bool Disabled { get; set; } = false;
 
         [Parameter]
@@ -209,6 +212,10 @@ namespace IPeople.Roadrunner.Razor.Components
         public double CalculateWordWidth(string word)
         {
             double width = CalculateWidth(word.Length);
+            if (Size == ComponentSizes.Small)
+                width = width - 7;
+            else if (Size == ComponentSizes.Large)
+                width = width + 10;
 
             width = word switch
             {
@@ -284,6 +291,18 @@ namespace IPeople.Roadrunner.Razor.Components
                 default:
                     return "invalid-state";
             }
+        }
+
+        private string GetDropdownSizeClasses()
+        {
+            if (Size == ComponentSizes.Small)
+                return "small";
+            else if (Size == ComponentSizes.Medium)
+                return "medium";
+            else if (Size == ComponentSizes.Large)
+                return "large";
+            else
+                return "medium";
         }
     }
 }

@@ -22,11 +22,11 @@ namespace IPeople.Roadrunner.Razor.Models
         public string Tag { get; set; }
     }
 
-    public class RrLoading
+    public class RrLoadingBase
     {
-        public RrLoadingType Type { get; set; } = RrLoadingType.Authenticating;
-        public bool IsLoading { get; set; } = true;
-        public string Message { get; set; } = "Authenticating...";
+        public RrLoadingType Type { get; set; }
+        public bool IsLoading { get; set; } = false;
+        public string? Message { get; set; } = "Authenticating...";
     }
     #endregion
 }

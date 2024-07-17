@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reflection;
+using IPeople.Roadrunner.Razor.Components;
 using IPeople.Roadrunner.Razor.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
@@ -10,16 +11,13 @@ namespace IPeople.Roadrunner.Razor.Services
 {
     public class RrStateService : IRrStateService
     {
-        public class GlobalVariables
-        {
-            public RrLoading? Loading { get; set; }
-        }
-
-        public GlobalVariables AppGlobalVariables { get; set; } = new();
         public Dictionary<Type, Dictionary<string, IRrComponentBase>> Components { get; set; } = new();
         public event Action? RefreshAllComponents;
         public event Action<List<string>?>? RefreshSpecificComponentsById;
         public event Action<List<string>?>? RefreshSpecificComponentsByTag;
+        public event Action<string, RrLoadingBase>? LoadingStateChangeRequestById;
+        public event Action<string, RrLoadingBase>? LoadingStateChangeRequestByTag;
+        public event Action? StopAllLoading;
 
         #region Register/Remove Component
         public void RegisterComponent<T>(T component) where T : IRrComponentBase
@@ -64,6 +62,21 @@ namespace IPeople.Roadrunner.Razor.Services
         public void RefreshComponentsByTag(string componentTag)
         {
             RefreshSpecificComponentsByTag?.Invoke(new List<string> { componentTag });
+        }
+        #endregion
+
+        #region Trigger/Stop Component Loading
+        public void SetComponentLoadStatusById(string id, RrLoadingBase loading)
+        {
+            LoadingStateChangeRequestById?.Invoke(id, loading);
+        }
+        public void SetComponentLoadStatusByTag(string tag, RrLoadingBase loading)
+        {
+            LoadingStateChangeRequestByTag?.Invoke(tag, loading);
+        }
+        public void StopAllComponentLoading()
+        {
+            StopAllLoading?.Invoke();
         }
         #endregion
 

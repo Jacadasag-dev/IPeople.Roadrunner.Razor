@@ -1,4 +1,4 @@
-﻿@if (Loading is not null && Loading.IsLoading && AllowLoading)
+﻿@if (Loading is not null && Loading.IsLoading)
 {
     switch (Loading.Type)
     {
@@ -13,7 +13,9 @@
             </div>
             break;
         case Razor.Models.RrLoadingType.Awaiting:
-            <p>@Loading.Message</p>
+            <div class="container">
+                <p>@Loading.Message</p>
+            </div>
             break;
     }
 }

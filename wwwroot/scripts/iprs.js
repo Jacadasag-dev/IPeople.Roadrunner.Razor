@@ -500,8 +500,8 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
         window.RrPage[pageId].bounds = getPageElementBounds(pageId);
         window.RrPage[pageId].panels.forEach(panel => {
             setPanelBounds(panel);
-            window.RrPage[pageId].panels.find(p => p.type === 'Left').container.style.zIndex = 15;
-            window.RrPage[pageId].panels.find(p => p.type === 'Right').container.style.zIndex = 16;
+            window.RrPage[pageId].panels.find(p => p.type === 'Right').container.style.zIndex = 15;
+            window.RrPage[pageId].panels.find(p => p.type === 'Left').container.style.zIndex = 16;
             window.RrPage[pageId].panels.find(p => p.type === 'Bottom').container.style.zIndex = 17;
             window.RrPage[pageId].panels.find(p => p.type === 'Top').container.style.zIndex = 18;
         });
