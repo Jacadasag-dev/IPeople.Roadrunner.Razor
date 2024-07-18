@@ -112,6 +112,8 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
         panels.push(panel);
 
         const onMouseDown = (event) => {
+
+
             let startY = event.clientY;
             let startX = event.clientX;
             const initialHieght = panel.element.offsetHeight;
@@ -119,6 +121,7 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
             const initialStateChangerLeft = panel.stateChanger.offsetLeft;
             const initialStateChangerTop = panel.stateChanger.offsetTop;
             const leftPanelInitialWidth = window.RrPage[pageId].panels.find(p => p.type === 'Left').element.offsetWidth
+            let mouseMoved = false;
             if (panel.latching) {
                 if (panel.latchingType === 'Vertical') {
                     leftPanel = window.RrPage[pageId].panels.find(p => p.type === 'Left');
@@ -132,6 +135,10 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
             panel.disableTransitions();
 
             const onMouseMove = (event) => {
+                if (panel.state === 'Collapsed')
+                    return;
+
+                mouseMoved = true;
                 const diffX = event.clientX - startX;
                 const diffY = event.clientY - startY;
                 if (panel.latching) {
@@ -178,6 +185,7 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
             };
 
             const onMouseUp = () => {
+                
                 document.removeEventListener('mousemove', onMouseMove);
                 document.removeEventListener('mouseup', onMouseUp);
                 if (panel.latching) {
@@ -195,6 +203,9 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
                         }
                     }
                 } else {
+                    if (!mouseMoved)
+                        toggleUIState(panel);
+
                     let size = -1;
                     if (panel.type === 'Left' || panel.type === 'Right') {
                         size = parseFloat(panel.element.style.width);
@@ -236,9 +247,9 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
         };
 
         if (!panel.latching) {
-            panel.arrow.addEventListener('mousedown', () => toggleUIState(panel));
             panel.dots1.addEventListener('mousedown', onMouseDown);
             panel.dots2.addEventListener('mousedown', onMouseDown);
+            panel.stateChanger.addEventListener('mousedown', onMouseDown);
         } else {
             panel.stateChanger.addEventListener('mousedown', onMouseDown);
         }
