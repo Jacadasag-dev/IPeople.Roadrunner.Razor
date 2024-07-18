@@ -18,8 +18,8 @@
     else
     {
         <div style="@($"min-width: {MinWidth}; width: {MultiLineWidth}; height: {MultiLineHeight}; display: flex;")">
-            <div class="line-numbers" style="width: 40px; padding: 5px; text-align: right; border-right: 1px solid #ccc;">
-                <pre>@lineNumbers</pre>
+            <div class="Rr-textarea-linenumbers-container">
+                <pre class="Rr-textarea-linenumbers">@lineNumbers</pre>
             </div>
             <textarea id="@Id"
                       class="Rr-textarea"

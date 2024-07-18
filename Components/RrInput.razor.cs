@@ -89,9 +89,17 @@ namespace IPeople.Roadrunner.Razor.Components
             await OnKeyDown.InvokeAsync((e, inputText, Id!));
         }
 
+        private void UpdateLineNumbers(string? mytext)
+        {
+            var lines = mytext?.Split('\n')?.Length ?? 1;
+            lineNumbers = string.Join('\n', Enumerable.Range(1, lines));
+            ShouldRender();
+        }
+
         private async void OnTextChanged(ChangeEventArgs e)
         {
             string? newText = e.Value?.ToString();
+            if (MultiLine) UpdateLineNumbers(newText);
             if (string.IsNullOrEmpty(newText)) return;
             if (DeBounce)
             {

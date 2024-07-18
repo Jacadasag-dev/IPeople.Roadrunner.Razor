@@ -57,6 +57,9 @@ namespace IPeople.Roadrunner.Razor.Components
         public string? LabelStyling { get; set; }
 
         [Parameter]
+        public bool AutoSelectFirstItem { get; set; } = false;
+
+        [Parameter]
         public EventCallback<T> OnSelectionChanged { get; set; }
 
         [Parameter]
@@ -68,6 +71,7 @@ namespace IPeople.Roadrunner.Razor.Components
         private UIStates dropdownUIState = UIStates.Neutral;
         private string? dropdownCssClass;
         private string? calculatedWidth;
+        private int _previousItemsHash;
         #endregion
 
         /// <summary>
@@ -97,6 +101,25 @@ namespace IPeople.Roadrunner.Razor.Components
             RrStateService.RefreshSpecificComponentsByTag += (tags) => { if (tags is not null && tags.Contains(Tag ?? "")) { StateHasChanged(); } };
         }
 
+        protected override void OnParametersSet()
+        {
+            int currentItemsHash = ComputeItemsHash(Items);
+
+            if (AutoSelectFirstItem && currentItemsHash != _previousItemsHash)
+            {
+                if (Items is null || !Items.Any())
+                    return;
+
+                SelectedItem = (T)Items.First();
+                RrStateService.SetComponentPropertyById<RrDropdown<T>, object>(Id, c => c.SelectedItem, SelectedItem);
+
+                // Update the previous items hash
+                _previousItemsHash = currentItemsHash;
+            }
+        }
+
+
+
         /// <summary>
         /// Registers the dropdown with the JS function to handle the click outside of the dropdown.
         /// </summary>
@@ -110,6 +133,23 @@ namespace IPeople.Roadrunner.Razor.Components
                 await JS.InvokeVoidAsync("registerDropdown", Id, DotNetObjectReference.Create(this));
             }
         }
+
+        private int ComputeItemsHash(IEnumerable<object>? items)
+        {
+            if (items is null)
+                return 0;
+
+            unchecked
+            {
+                int hash = 19;
+                foreach (var item in items)
+                {
+                    hash = hash * 31 + (item?.GetHashCode() ?? 0);
+                }
+                return hash;
+            }
+        }
+
 
         /// <summary>
         /// Handles the selected item and invokes the OnSelectionChanged event passing the item.

@@ -18,7 +18,6 @@
     }
 
 .Rr-textarea {
-    border-radius: 7px; /* Adjust radius as needed */
     border: thin solid #c8c6c6;
     font-size: 14px;
     font-family: 'Roboto', sans-serif; /* Substitute with your chosen font */
@@ -27,4 +26,19 @@
     outline: none; /* Remove default outline */
     height: 100%;
     width: 100%;
+}
+
+.Rr-textarea-linenumbers-container {
+    color: #333; /* This is a dark gray, visible against a light background */
+    width: 20px;
+    text-align: center;
+    background: #9bb1c2;
+}
+
+.Rr-textarea-linenumbers {
+    padding-top: 3px;
+    font-size: 14px;
+    font-family: 'Roboto', sans-serif; /* Substitute with your chosen font */
+    color: #333; /* This is a dark gray, visible against a light background */
+    
 }

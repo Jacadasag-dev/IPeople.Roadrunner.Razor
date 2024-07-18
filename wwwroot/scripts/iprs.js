@@ -426,6 +426,8 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
                 leftPanel = window.RrPage[pageId].panels.find(p => p.type === 'Left');
                 rightPanel = window.RrPage[pageId].panels.find(p => p.type === 'Right');
                 if (leftPanel && rightPanel) {
+                    leftPanel.disableTransitions();
+                    rightPanel.disableTransitions();
                     panel.container.style.top = `${0 + getVerticalPanelTopOffsets(panel)}px`;
                     panel.stateChanger.style.height = `${window.RrPage[pageId].bounds.height + getVerticalPanelHeightOffsets(panel)}px`;
                     panel.centerDots.style.height = `${window.RrPage[pageId].bounds.height + getVerticalPanelHeightOffsets(panel)}px`;
