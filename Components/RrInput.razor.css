@@ -16,3 +16,15 @@
         outline: 2px solid #036D80; /* Added outline with the desired color on focus */
         border: none;
     }
+
+.Rr-textarea {
+    border-radius: 7px; /* Adjust radius as needed */
+    border: thin solid #c8c6c6;
+    font-size: 14px;
+    font-family: 'Roboto', sans-serif; /* Substitute with your chosen font */
+    color: #333; /* This is a dark gray, visible against a light background */
+    letter-spacing: 1px; /* To give a little breathing room for the uppercase letters */
+    outline: none; /* Remove default outline */
+    height: 100%;
+    width: 100%;
+}

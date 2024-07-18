@@ -5,9 +5,10 @@
     class="Rr-button
     @(selected ? "selected" : "")
     @(Size == ComponentSizes.Small ? "small" :
+    (Size == ComponentSizes.Tiny ? "tiny" :
     (Size == ComponentSizes.Medium ? "medium" :
     (Size == ComponentSizes.Large ? "large" :
-    "Rr-button-default")))"
+    "Rr-button-default"))))"
     type="button"
     style="@Style"
     @onclick="HandleOnClick">

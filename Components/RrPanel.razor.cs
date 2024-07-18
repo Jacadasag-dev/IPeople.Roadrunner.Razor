@@ -50,10 +50,13 @@ namespace IPeople.Roadrunner.Razor.Components
         public bool Visible { get; set; } = true;
 
         [Parameter] 
-        public UIStates State { get; set; } = UIStates.Collapsed;
+        public UIStates State { get; set; }
 
         [Parameter]
         public bool HeaderDefaultStyling { get; set; } = false;
+
+        [Parameter]
+        public UIStates InitialState { get; set; }
 
         [CascadingParameter]
         public LatchingTypes LatchingType { get; set; }
@@ -77,6 +80,9 @@ namespace IPeople.Roadrunner.Razor.Components
             PType = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.PType, PType);
             LatchingType = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.LatchingType, LatchingType);
             State = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.State, State);
+            if (State == UIStates.Neutral)
+                State = InitialState;
+
             await SetPannelState();
             // Set DotNetReference
             dotNetReference = DotNetObjectReference.Create(this);
@@ -113,10 +119,12 @@ namespace IPeople.Roadrunner.Razor.Components
             if (state == "Expanded")
             {
                 RrStateService.SetComponentPropertyById<RrPanel, UIStates>(Id, p => p.State, UIStates.Expanded);
+                State = UIStates.Expanded;
             }
             else if (state == "Collapsed")
             {
                 RrStateService.SetComponentPropertyById<RrPanel, UIStates>(Id, p => p.State, UIStates.Collapsed);
+                State = UIStates.Collapsed;
             }
         }
 

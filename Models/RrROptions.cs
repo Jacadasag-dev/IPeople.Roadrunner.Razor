@@ -26,9 +26,10 @@
 
     public enum ComponentSizes
     {
-        Small,
         Medium,
-        Large
+        Small,
+        Large,
+        Tiny
     }
 
     public enum PanelTypes
@@ -58,9 +59,9 @@
 
     public enum UIStates
     {
+        Neutral,
         Expanded,
         Collapsed,
-        Neutral,
         Peaking
     }
 }

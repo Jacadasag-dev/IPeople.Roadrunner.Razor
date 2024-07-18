@@ -2,11 +2,36 @@
 
 @if (Visible)
 {
-    InitializeInput();
-    <input id="@Id" type="text" class="Rr-input" placeholder="@Placeholder"
-           style="@($"max-width:{MaxWidth}; min-width:{MinWidth};") @Style"
-           value="@instantInputText" @oninput="OnTextChanged" @onclick="@OnInputClick"
-           @onkeydown="HandleOnKeyDown" spellcheck="false">
+    if (!MultiLine)
+    {
+        InitializeInput();
+        <input id="@Id" type="text"
+               class="Rr-input"
+               placeholder="@Placeholder"
+               style="@($"max-width:{MaxWidth}; min-width:{MinWidth};") @Style"
+               value="@instantInputText"
+               @oninput="OnTextChanged"
+               @onclick="@OnInputClick"
+               @onkeydown="HandleOnKeyDown"
+               spellcheck="false">
+    }
+    else
+    {
+        <div style="@($"min-width: {MinWidth}; width: {MultiLineWidth}; height: {MultiLineHeight}; display: flex;")">
+            <div class="line-numbers" style="width: 40px; padding: 5px; text-align: right; border-right: 1px solid #ccc;">
+                <pre>@lineNumbers</pre>
+            </div>
+            <textarea id="@Id"
+                      class="Rr-textarea"
+                      placeholder="@Placeholder"
+                      style="resize: none; @Style; flex-grow: 1; padding-left: 5px;"
+                      @oninput="OnTextChanged"
+                      @onclick="@OnInputClick"
+                      @onkeydown="HandleOnKeyDown"
+                      spellcheck="false">@instantInputText
+            </textarea>
+        </div>
+    }
 }
 
 

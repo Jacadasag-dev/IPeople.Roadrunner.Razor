@@ -20,6 +20,9 @@ namespace IPeople.Roadrunner.Razor.Components
         public string? Placeholder { get; set; } = "Start typing...";
 
         [Parameter]
+        public bool MultiLine { get; set; } = false;
+
+        [Parameter]
         public string MaxWidth { get; set; } = "620px";
 
         [Parameter]
@@ -33,6 +36,15 @@ namespace IPeople.Roadrunner.Razor.Components
 
         [Parameter]
         public string? Text { get; set; } = "";
+
+        [Parameter]
+        public string MultiLineHeight { get; set; } = "90px";
+
+        [Parameter]
+        public string MultiLineWidth { get; set; } = "400px";
+
+        [Parameter]
+        public bool MultiLineLineNumbers { get; set; } = false;
         
         [Parameter]
         public EventCallback<string> OnChangedText { get; set; }
@@ -47,6 +59,7 @@ namespace IPeople.Roadrunner.Razor.Components
         #region Private Fields
         private string? inputText;
         private string? instantInputText;
+        private string lineNumbers = "1";
         private CancellationTokenSource debounceCts = new CancellationTokenSource();
         #endregion
 
@@ -58,6 +71,7 @@ namespace IPeople.Roadrunner.Razor.Components
             Tag = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.Tag, Tag);
             Placeholder = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.Placeholder, Placeholder);
             DeBounce = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.DeBounce, DeBounce);
+            MultiLine = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.MultiLine, MultiLine);
             inputText = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.Text, Text);
             instantInputText = inputText;
         }
@@ -101,6 +115,7 @@ namespace IPeople.Roadrunner.Razor.Components
                 RrStateService.SetComponentPropertyById<RrInput, string>(Id, c => c.Text, inputText);
                 await OnChangedText.InvokeAsync(inputText);
             }
+            
         }
     }
 }

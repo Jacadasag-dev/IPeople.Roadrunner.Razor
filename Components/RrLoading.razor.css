@@ -7,7 +7,7 @@
     height: 100%; /* Set height to 100% of the parent container */
     flex-direction: column;
     text-align: center;
-    animation: fadeInOut 3s forwards; /* Apply the fadeInOut animation */
+    animation: fadeIn .3s forwards;
 }
 
     .container.full {
@@ -16,24 +16,15 @@
         width: 100vw;
     }
 
-@keyframes fadeInOut {
+@keyframes fadeIn {
     0% {
         opacity: 0;
     }
 
-    16.67% {
-        opacity: 1;
-    }
-
-    83.33% {
-        opacity: 1;
-    }
-
     100% {
-        opacity: 0;
+        opacity: 1;
     }
 }
-
 /* Spinner container */
 .spinner {
     position: relative;
@@ -41,6 +32,9 @@
     height: 50px;
 }
 
+.container.fadeout .spinner {
+    animation: fadeOut .3s forwards
+}
 /* Brush styles */
 .brush {
     position: absolute;

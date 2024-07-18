@@ -28,13 +28,21 @@
     z-index: 1;
 }
 
-    .Rr-button.small {
+    .Rr-button.tiny {
         height: 24px;
         font-size: 10px;
         letter-spacing: .5px; /* To give a little breathing room for the uppercase letters */
         border-radius: 4px; /* Adjust radius as needed */
         padding-left: 6px;
         padding-right: 7px;
+    }
+
+    .Rr-button.small {
+        font-size: 12px;
+        letter-spacing: .1px; /* To give a little breathing room for the uppercase letters */
+        border-radius: 4px; /* Adjust radius as needed */
+        height: 28px;
+        margin: 3px 0px 0px 0px;
     }
 
     .Rr-button.medium {
@@ -49,7 +57,7 @@
 
 
     .Rr-button:hover {
-        background: linear-gradient(90deg, #26A98F, #10707f, #26A98F); /* Diagonal gradient background for the tabs container */
+        background: linear-gradient(90deg, #036E80, #02424D, #036E80); /* Diagonal gradient background for the tabs container */
         background-size: 200% 100%; /* Required for shimmer effect */
         color: #FFFFFF; /* This is a dark gray, visible against a light background */
     }
