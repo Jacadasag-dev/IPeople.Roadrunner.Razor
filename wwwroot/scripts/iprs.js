@@ -139,6 +139,7 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
                     return;
 
                 mouseMoved = true;
+
                 const diffX = event.clientX - startX;
                 const diffY = event.clientY - startY;
                 if (panel.latching) {
@@ -206,8 +207,32 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
                     if (!mouseMoved)
                         toggleUIState(panel);
 
+
+
+
                     let size = -1;
                     if (panel.type === 'Left' || panel.type === 'Right') {
+
+                        leftPanel = window.RrPage[pageId].panels.find(p => p.type === 'Left');
+                        rightPanel = window.RrPage[pageId].panels.find(p => p.type === 'Right');
+
+                        const leftRect = leftPanel.stateChanger.getBoundingClientRect();
+                        const rightRect = rightPanel.stateChanger.getBoundingClientRect();
+                        // Check if the left panel intersects with the right panel
+                        if (leftPanel.stateChanger.offsetLeft + leftRect.width >= rightRect.left
+                            && leftRect.left <= rightRect.left + rightRect.width
+                            && leftRect.left + leftRect.width >= rightRect.left)
+                        {
+                            addLatching(leftPanel);
+                        }
+                        // Check if the right panel intersects with the left panel
+                        else if (rightRect.left <= leftRect.left + leftRect.width
+                            && rightRect.left >= leftRect.left
+                            && rightRect.left <= leftRect.left + leftRect.width) {
+                            addLatching(rightPanel);
+                        }
+
+
                         size = parseFloat(panel.element.style.width);
                         if (size < 100 || size > window.RrPage[pageId].bounds.width - 20) {
                             toggleUIState(panel);
@@ -247,10 +272,10 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
         };
 
         if (!panel.latching) {
-            panel.dots1.addEventListener('mousedown', onMouseDown);
-            panel.dots2.addEventListener('mousedown', onMouseDown);
             panel.stateChanger.addEventListener('mousedown', onMouseDown);
         } else {
+            panel.dots1.addEventListener('mouseup', () => removeLatching(panel));
+            panel.dots2.addEventListener('mouseup', () => removeLatching(panel));
             panel.stateChanger.addEventListener('mousedown', onMouseDown);
         }
         panel.element.addEventListener('mousedown', () => focusPanel(panel));
@@ -367,6 +392,40 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
             }
         }
     };
+    function addLatching(panel) {
+        if (!panel.latching && panel.latchingType === 'Vertical') {
+            leftPanel = window.RrPage[pageId].panels.find(p => p.type === 'Left');
+            rightPanel = window.RrPage[pageId].panels.find(p => p.type === 'Right');
+            if (leftPanel && rightPanel) {
+                leftPanel.latching = true;
+                rightPanel.latching = true;
+                leftPanel.state = 'Expanded';
+                rightPanel.state = 'Expanded';
+                leftPanel.disableTransitions();
+                rightPanel.disableTransitions();
+                leftPanel.dotNetHelper.invokeMethodAsync('UpdatePanelLatching', leftPanel.latching).catch(err => console.error(err));
+                rightPanel.dotNetHelper.invokeMethodAsync('UpdatePanelLatching', rightPanel.latching).catch(err => console.error(err));
+            }
+        }
+    }
+    function removeLatching(panel) {
+        if (panel.latching && panel.latchingType === 'Vertical') {
+            leftPanel = window.RrPage[pageId].panels.find(p => p.type === 'Left');
+            rightPanel = window.RrPage[pageId].panels.find(p => p.type === 'Right');
+            if (leftPanel && rightPanel) {
+                leftPanel.latching = false;
+                rightPanel.latching = false;
+                leftPanel.state = 'Collapsed';
+                rightPanel.state = 'Collapsed';
+                leftPanel.enableTransitions();
+                rightPanel.enableTransitions();
+                toggleUIState(leftPanel, 'Collapsed')
+                toggleUIState(rightPanel, 'Collapsed')
+                leftPanel.dotNetHelper.invokeMethodAsync('UpdatePanelLatching', leftPanel.latching).catch(err => console.error(err));
+                rightPanel.dotNetHelper.invokeMethodAsync('UpdatePanelLatching', rightPanel.latching).catch(err => console.error(err));
+            }
+        }
+    }
     function toggleUIState(panel, desiredState) {
         const stateToSet = desiredState || (panel.state === 'Collapsed' ? 'Expanded' : 'Collapsed');
         if (panel.latching)

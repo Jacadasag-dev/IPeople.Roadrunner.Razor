@@ -59,7 +59,13 @@ namespace IPeople.Roadrunner.Razor.Components
         public UIStates InitialState { get; set; }
 
         [CascadingParameter]
+        public bool LatchingDetachable { get; set; }
+
+        [CascadingParameter]
         public LatchingTypes LatchingType { get; set; }
+
+        [CascadingParameter]
+        public bool PanelLatching { get; set; }
 
         [CascadingParameter(Name = "PageId")]
         public string? PageId { get; set; }
@@ -78,7 +84,6 @@ namespace IPeople.Roadrunner.Razor.Components
             Visible = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.Visible, Visible);
             Size = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.Size, Size);
             PType = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.PType, PType);
-            LatchingType = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.LatchingType, LatchingType);
             State = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.State, State);
             if (State == UIStates.Neutral)
                 State = InitialState;
@@ -95,11 +100,6 @@ namespace IPeople.Roadrunner.Razor.Components
             RrStateService.LoadingStateChangeRequestById += (id , newLoading) => { if (id == Id) { loading = newLoading; StateHasChanged(); } };
             RrStateService.LoadingStateChangeRequestByTag += (tag, newLoading) => { if (tag == Tag) { loading = newLoading; StateHasChanged(); } };
             RrStateService.StopAllLoading += () => { if (loading is not null && loading.IsLoading) { loading = new(); StateHasChanged(); } };
-        }
-
-        private void HandleTag(string id, RrLoadingBase newLoading)
-        {
-
         }
 
         protected override void OnAfterRender(bool firstRender)
@@ -128,6 +128,14 @@ namespace IPeople.Roadrunner.Razor.Components
             }
         }
 
+        [JSInvokable]
+        public void UpdatePanelLatching(bool latching)
+        {
+            RrStateService.SetComponentPropertyById<RrPanel, bool>(PageId, p => p.PanelLatching, latching);
+            PanelLatching = latching;
+            StateHasChanged();
+        }
+
         private string GetBodySizeOffset()
         {
             if (Header is null && Footer is null)
@@ -145,8 +153,8 @@ namespace IPeople.Roadrunner.Razor.Components
         }
         private string GetInitialStateCssClass()
         {
-            if (LatchingType == LatchingTypes.Vertical && (PType == PanelTypes.Left || PType == PanelTypes.Right)) return "latching-vertical";
-            if (LatchingType == LatchingTypes.Horizontal && (PType == PanelTypes.Top || PType == PanelTypes.Bottom)) return "latching-horizontal";
+            if (PanelLatching && LatchingType == LatchingTypes.Vertical && (PType == PanelTypes.Left || PType == PanelTypes.Right)) return "latching-vertical";
+            if (PanelLatching && LatchingType == LatchingTypes.Horizontal && (PType == PanelTypes.Top || PType == PanelTypes.Bottom)) return "latching-horizontal";
             if (State == Models.UIStates.Expanded)
             {
                 return "expanded";

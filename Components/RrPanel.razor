@@ -26,38 +26,38 @@
             }
         </div>
         <div id="@($"{Id}-panel-statechanger")" class="Rr-panel-statechanger @GetPanelTypeCssClass() @GetInitialStateCssClass()">
-            @if (LatchingType == LatchingTypes.Vertical && (PType == PanelTypes.Left || PType == PanelTypes.Right))
+            @if (PType == PanelTypes.Left || PType == PanelTypes.Right)
             {
-                <div id="@($"{Id}-panel-dots-container-center")" class="Rr-panel-statechanger-dots-container @GetCenterStateChangerCssClass()">
-                    <span class="Rr-panel-statechanger-dots vertical @GetCenterStateChangerCssClass()"></span>
+                <div id="@($"{Id}-dots-container-top")" class="@(PanelLatching && LatchingType == LatchingTypes.Vertical ? "Rr-panel-detacher-container" : "Rr-panel-statechanger-dots-container") top">
+                    <span class="@(PanelLatching && LatchingType == LatchingTypes.Vertical ? "Rr-panel-detacher" : "Rr-panel-statechanger-dots") vertical @(PType == PanelTypes.Left ? "left" : "right")"></span>
                 </div>
-            }
-            else
-            {
-                if (PType == PanelTypes.Left || PType == PanelTypes.Right)
+                @if (PanelLatching && LatchingType == LatchingTypes.Vertical)
                 {
-                    <div id="@($"{Id}-dots-container-top")" class="Rr-panel-statechanger-dots-container top">
-                        <span class="Rr-panel-statechanger-dots vertical"></span>
-                    </div>
-                    <div id="@($"{Id}-panel-arrow-container")" class="Rr-panel-statechanger-arrow-container vertical">
-                        <span class="Rr-panel-statechanger-arrow @GetPanelTypeCssClass()"></span>
-                    </div>
-                    <div id="@($"{Id}-dots-container-bottom")" class="Rr-panel-statechanger-dots-container bottom">
-                        <span class="Rr-panel-statechanger-dots vertical"></span>
+                    <div id="@($"{Id}-panel-dots-container-center")" class="Rr-panel-statechanger-dots-container @GetCenterStateChangerCssClass()">
+                        <span class="Rr-panel-statechanger-dots vertical @GetCenterStateChangerCssClass()"></span>
                     </div>
                 }
                 else
                 {
-                    <div id="@($"{Id}-dots-container-left")" class="Rr-panel-statechanger-dots-container left">
-                        <span class="Rr-panel-statechanger-dots horizontal"></span>
-                    </div>
-                    <div id="@($"{Id}-panel-arrow-container")" class="Rr-panel-statechanger-arrow-container horizontal">
+                    <div id="@($"{Id}-panel-arrow-container")" class="Rr-panel-statechanger-arrow-container vertical">
                         <span class="Rr-panel-statechanger-arrow @GetPanelTypeCssClass()"></span>
                     </div>
-                    <div id="@($"{Id}-dots-container-right")" class="Rr-panel-statechanger-dots-container right">
-                        <span class="Rr-panel-statechanger-dots horizontal"></span>
-                    </div>
                 }
+                <div id="@($"{Id}-dots-container-bottom")" class="@(PanelLatching && LatchingType == LatchingTypes.Vertical ? "Rr-panel-detacher-container" : "Rr-panel-statechanger-dots-container") bottom">
+                    <span class="@(PanelLatching && LatchingType == LatchingTypes.Vertical ? "Rr-panel-detacher" : "Rr-panel-statechanger-dots") vertical @(PType == PanelTypes.Left ? "left" : "right")"></span>
+                </div>
+            }
+            else
+            {
+                <div id="@($"{Id}-dots-container-left")" class="Rr-panel-statechanger-dots-container left">
+                    <span class="Rr-panel-statechanger-dots horizontal"></span>
+                </div>
+                <div id="@($"{Id}-panel-arrow-container")" class="Rr-panel-statechanger-arrow-container horizontal">
+                    <span class="Rr-panel-statechanger-arrow @GetPanelTypeCssClass()"></span>
+                </div>
+                <div id="@($"{Id}-dots-container-right")" class="Rr-panel-statechanger-dots-container right">
+                    <span class="Rr-panel-statechanger-dots horizontal"></span>
+                </div>
             }
         </div>
     </div>
