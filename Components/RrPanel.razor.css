@@ -74,23 +74,6 @@
     cursor: pointer;
     user-select: none; /* Prevent text selection */    
 }
-
-    .Rr-panel-statechanger.left {
-        border-right: thin solid #c8c6c6;
-        border-left: thin solid #c8c6c6;
-        box-shadow: 4px 0 6px -1px rgba(0, 0, 0, 0.1), 2px 0 4px -1px rgba(0, 0, 0, 0.06);
-        transition: left 0.3s ease, right 0.3s ease;
-        background: linear-gradient(#E8E8E8, #d0d0d0, #E8E8E8);
-    }
-
-    .Rr-panel-statechanger.right {
-        border-right: thin solid #c8c6c6;
-        border-left: thin solid #c8c6c6;
-        box-shadow: -4px 0 6px -1px rgba(0, 0, 0, 0.1), -2px 0 4px -1px rgba(0, 0, 0, 0.06);
-        transition: left 0.3s ease, right 0.3s ease;
-        background: linear-gradient(#E8E8E8, #d0d0d0, #E8E8E8);
-    }
-
     .Rr-panel-statechanger.top {
         border-top: thin solid #c8c6c6;
         border-bottom: thin solid #c8c6c6;
@@ -110,8 +93,22 @@
         justify-content: center;
         background: linear-gradient(90deg, #E8E8E8, #d0d0d0, #E8E8E8);
     }
+    .Rr-panel-statechanger.left {
+        border-right: thin solid #c8c6c6;
+        border-left: thin solid #c8c6c6;
+        box-shadow: 4px 0 6px -1px rgba(0, 0, 0, 0.1), 2px 0 4px -1px rgba(0, 0, 0, 0.06);
+        transition: left 0.3s ease, right 0.3s ease;
+        background: linear-gradient(#E8E8E8, #d0d0d0, #E8E8E8);
+    }
+    .Rr-panel-statechanger.right {
+        border-right: thin solid #c8c6c6;
+        border-left: thin solid #c8c6c6;
+        box-shadow: -4px 0 6px -1px rgba(0, 0, 0, 0.1), -2px 0 4px -1px rgba(0, 0, 0, 0.06);
+        transition: left 0.3s ease, right 0.3s ease;
+        background: linear-gradient(#E8E8E8, #d0d0d0, #E8E8E8);
+    }
 
-    .Rr-panel-statechanger.left.latching-vertical {
+    .Rr-panel-statechanger.left.latching {
         border-right: none;
         border-left: thin solid #c8c6c6;
         box-shadow: none;
@@ -120,7 +117,7 @@
         cursor: ew-resize;
     }
 
-    .Rr-panel-statechanger.right.latching-vertical {
+    .Rr-panel-statechanger.right.latching {
         border-right: thin solid #c8c6c6;
         border-left: none;
         box-shadow: none;
@@ -128,50 +125,6 @@
         background: linear-gradient(#E8E8E8, #d0d0d0, #E8E8E8);
         cursor: ew-resize;
     }
-
-.Rr-panel-detacher-container {
-    position: absolute;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 20px; /* Adjust height as needed */
-    width: 100%;
-    cursor: pointer;
-    user-select: none;
-    right: 0px;
-    width: 9px;
-    height: 29px;
-}
-
-    .Rr-panel-detacher-container.top {
-        top: 3px;
-    }
-
-    .Rr-panel-detacher-container.bottom {
-        bottom: 3px;
-    }
-
-.Rr-panel-detacher {
-    position: absolute;
-    display: inline-block;
-    width: 0;
-    height: 0;
-    cursor: pointer;
-}
-
-.Rr-panel-detacher.left {
-    border-top: 5px solid transparent;
-    border-bottom: 5px solid transparent;
-    border-right: 5px solid #333;
-    left: 3px;
-}
-
-.Rr-panel-detacher.right {
-    border-top: 5px solid transparent;
-    border-bottom: 5px solid transparent;
-    border-left: 5px solid #333;
-    left: 2px;
-}
 
 .no-transition {
     transition: none !important;
@@ -205,40 +158,61 @@
     opacity: 0;
 }
 
-.Rr-panel-statechanger-center-container {
+.Rr-panel-statechanger-center-container.arrow {
     position: absolute;
 }
 
-    .Rr-panel-statechanger-center-container.top,
-    .Rr-panel-statechanger-center-container.bottom {
-        width: calc(100% - 104px);
-        height: 11px;
-        bottom: -1px;
-        text-align: center;
-    }
-    .Rr-panel-statechanger-center-container.left,
-    .Rr-panel-statechanger-center-container.right {
-        right: -1px;
-        width: 11px;
-        height: calc(100% - 70px);
-        align-content: center;
-        top: 34px;
-    }
+.Rr-panel-statechanger-center-container.dots {
+    position: absolute;
+    height: 30px;
+}
 
-    .Rr-panel-statechanger-center-container.left {
-        left: 4px;
+.Rr-panel-statechanger-center-container.top.arrow,
+.Rr-panel-statechanger-center-container.bottom.arrow {
+    width: calc(100% - 104px);
+    height: 11px;
+    bottom: -1px;
+    text-align: center;
+}
+.Rr-panel-statechanger-center-container.left.arrow,
+.Rr-panel-statechanger-center-container.right.arrow {
+    right: -1px;
+    width: 11px;
+    height: calc(100% - 70px);
+    align-content: center;
+    top: 34px;
+}
+
+
+.Rr-panel-statechanger-center-container.left.dots,
+.Rr-panel-statechanger-center-container.right.dots {
+    right: -1px;
+    width: 11px;
+    height: calc(100% - 70px);
+    align-content: center;
+    top: 34px;
+}
+
+    .Rr-panel-statechanger-center-container.left.dots {
+        left: 7px;
         z-index: 1;
     }
 
-    .Rr-panel-statechanger-center-container.right {
+    .Rr-panel-statechanger-center-container.right.dots {
         display: none;
     }
 
-.Rr-panel-statechanger-center {
+.Rr-panel-statechanger-center.arrow {
     position: absolute;
+}
+
+.Rr-panel-statechanger-center.dots {
     display: inline-block;
-    width: 0;
-    height: 0;
+    position: relative;
+    width: 4px; /* Width of the dots */
+    height: 4px; /* Height of the dots */
+    background-color: #333; /* Color of the dots */
+    border-radius: 50%; /* Make the dots round */
 }
 
     .Rr-panel-statechanger-center.top.arrow {
@@ -247,23 +221,47 @@
         border-top: 5px solid #333;
         top: 3px;
     }
+
     .Rr-panel-statechanger-center.bottom.arrow {
         border-left: 5px solid transparent;
         border-right: 5px solid transparent;
         border-bottom: 5px solid #333;
         top: 3px;
     }
+
     .Rr-panel-statechanger-center.left.arrow {
         border-top: 5px solid transparent;
         border-bottom: 5px solid transparent;
         border-left: 5px solid #333;
         left: 3px;
     }
+
     .Rr-panel-statechanger-center.right.arrow {
         border-top: 5px solid transparent;
         border-bottom: 5px solid transparent;
         border-right: 5px solid #333;
         left: 3px;
+    }
+
+    .Rr-panel-statechanger-center.dots::before,
+    .Rr-panel-statechanger-center.dots::after {
+        content: '';
+        display: inline-block;
+        position: absolute;
+        width: 4px; /* Width of the dots */
+        height: 4px; /* Height of the dots */
+        background-color: #333; /* Color of the dots */
+        border-radius: 50%; /* Make the dots round */
+    }
+
+    .Rr-panel-statechanger-center.left.dots::before,
+    .Rr-panel-statechanger-center.right.dots::before {
+        top: -8px; /* Adjust the spacing between the dots */
+    }
+
+    .Rr-panel-statechanger-center.left.dots::after,
+    .Rr-panel-statechanger-center.right.dots::after {
+        top: 8px; /* Adjust the spacing between the dots */
     }
 
 .Rr-panel-statechanger.expanded .Rr-panel-statechanger-center.bottom.arrow {
@@ -274,37 +272,36 @@
     left: 4px;
 }
 
-.Rr-panel-statechanger-Selement-container.one {
+.Rr-panel-statechanger-Selement-container {
     position: absolute;
 }
 
-
-    .Rr-panel-statechanger-Selement-container.one.top {
+    .Rr-panel-statechanger-Selement-container.one.top,
+    .Rr-panel-statechanger-Selement-container.one.bottom {
         left: 22px;
         bottom: -1px;
         height: 10px;
         width: 30px;
         cursor: ns-resize;
-        background: red;
     }
-
-    .Rr-panel-statechanger-Selement-container.one.bottom {
+    .Rr-panel-statechanger-Selement-container.two.bottom,
+    .Rr-panel-statechanger-Selement-container.two.top {
         right: 22px;
         bottom: -1px;
         height: 10px;
         width: 30px;
         cursor: ns-resize;
-        background: red;
     }
-    .Rr-panel-statechanger-Selement-container.one.left {
+    .Rr-panel-statechanger-Selement-container.one.left,
+    .Rr-panel-statechanger-Selement-container.one.right {
         top: 3px;
         right: 0px;
         width: 9px;
         height: 29px;
         cursor: ew-resize;
-        align-content: center;
     }
-    .Rr-panel-statechanger-Selement-container.one.right {
+    .Rr-panel-statechanger-Selement-container.two.right,
+    .Rr-panel-statechanger-Selement-container.two.left {
         bottom: 3px;
         right: 0px;
         width: 9px;
@@ -312,8 +309,14 @@
         cursor: ew-resize;
     }
 
+.Rr-panel-statechanger.latching.vertical .Rr-panel-statechanger-Selement-container.one.left,
+.Rr-panel-statechanger.latching.vertical .Rr-panel-statechanger-Selement-container.two.left,
+.Rr-panel-statechanger.latching.vertical .Rr-panel-statechanger-Selement-container.one.right,
+.Rr-panel-statechanger.latching.vertical .Rr-panel-statechanger-Selement-container.two.right {
+    cursor: pointer;
+}
 
-.Rr-panel-statechanger-Selement.one {
+.Rr-panel-statechanger-Selement.dots {
     display: inline-block;
     position: relative;
     width: 4px; /* Width of the dots */
@@ -322,54 +325,107 @@
     border-radius: 50%; /* Make the dots round */
 }
 
-
+.Rr-panel-statechanger-Selement.detacher {
+    position: absolute;
+    top: 10px;
+    display: inline-block;
+    cursor: pointer;
+}
 
     .Rr-panel-statechanger-Selement.one.top.dots,
-    .Rr-panel-statechanger-Selement.one.bottom.dots {
+    .Rr-panel-statechanger-Selement.one.bottom.dots,
+    .Rr-panel-statechanger-Selement.two.top.dots,
+    .Rr-panel-statechanger-Selement.two.bottom.dots {
         left: 5px;
         bottom: 10px;
     }
 
     .Rr-panel-statechanger-Selement.one.left.dots,
-    .Rr-panel-statechanger-Selement.one.right.dots {
+    .Rr-panel-statechanger-Selement.one.right.dots,
+    .Rr-panel-statechanger-Selement.two.left.dots,
+    .Rr-panel-statechanger-Selement.two.right.dots {
         right: -3px;
         top: -1px;
     }
 
+.Rr-panel-statechanger-Selement.dots::before,
+.Rr-panel-statechanger-Selement.dots::after {
+    content: '';
+    display: inline-block;
+    position: absolute;
+    width: 4px; /* Width of the dots */
+    height: 4px; /* Height of the dots */
+    background-color: #333; /* Color of the dots */
+    border-radius: 50%; /* Make the dots round */
+}
 
-    .Rr-panel-statechanger-Selement.one::before,
-    .Rr-panel-statechanger-Selement.one::after {
-        content: '';
-        display: inline-block;
-        position: absolute;
-        width: 4px; /* Width of the dots */
-        height: 4px; /* Height of the dots */
-        background-color: #333; /* Color of the dots */
-        border-radius: 50%; /* Make the dots round */
-    }
+.Rr-panel-statechanger-Selement.one.top.dots::before,
+.Rr-panel-statechanger-Selement.one.bottom.dots::before {
+    left: 16px; /* Adjust the spacing between the dots */
+}
 
-    .Rr-panel-statechanger-Selement.one.top::before,
-    .Rr-panel-statechanger-Selement.one.bottom::before {
-        left: 16px; /* Adjust the spacing between the dots */
-    }
+.Rr-panel-statechanger-Selement.two.top.dots::before,
+.Rr-panel-statechanger-Selement.two.bottom.dots::before {
+    left: 16px; /* Adjust the spacing between the dots */
+}
 
-    .Rr-panel-statechanger-Selement.one.top::after,
-    .Rr-panel-statechanger-Selement.one.bottom::after {
-        left: 8px; /* Adjust the spacing between the dots */
-    }
+.Rr-panel-statechanger-Selement.one.top.dots::after,
+.Rr-panel-statechanger-Selement.one.bottom.dots::after {
+    left: 8px; /* Adjust the spacing between the dots */
+}
 
-    .Rr-panel-statechanger-Selement.one.left::before,
-    .Rr-panel-statechanger-Selement.one.right::before {
-        top: -8px; /* Adjust the spacing between the dots */
-    }
+.Rr-panel-statechanger-Selement.two.top.dots::after,
+.Rr-panel-statechanger-Selement.two.bottom.dots::after {
+    left: 8px; /* Adjust the spacing between the dots */
+}
 
-    .Rr-panel-statechanger-Selement.one.left::after,
-    .Rr-panel-statechanger-Selement.one.right::after {
-        top: 8px; /* Adjust the spacing between the dots */
-    }
+.Rr-panel-statechanger-Selement.one.left.dots::before,
+.Rr-panel-statechanger-Selement.one.right.dots::before {
+    top: -8px; /* Adjust the spacing between the dots */
+}
 
+.Rr-panel-statechanger-Selement.two.left.dots::before,
+.Rr-panel-statechanger-Selement.two.right.dots::before {
+    top: -8px; /* Adjust the spacing between the dots */
+}
 
+.Rr-panel-statechanger-Selement.one.left.dots::after,
+.Rr-panel-statechanger-Selement.one.right.dots::after {
+    top: 8px; /* Adjust the spacing between the dots */
+}
 
+.Rr-panel-statechanger-Selement.two.left.dots::after,
+.Rr-panel-statechanger-Selement.two.right.dots::after {
+    top: 8px; /* Adjust the spacing between the dots */
+}
+
+.Rr-panel-statechanger-Selement.one.left.detacher {
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-right: 5px solid #333;
+    left: 3px;
+}
+
+.Rr-panel-statechanger-Selement.two.left.detacher {
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-right: 5px solid #333;
+    left: 3px;
+}
+
+.Rr-panel-statechanger-Selement.one.right.detacher {
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 5px solid #333;
+    left: 2px;
+}
+
+.Rr-panel-statechanger-Selement.two.right.detacher {
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 5px solid #333;
+    left: 2px;
+}
 
 .Rr-panel-statechanger.expanded .Rr-panel-statechanger-center.top.arrow,
 .Rr-panel-statechanger.expanded .Rr-panel-statechanger-center.bottom.arrow,
@@ -385,15 +441,15 @@
     display: none;
 }
 
-.Rr-panel-statechanger.minimized .Rr-panel-statechanger-center-container.top,
-.Rr-panel-statechanger.minimized .Rr-panel-statechanger-center-container.bottom
+.Rr-panel-statechanger.minimized .Rr-panel-statechanger-center-container.top.arrow,
+.Rr-panel-statechanger.minimized .Rr-panel-statechanger-center-container.bottom.arrow
 {
     width: 100%;
     left: 0px;
 }
 
-.Rr-panel-statechanger.minimized .Rr-panel-statechanger-center-container.left,
-.Rr-panel-statechanger.minimized .Rr-panel-statechanger-center-container.right {
+.Rr-panel-statechanger.minimized .Rr-panel-statechanger-center-container.left.arrow,
+.Rr-panel-statechanger.minimized .Rr-panel-statechanger-center-container.right.arrow {
     height: 100%;
     top: 0px;
 }
@@ -411,15 +467,15 @@
     border-right: 5px solid #FFFFFF; /* White color on hover */
 }
 
-.Rr-panel-statechanger-Selement.dots,
-.Rr-panel-statechanger-Selement.dots::after,
-.Rr-panel-statechanger-Selement.dots::before {
+.Rr-panel-statechanger:hover .Rr-panel-statechanger-Selement.dots,
+.Rr-panel-statechanger:hover .Rr-panel-statechanger-Selement.dots::after,
+.Rr-panel-statechanger:hover .Rr-panel-statechanger-Selement.dots::before {
     background-color: #FFFFFF; /* Color of the dots */
 }
 
-.Rr-panel-statechanger-center.left,
-.Rr-panel-statechanger-center.left::after,
-.Rr-panel-statechanger-center.left::before {
+.Rr-panel-statechanger-center.left.dots,
+.Rr-panel-statechanger-center.left.dots::after,
+.Rr-panel-statechanger-center.left.dots::before {
     background-color: #333; /* Color of the dots */
 }
 
