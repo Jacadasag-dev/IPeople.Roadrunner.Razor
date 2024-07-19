@@ -7,6 +7,10 @@
     opacity: 1; /* Default fully visible */
 }
 
+    .Rr-panel-container.latching {
+        transition: none;
+    }
+
 .Rr-panel {
     position: absolute;
     background: white;
@@ -109,19 +113,19 @@
     }
 
     .Rr-panel-statechanger.left.latching {
+        transition: none;
         border-right: none;
         border-left: thin solid #c8c6c6;
         box-shadow: none;
-        transition: left 0.3s ease, right 0.3s ease;
         background: linear-gradient(#E8E8E8, #d0d0d0, #E8E8E8);
         cursor: ew-resize;
     }
 
     .Rr-panel-statechanger.right.latching {
+        transition: none;
         border-right: thin solid #c8c6c6;
         border-left: none;
         box-shadow: none;
-        transition: left 0.3s ease, right 0.3s ease;
         background: linear-gradient(#E8E8E8, #d0d0d0, #E8E8E8);
         cursor: ew-resize;
     }
