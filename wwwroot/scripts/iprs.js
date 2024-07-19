@@ -28,7 +28,7 @@ class RrPage {
     }
 }
 class RrPanel {
-    constructor(id, panelElement, dotNetHelper, type, latchingType, container, stateChanger, minLatchingWidth, latching, size, state, dots1, dots2, stateToggler, latchingStateToggler) {
+    constructor(id, panelElement, dotNetHelper, type, latchingType, container, stateChanger, minLatchingWidth, latching, size, state, sElement1, sElement2, centerElementContainer, sElementContainer1, sElementContainer2, centerElement) {
         this.id = id;
         this.element = panelElement;
         this.container = container;
@@ -40,10 +40,12 @@ class RrPanel {
         this.latching = latching;
         this.size = size;
         this.state = state;
-        this.dots1 = dots1;
-        this.dots2 = dots2;
-        this.arrow = stateToggler;
-        this.centerDots = latchingStateToggler;
+        this.sElement1 = sElement1;
+        this.sElement2 = sElement2;
+        this.sElementContainer1 = sElementContainer1;
+        this.sElementContainer2 = sElementContainer2;
+        this.centerElementContainer = centerElementContainer;
+        this.centerElement = centerElement;
         this.isFocused = false;
         this.wasFocused1 = false;
         this.wasFocused2 = false;
@@ -97,18 +99,13 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
         const panelElement = document.getElementById(`${dto.id}-panel`);
         const container = document.getElementById(`${dto.id}-panel-container`);
         const stateChanger = document.getElementById(`${dto.id}-panel-statechanger`);
-        const stateToggler = document.getElementById(`${dto.id}-panel-arrow-container`);
-        const latchingStateToggler = document.getElementById(`${dto.id}-panel-dots-container-center`);
-        let dots1;
-        let dots2;
-        if (dto.pType === 'Left' || dto.pType === 'Right') {
-            dots1 = document.getElementById(`${dto.id}-dots-container-top`);
-            dots2 = document.getElementById(`${dto.id}-dots-container-bottom`);
-        } else if (dto.pType === 'Top' || dto.pType === 'Bottom') {
-            dots1 = document.getElementById(`${dto.id}-dots-container-left`);
-            dots2 = document.getElementById(`${dto.id}-dots-container-right`);
-        }
-        const panel = new RrPanel(dto.id, panelElement, dto.dotNetObjectReference, dto.pType, dto.latchingType, container, stateChanger, dto.minLatchingWidth, dto.latching, dto.size, dto.state, dots1, dots2, stateToggler, latchingStateToggler);
+        const centerElementContainer = document.getElementById(`${dto.id}-panel-container-center`);
+        const centerElement = document.getElementById(`${dto.id}-panel-center`);
+        let sElementContainer1 = document.getElementById(`${dto.id}-Selement-container-1`);
+        let sElementContainer2 = document.getElementById(`${dto.id}-Selement-container-2`);
+        let sElement1 = document.getElementById(`${dto.id}-Selement-1`);
+        let sElement2 = document.getElementById(`${dto.id}-Selement-2`);
+        const panel = new RrPanel(dto.id, panelElement, dto.dotNetObjectReference, dto.pType, dto.latchingType, container, stateChanger, dto.minLatchingWidth, dto.latching, dto.size, dto.state, sElement1, sElement2, centerElementContainer, sElementContainer1, sElementContainer2, centerElement);
         panels.push(panel);
 
         const onMouseDown = (event) => {
@@ -207,9 +204,6 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
                     if (!mouseMoved)
                         toggleUIState(panel);
 
-
-
-
                     let size = -1;
                     if (panel.type === 'Left' || panel.type === 'Right') {
 
@@ -223,15 +217,21 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
                             && leftRect.left <= rightRect.left + rightRect.width
                             && leftRect.left + leftRect.width >= rightRect.left)
                         {
+                            leftPanel.size = leftPanel.element.style.width;
+                            rightPanel.size = rightPanel.element.style.width;
                             addLatching(leftPanel);
+                            return;
                         }
                         // Check if the right panel intersects with the left panel
                         else if (rightRect.left <= leftRect.left + leftRect.width
                             && rightRect.left >= leftRect.left
-                            && rightRect.left <= leftRect.left + leftRect.width) {
+                            && rightRect.left <= leftRect.left + leftRect.width)
+                        {
+                            leftPanel.size = leftPanel.element.style.width;
+                            rightPanel.size = rightPanel.element.style.width;
                             addLatching(rightPanel);
+                            return;
                         }
-
 
                         size = parseFloat(panel.element.style.width);
                         if (size < 100 || size > window.RrPage[pageId].bounds.width - 20) {
@@ -274,8 +274,8 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
         if (!panel.latching) {
             panel.stateChanger.addEventListener('mousedown', onMouseDown);
         } else {
-            panel.dots1.addEventListener('mouseup', () => removeLatching(panel));
-            panel.dots2.addEventListener('mouseup', () => removeLatching(panel));
+            panel.sElementContainer1.addEventListener('mousedown', () => removeLatching(panel));
+            panel.sElementContainer2.addEventListener('mousedown', () => removeLatching(panel));
             panel.stateChanger.addEventListener('mousedown', onMouseDown);
         }
         panel.element.addEventListener('mousedown', () => focusPanel(panel));
@@ -401,10 +401,10 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
                 rightPanel.latching = true;
                 leftPanel.state = 'Expanded';
                 rightPanel.state = 'Expanded';
-                leftPanel.disableTransitions();
-                rightPanel.disableTransitions();
-                leftPanel.dotNetHelper.invokeMethodAsync('UpdatePanelLatching', leftPanel.latching).catch(err => console.error(err));
-                rightPanel.dotNetHelper.invokeMethodAsync('UpdatePanelLatching', rightPanel.latching).catch(err => console.error(err));
+                setPanelElementTypeClasses(rightPanel);
+                setPanelElementTypeClasses(leftPanel);
+                setPanelBounds(leftPanel);
+                setPanelBounds(rightPanel);
             }
         }
     }
@@ -415,14 +415,12 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
             if (leftPanel && rightPanel) {
                 leftPanel.latching = false;
                 rightPanel.latching = false;
-                leftPanel.state = 'Collapsed';
-                rightPanel.state = 'Collapsed';
-                leftPanel.enableTransitions();
-                rightPanel.enableTransitions();
-                toggleUIState(leftPanel, 'Collapsed')
-                toggleUIState(rightPanel, 'Collapsed')
-                leftPanel.dotNetHelper.invokeMethodAsync('UpdatePanelLatching', leftPanel.latching).catch(err => console.error(err));
-                rightPanel.dotNetHelper.invokeMethodAsync('UpdatePanelLatching', rightPanel.latching).catch(err => console.error(err));
+                leftPanel.state = 'Expanded';
+                rightPanel.state = 'Expanded';
+                setPanelElementTypeClasses(rightPanel);
+                setPanelElementTypeClasses(leftPanel);
+                setPanelBounds(leftPanel);
+                setPanelBounds(rightPanel);
             }
         }
     }
@@ -435,62 +433,102 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
             if (stateToSet === 'Expanded') {
                 panel.state = 'Expanded';
                 panel.container.style.left = `0px`;
-                panel.dots1.style.display = 'block';
-                panel.dots2.style.display = 'block';
+                panel.sElementContainer1.style.display = 'block';
+                panel.sElementContainer2.style.display = 'block';
                 panel.makeExpanded();
             } else if (stateToSet === 'Collapsed') {
                 panel.state = 'Collapsed';
                 panel.container.style.left = `-${panel.size}`;
-                panel.dots1.style.display = 'none';
-                panel.dots2.style.display = 'none';
+                panel.sElementContainer1.style.display = 'none';
+                panel.sElementContainer2.style.display = 'none';
                 panel.makeMinimized();
             }
         } else if (panel.type === 'Right') {
             if (stateToSet === 'Expanded') {
                 panel.state = 'Expanded';
                 panel.container.style.right = `${panel.size}`;
-                panel.dots1.style.display = 'block';
-                panel.dots2.style.display = 'block';
+                panel.sElementContainer1.style.display = 'block';
+                panel.sElementContainer2.style.display = 'block';
                 panel.makeExpanded();
             } else if (stateToSet === 'Collapsed') {
                 panel.state = 'Collapsed';
                 panel.container.style.right = `0px`;
-                panel.dots1.style.display = 'none';
-                panel.dots2.style.display = 'none';
+                panel.sElementContainer1.style.display = 'none';
+                panel.sElementContainer2.style.display = 'none';
                 panel.makeMinimized();
             }
         } else if (panel.type === 'Top') {
             if (stateToSet === 'Expanded') {
                 panel.state = 'Expanded';
                 panel.container.style.top = `0px`;
-                panel.dots1.style.display = 'block';
-                panel.dots2.style.display = 'block';
+                panel.sElementContainer1.style.display = 'block';
+                panel.sElementContainer2.style.display = 'block';
                 panel.makeExpanded();
             } else if (stateToSet === 'Collapsed') {
                 panel.state = 'Collapsed';
                 panel.container.style.top = `-${panel.size}`;
-                panel.dots1.style.display = 'none';
-                panel.dots2.style.display = 'none';
+                panel.sElementContainer1.style.display = 'none';
+                panel.sElementContainer2.style.display = 'none';
                 panel.makeMinimized();
             }
         } else if (panel.type === 'Bottom') {
             if (stateToSet === 'Expanded') {
                 panel.state = 'Expanded';
                 panel.container.style.bottom = `${panel.size}`;
-                panel.dots1.style.display = 'block';
-                panel.dots2.style.display = 'block';
+                panel.sElementContainer1.style.display = 'block';
+                panel.sElementContainer2.style.display = 'block';
                 panel.makeExpanded();
             } else if (stateToSet === 'Collapsed') {
                 panel.state = 'Collapsed';
                 panel.container.style.bottom = `0px`;
-                panel.dots1.style.display = 'none';
-                panel.dots2.style.display = 'none';
+                panel.sElementContainer1.style.display = 'none';
+                panel.sElementContainer2.style.display = 'none';
                 panel.makeMinimized();
             }
         }
         panel.dotNetHelper.invokeMethodAsync('UpdateStateServicePanelState', panel.state).catch(err => console.error(err));
     }
+    function setPanelTypeClasses(panel) {
+        if (panel) {
+            let panelType = panel.type.toLowerCase();
+            if (!panel.centerElementContainer.classList.contains(panelType)) panel.centerElementContainer.classList.add(panelType)
+            if (!panel.centerElement.classList.contains(panelType)) panel.centerElement.classList.add(panelType)
+            if (!panel.sElementContainer1.classList.contains(panelType)) panel.sElementContainer1.classList.add(panelType)
+            if (!panel.sElementContainer2.classList.contains(panelType)) panel.sElementContainer2.classList.add(panelType)
+            if (!panel.sElement1.classList.contains(panelType)) panel.sElement1.classList.add(panelType)
+            if (!panel.sElement2.classList.contains(panelType)) panel.sElement2.classList.add(panelType)
+        }
+    }
+    function setPanelElementTypeClasses(panel) {
+        if (panel) {
+            if (panel.latching) {
+                if (panel.latchingType === 'Vertical') {
+                    panel.centerElement.classList.add('dots');
+                    panel.centerElementContainer.classList.add('dots');
+                    panel.sElement1.classList.add('detacher');
+                    panel.sElement2.classList.add('detacher');
+                    if (panel.centerElement.classList.contains('arrow')) panel.centerElement.classList.remove('arrow');
+                    if (panel.centerElementContainer.classList.contains('arrow')) panel.centerElementContainer.classList.remove('arrow');
+                    if (panel.sElement1.classList.contains('dots')) panel.sElement1.classList.remove('dots');
+                    if (panel.sElement2.classList.contains('dots')) panel.sElement2.classList.remove('dots');
+                }
+            }
+            else {
+                if (panel.latchingType === 'Vertical') {
+                    panel.centerElement.classList.add('arrow');
+                    panel.centerElementContainer.classList.add('arrow');
+                    panel.sElement1.classList.add('dots');
+                    panel.sElement2.classList.add('dots');
+                    if (panel.centerElementContainer.classList.contains('dots')) panel.centerElementContainer.classList.remove('dots');
+                    if (panel.centerElement.classList.contains('dots')) panel.centerElement.classList.remove('dots');
+                    if (panel.sElement1.classList.contains('detacher')) panel.sElement1.classList.remove('detacher');
+                    if (panel.sElement2.classList.contains('detacher')) panel.sElement2.classList.remove('detacher');
+                }
+            }
+        }
+    }
     function setPanelBounds(panel) {
+        setPanelTypeClasses(panel);
         if (panel.latching) {
             if (panel.latchingType === 'Vertical') {
                 leftPanel = window.RrPage[pageId].panels.find(p => p.type === 'Left');
@@ -500,20 +538,24 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
                     rightPanel.disableTransitions();
                     panel.container.style.top = `${0 + getVerticalPanelTopOffsets(panel)}px`;
                     panel.stateChanger.style.height = `${window.RrPage[pageId].bounds.height + getVerticalPanelHeightOffsets(panel)}px`;
-                    panel.centerDots.style.height = `${window.RrPage[pageId].bounds.height + getVerticalPanelHeightOffsets(panel)}px`;
+                    panel.centerElementContainer.style.height = `${window.RrPage[pageId].bounds.height + getVerticalPanelHeightOffsets(panel)}px`;
                     panel.element.style.height = `${window.RrPage[pageId].bounds.height + getVerticalPanelHeightOffsets(panel)}px`;
                     panel.stateChanger.style.width = "10px";
                     leftPanel.container.style.left = "0px";
-                    leftPanel.element.style.width = panel.size;
-                    leftPanel.stateChanger.style.left = panel.size;
-                    rightPanel.container.style.right = `calc(${window.RrPage[pageId].bounds.width - 20}px - ${panel.size})`;
-                    rightPanel.element.style.width = `calc(${window.RrPage[pageId].bounds.width - 20}px - ${panel.size})`;
+                    leftPanel.element.style.width = leftPanel.size;
+                    leftPanel.stateChanger.style.left = leftPanel.size;
+                    rightPanel.container.style.right = `calc(${window.RrPage[pageId].bounds.width - 20}px - ${leftPanel.size})`;
+                    rightPanel.element.style.width = `calc(${window.RrPage[pageId].bounds.width - 20}px - ${leftPanel.size})`;
                     rightPanel.stateChanger.style.right = `0px`;
                     leftPanel.container.style.zIndex = 19;
                     rightPanel.container.style.zIndex = 18;
+                    setPanelElementTypeClasses(rightPanel);
+                    setPanelElementTypeClasses(leftPanel);
+                    setPanelTypeClasses(panel);
                 }
             }
         } else {
+            setPanelElementTypeClasses(panel);
             if (panel.type === 'Top') {
                 if (panel.state === 'Expanded')
                     panel.container.style.top = `0px`;

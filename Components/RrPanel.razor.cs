@@ -151,57 +151,7 @@ namespace IPeople.Roadrunner.Razor.Components
                 return "35px";
             }
         }
-        private string GetInitialStateCssClass()
-        {
-            if (PanelLatching && LatchingType == LatchingTypes.Vertical && (PType == PanelTypes.Left || PType == PanelTypes.Right)) return "latching-vertical";
-            if (PanelLatching && LatchingType == LatchingTypes.Horizontal && (PType == PanelTypes.Top || PType == PanelTypes.Bottom)) return "latching-horizontal";
-            if (State == Models.UIStates.Expanded)
-            {
-                return "expanded";
-            }
-            else if (State == Models.UIStates.Collapsed)
-            {
-                return "minimized";
-            }
-            else if (State == Models.UIStates.Neutral)
-            {
-                return "";
-            }
-            return "invalid-state";
-        }
-        private string GetPanelTypeCssClass()
-        {
-            if (PType == PanelTypes.Left)
-            {
-                return "left";
-            }
-            else if (PType == PanelTypes.Right)
-            {
-                return "right";
-            }
-            else if (PType == PanelTypes.Top)
-            {
-                return "top";
-            }
-            else if (PType == PanelTypes.Bottom)
-            {
-                return "bottom";
-            }
-            return "invalid-type";
-        }
-        private string GetCenterStateChangerCssClass()
-        {
-
-            if (PType == PanelTypes.Left)
-            {
-                return "center-left";
-            }
-            else if (PType == PanelTypes.Right)
-            {
-                return "center-right";
-            }
-            return "";
-        }
+        
         private string GetAllowedScrolling()
         {
             if (AllowScrolling)

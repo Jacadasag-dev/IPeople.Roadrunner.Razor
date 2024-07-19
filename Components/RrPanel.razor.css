@@ -205,18 +205,19 @@
     opacity: 0;
 }
 
-.Rr-panel-statechanger-arrow-container {
-   position: absolute;
+.Rr-panel-statechanger-center-container {
+    position: absolute;
 }
 
-    .Rr-panel-statechanger-arrow-container.horizontal {
+    .Rr-panel-statechanger-center-container.top,
+    .Rr-panel-statechanger-center-container.bottom {
         width: calc(100% - 104px);
         height: 11px;
         bottom: -1px;
         text-align: center;
     }
-
-    .Rr-panel-statechanger-arrow-container.vertical {
+    .Rr-panel-statechanger-center-container.left,
+    .Rr-panel-statechanger-center-container.right {
         right: -1px;
         width: 11px;
         height: calc(100% - 70px);
@@ -224,78 +225,86 @@
         top: 34px;
     }
 
+    .Rr-panel-statechanger-center-container.left {
+        left: 4px;
+        z-index: 1;
+    }
 
-.Rr-panel-statechanger-arrow {
+    .Rr-panel-statechanger-center-container.right {
+        display: none;
+    }
+
+.Rr-panel-statechanger-center {
     position: absolute;
     display: inline-block;
     width: 0;
     height: 0;
 }
 
-    .Rr-panel-statechanger-arrow.right {
+    .Rr-panel-statechanger-center.top.arrow {
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-top: 5px solid #333;
+        top: 3px;
+    }
+    .Rr-panel-statechanger-center.bottom.arrow {
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-bottom: 5px solid #333;
+        top: 3px;
+    }
+    .Rr-panel-statechanger-center.left.arrow {
+        border-top: 5px solid transparent;
+        border-bottom: 5px solid transparent;
+        border-left: 5px solid #333;
+        left: 3px;
+    }
+    .Rr-panel-statechanger-center.right.arrow {
         border-top: 5px solid transparent;
         border-bottom: 5px solid transparent;
         border-right: 5px solid #333;
         left: 3px;
     }
 
-    .Rr-panel-statechanger-arrow.left {
-        border-top: 5px solid transparent;
-        border-bottom: 5px solid transparent;
-        border-left: 5px solid #333;
-        left: 3px;
-    }
+.Rr-panel-statechanger.expanded .Rr-panel-statechanger-center.bottom.arrow {
+    top: 4px;
+}
 
-    .Rr-panel-statechanger-arrow.top {
-        border-left: 5px solid transparent;
-        border-right: 5px solid transparent;
-        border-top: 5px solid #333;
-        top: 3px;
-    }
+.Rr-panel-statechanger.expanded .Rr-panel-statechanger-center.right.arrow {
+    left: 4px;
+}
 
-    .Rr-panel-statechanger-arrow.bottom {
-        border-left: 5px solid transparent;
-        border-right: 5px solid transparent;
-        border-bottom: 5px solid #333;
-        top: 3px;
-    }
-
-    .Rr-panel-statechanger.expanded .Rr-panel-statechanger-arrow.bottom {
-        top: 4px;
-    }
-
-    .Rr-panel-statechanger.expanded .Rr-panel-statechanger-arrow.right {
-        left: 4px;
-    }
-
-.Rr-panel-statechanger-dots-container {
+.Rr-panel-statechanger-Selement-container.one {
     position: absolute;
 }
-    .Rr-panel-statechanger-dots-container.left {
+
+
+    .Rr-panel-statechanger-Selement-container.one.top {
         left: 22px;
         bottom: -1px;
         height: 10px;
         width: 30px;
         cursor: ns-resize;
+        background: red;
     }
 
-    .Rr-panel-statechanger-dots-container.right {
+    .Rr-panel-statechanger-Selement-container.one.bottom {
         right: 22px;
         bottom: -1px;
         height: 10px;
         width: 30px;
         cursor: ns-resize;
+        background: red;
     }
-
-    .Rr-panel-statechanger-dots-container.top {
+    .Rr-panel-statechanger-Selement-container.one.left {
         top: 3px;
         right: 0px;
         width: 9px;
         height: 29px;
         cursor: ew-resize;
+        align-content: center;
     }
-
-    .Rr-panel-statechanger-dots-container.bottom {
+    .Rr-panel-statechanger-Selement-container.one.right {
         bottom: 3px;
         right: 0px;
         width: 9px;
@@ -303,16 +312,8 @@
         cursor: ew-resize;
     }
 
-    .Rr-panel-statechanger-dots-container.center-left {
-        left: 4px;
-        z-index: 1;
-    }
 
-    .Rr-panel-statechanger-dots-container.center-right {
-        display: none;
-    }
-
-.Rr-panel-statechanger-dots {
+.Rr-panel-statechanger-Selement.one {
     display: inline-block;
     position: relative;
     width: 4px; /* Width of the dots */
@@ -321,95 +322,107 @@
     border-radius: 50%; /* Make the dots round */
 }
 
-    .Rr-panel-statechanger-dots.vertical {
-        right: -3px;
-        top: -1px;
-    }
 
-    .Rr-panel-statechanger-dots.horizontal {
+
+    .Rr-panel-statechanger-Selement.one.top.dots,
+    .Rr-panel-statechanger-Selement.one.bottom.dots {
         left: 5px;
         bottom: 10px;
     }
 
-.Rr-panel-statechanger-dots::before,
-.Rr-panel-statechanger-dots::after {
-    content: '';
-    display: inline-block;
-    position: absolute;
-    width: 4px; /* Width of the dots */
-    height: 4px; /* Height of the dots */
-    background-color: #333; /* Color of the dots */
-    border-radius: 50%; /* Make the dots round */
-}
-
-    .Rr-panel-statechanger-dots.vertical::before {
-        top: -8px; /* Adjust the spacing between the dots */
+    .Rr-panel-statechanger-Selement.one.left.dots,
+    .Rr-panel-statechanger-Selement.one.right.dots {
+        right: -3px;
+        top: -1px;
     }
 
-    .Rr-panel-statechanger-dots.vertical::after {
-        top: 8px; /* Adjust the spacing between the dots */
+
+    .Rr-panel-statechanger-Selement.one::before,
+    .Rr-panel-statechanger-Selement.one::after {
+        content: '';
+        display: inline-block;
+        position: absolute;
+        width: 4px; /* Width of the dots */
+        height: 4px; /* Height of the dots */
+        background-color: #333; /* Color of the dots */
+        border-radius: 50%; /* Make the dots round */
     }
 
-    .Rr-panel-statechanger-dots.horizontal::before {
+    .Rr-panel-statechanger-Selement.one.top::before,
+    .Rr-panel-statechanger-Selement.one.bottom::before {
         left: 16px; /* Adjust the spacing between the dots */
     }
 
-    .Rr-panel-statechanger-dots.horizontal::after {
+    .Rr-panel-statechanger-Selement.one.top::after,
+    .Rr-panel-statechanger-Selement.one.bottom::after {
         left: 8px; /* Adjust the spacing between the dots */
     }
 
-.Rr-panel-statechanger.expanded .Rr-panel-statechanger-arrow.right,
-.Rr-panel-statechanger.expanded .Rr-panel-statechanger-arrow.left,
-.Rr-panel-statechanger.expanded .Rr-panel-statechanger-arrow.top,
-.Rr-panel-statechanger.expanded .Rr-panel-statechanger-arrow.bottom {
+    .Rr-panel-statechanger-Selement.one.left::before,
+    .Rr-panel-statechanger-Selement.one.right::before {
+        top: -8px; /* Adjust the spacing between the dots */
+    }
+
+    .Rr-panel-statechanger-Selement.one.left::after,
+    .Rr-panel-statechanger-Selement.one.right::after {
+        top: 8px; /* Adjust the spacing between the dots */
+    }
+
+
+
+
+.Rr-panel-statechanger.expanded .Rr-panel-statechanger-center.top.arrow,
+.Rr-panel-statechanger.expanded .Rr-panel-statechanger-center.bottom.arrow,
+.Rr-panel-statechanger.expanded .Rr-panel-statechanger-center.left.arrow,
+.Rr-panel-statechanger.expanded .Rr-panel-statechanger-center.right.arrow {
     transform: rotate(180deg);
 }
 
-.Rr-panel-statechanger.minimized .Rr-panel-statechanger-dots-container.right,
-.Rr-panel-statechanger.minimized .Rr-panel-statechanger-dots-container.left,
-.Rr-panel-statechanger.minimized .Rr-panel-statechanger-dots-container.top,
-.Rr-panel-statechanger.minimized .Rr-panel-statechanger-dots-container.bottom {
+.Rr-panel-statechanger.minimized .Rr-panel-statechanger-Selement-container.top,
+.Rr-panel-statechanger.minimized .Rr-panel-statechanger-Selement-container.bottom,
+.Rr-panel-statechanger.minimized .Rr-panel-statechanger-Selement-container.left,
+.Rr-panel-statechanger.minimized .Rr-panel-statechanger-Selement-container.right {
     display: none;
 }
 
-.Rr-panel-statechanger.minimized .Rr-panel-statechanger-arrow-container.horizontal {
+.Rr-panel-statechanger.minimized .Rr-panel-statechanger-center-container.top,
+.Rr-panel-statechanger.minimized .Rr-panel-statechanger-center-container.bottom
+{
     width: 100%;
     left: 0px;
 }
-.Rr-panel-statechanger.minimized .Rr-panel-statechanger-arrow-container.vertical {
+
+.Rr-panel-statechanger.minimized .Rr-panel-statechanger-center-container.left,
+.Rr-panel-statechanger.minimized .Rr-panel-statechanger-center-container.right {
     height: 100%;
     top: 0px;
 }
 
-.Rr-panel-statechanger:hover {
-    
+.Rr-panel-statechanger:hover .Rr-panel-statechanger-center.top.arrow {
+    border-top: 5px solid #FFFFFF; /* White color on hover */
+}
+.Rr-panel-statechanger:hover .Rr-panel-statechanger-center.bottom.arrow {
+    border-bottom: 5px solid #FFFFFF; /* White color on hover */
+}
+.Rr-panel-statechanger:hover .Rr-panel-statechanger-center.left.arrow {
+    border-left: 5px solid #FFFFFF; /* White color on hover */
+}
+.Rr-panel-statechanger:hover .Rr-panel-statechanger-center.right.arrow {
+    border-right: 5px solid #FFFFFF; /* White color on hover */
 }
 
-    .Rr-panel-statechanger:hover .Rr-panel-statechanger-arrow.left {
-        border-left: 5px solid #FFFFFF; /* White color on hover */
-    }
-    .Rr-panel-statechanger:hover .Rr-panel-statechanger-arrow.right {
-        border-right: 5px solid #FFFFFF; /* White color on hover */
-    }
-    .Rr-panel-statechanger:hover .Rr-panel-statechanger-arrow.top {
-        border-top: 5px solid #FFFFFF; /* White color on hover */
-    }
-    .Rr-panel-statechanger:hover .Rr-panel-statechanger-arrow.bottom {
-        border-bottom: 5px solid #FFFFFF; /* White color on hover */
-    }
+.Rr-panel-statechanger-Selement.dots,
+.Rr-panel-statechanger-Selement.dots::after,
+.Rr-panel-statechanger-Selement.dots::before {
+    background-color: #FFFFFF; /* Color of the dots */
+}
 
-    .Rr-panel-statechanger:hover .Rr-panel-statechanger-dots,
-    .Rr-panel-statechanger:hover .Rr-panel-statechanger-dots::after,
-    .Rr-panel-statechanger:hover .Rr-panel-statechanger-dots::before {
-        background-color: #FFFFFF; /* Color of the dots */
-    }
+.Rr-panel-statechanger-center.left,
+.Rr-panel-statechanger-center.left::after,
+.Rr-panel-statechanger-center.left::before {
+    background-color: #333; /* Color of the dots */
+}
 
-    .Rr-panel-statechanger:hover .Rr-panel-statechanger-dots.center-left,
-    .Rr-panel-statechanger:hover .Rr-panel-statechanger-dots.center-left::after,
-    .Rr-panel-statechanger:hover .Rr-panel-statechanger-dots.center-left::before {
-        background-color: #333; /* Color of the dots */
-    }
-
-.Rr-panel-statechanger.minimized .Rr-panel-statechanger-dots {
+.Rr-panel-statechanger.minimized .Rr-panel-statechanger-Selement.dots {
     display: none;
 }

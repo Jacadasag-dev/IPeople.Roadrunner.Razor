@@ -2,8 +2,8 @@
 @if (Visible)
 {
     InitializePanel();
-    <div id="@($"{Id}-panel-container")" class="Rr-panel-container @GetPanelTypeCssClass() @GetInitialStateCssClass()">
-        <div id="@($"{Id}-panel")" class="Rr-panel @GetPanelTypeCssClass() @GetInitialStateCssClass()"
+    <div id="@($"{Id}-panel-container")" class="Rr-panel-container @PType.ToString().ToLower()">
+        <div id="@($"{Id}-panel")" class="Rr-panel @PType.ToString().ToLower()"
              style="@Style">
             @if (Header is not null)
             {
@@ -25,40 +25,16 @@
                 </div>
             }
         </div>
-        <div id="@($"{Id}-panel-statechanger")" class="Rr-panel-statechanger @GetPanelTypeCssClass() @GetInitialStateCssClass()">
-            @if (PType == PanelTypes.Left || PType == PanelTypes.Right)
-            {
-                <div id="@($"{Id}-dots-container-top")" class="@(PanelLatching && LatchingType == LatchingTypes.Vertical ? "Rr-panel-detacher-container" : "Rr-panel-statechanger-dots-container") top">
-                    <span class="@(PanelLatching && LatchingType == LatchingTypes.Vertical ? "Rr-panel-detacher" : "Rr-panel-statechanger-dots") vertical @(PType == PanelTypes.Left ? "left" : "right")"></span>
-                </div>
-                @if (PanelLatching && LatchingType == LatchingTypes.Vertical)
-                {
-                    <div id="@($"{Id}-panel-dots-container-center")" class="Rr-panel-statechanger-dots-container @GetCenterStateChangerCssClass()">
-                        <span class="Rr-panel-statechanger-dots vertical @GetCenterStateChangerCssClass()"></span>
-                    </div>
-                }
-                else
-                {
-                    <div id="@($"{Id}-panel-arrow-container")" class="Rr-panel-statechanger-arrow-container vertical">
-                        <span class="Rr-panel-statechanger-arrow @GetPanelTypeCssClass()"></span>
-                    </div>
-                }
-                <div id="@($"{Id}-dots-container-bottom")" class="@(PanelLatching && LatchingType == LatchingTypes.Vertical ? "Rr-panel-detacher-container" : "Rr-panel-statechanger-dots-container") bottom">
-                    <span class="@(PanelLatching && LatchingType == LatchingTypes.Vertical ? "Rr-panel-detacher" : "Rr-panel-statechanger-dots") vertical @(PType == PanelTypes.Left ? "left" : "right")"></span>
-                </div>
-            }
-            else
-            {
-                <div id="@($"{Id}-dots-container-left")" class="Rr-panel-statechanger-dots-container left">
-                    <span class="Rr-panel-statechanger-dots horizontal"></span>
-                </div>
-                <div id="@($"{Id}-panel-arrow-container")" class="Rr-panel-statechanger-arrow-container horizontal">
-                    <span class="Rr-panel-statechanger-arrow @GetPanelTypeCssClass()"></span>
-                </div>
-                <div id="@($"{Id}-dots-container-right")" class="Rr-panel-statechanger-dots-container right">
-                    <span class="Rr-panel-statechanger-dots horizontal"></span>
-                </div>
-            }
+        <div id="@($"{Id}-panel-statechanger")" class="Rr-panel-statechanger @PType.ToString().ToLower()">
+            <div id="@($"{Id}-Selement-container-1")" class="Rr-panel-statechanger-Selement-container one">
+                <span id="@($"{Id}-Selement-1")" class="Rr-panel-statechanger-Selement one"></span>
+            </div>
+            <div id="@($"{Id}-panel-container-center")" class="Rr-panel-statechanger-center-container">
+                <span id="@($"{Id}-panel-center")" class="Rr-panel-statechanger-center"></span>
+            </div>
+            <div id="@($"{Id}-Selement-container-2")" class="Rr-panel-statechanger-Selement-container two">
+                <span id="@($"{Id}-Selement-2")" class="Rr-panel-statechanger-Selement two"></span>
+            </div>
         </div>
     </div>
 }
