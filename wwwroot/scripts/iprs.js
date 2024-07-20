@@ -161,7 +161,6 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
         const onMouseDown = (event) => {
             let startY = event.clientY;
             let startX = event.clientX;
-            console.log(panel.type);
             const initialHieght = panel.element.offsetHeight;
             const initialWidth = panel.element.offsetWidth
             const initialStateChangerLeft = panel.stateChanger.offsetLeft;
@@ -320,9 +319,9 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
             panel.sElementContainer1.addEventListener('mousedown', () => removeLatching(panel));
             panel.sElementContainer2.addEventListener('mousedown', () => removeLatching(panel));
         }
-        panel.stateChanger.addEventListener('mousedown', onMouseDown);
+        panel.stateChanger.addEventListener('mousedown', (event) => { onMouseDown(event); });
         panel.element.addEventListener('mousedown', () => focusPanel(panel));
-        panel.stateChanger.addEventListener('mousedown', () => focusPanel(panel));
+        
     });
     window.RrPage[pageId].panels = panels;
     window.setPanelUIState = function (myPageId, panelId, desiredState) {
@@ -419,17 +418,14 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
 
             panels.forEach((p, i) => {
                 p.container.style.zIndex = `${20 + (panels.length - i)}`;
-            });
-
-            
-
-            panels.forEach((p, i) => {
                 setPanelBounds(p);
             });
 
             if (panel.state === 'Collapsed') {
                 panel.container.style.zIndex = 20;
             }
+
+            console.log(`From focusPanel: ${panel.state}`);
         }
     };
     function addLatching(panel) {
@@ -465,10 +461,13 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
 
         if (panel.state === 'Expanded' || desiredState === 'Collapsed') {
             panel.makeMinimized();
+            focusPanel(panel);
         }
         else {
             panel.makeExpanded();
+            focusPanel(panel);
         }
+        console.log(`From toggleUIState: ${panel.state}`);
         setPanelBounds(panel);
         panel.dotNetHelper.invokeMethodAsync('UpdateStateServicePanelState', panel.state).catch(err => console.error(err));
     }
@@ -498,7 +497,6 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
                     rightPanel.size = `${rightPanel.element.offsetWidth}px`;
                     rightPanel.setPanelStatechangerElementClasses();
                     leftPanel.setPanelStatechangerElementClasses();
-                    panel.setPanelTypeClasses();
                 }
             }
         } else {
