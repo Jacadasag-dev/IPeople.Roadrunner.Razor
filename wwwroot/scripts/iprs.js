@@ -161,6 +161,7 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
         const onMouseDown = (event) => {
             let startY = event.clientY;
             let startX = event.clientX;
+            console.log(panel.type);
             const initialHieght = panel.element.offsetHeight;
             const initialWidth = panel.element.offsetWidth
             const initialStateChangerLeft = panel.stateChanger.offsetLeft;
@@ -222,14 +223,15 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
             const onMouseUp = () => {
                 document.removeEventListener('mousemove', onMouseMove);
                 document.removeEventListener('mouseup', onMouseUp);
+                panel.enableTransitions();
                 if (panel.latching) {
                     if (panel.latchingType === 'Vertical') {
                         leftPanel = window.RrPage[pageId].panels.find(p => p.type === 'Left');
                         rightPanel = window.RrPage[pageId].panels.find(p => p.type === 'Right');
                         if (leftPanel && rightPanel) {
-                            panel.enableTransitions();
                             leftPanel.size = `${leftPanel.element.offsetWidth}px`;
                             rightPanel.size = `${rightPanel.element.offsetWidth}px`;
+                            
                         }
                     }
                 } else {
@@ -276,38 +278,38 @@ window.registerPageAndPanels = function (pageId, panelDtos) {
                         }
                         size = parseFloat(panel.element.style.width);
                         if (size < 100 || size > window.RrPage[pageId].bounds.width - 20) {
-                            toggleUIState(panel);
                             if (panel.type === 'Left') {
-                                
+                                panel.container.style.transition = 'none';
                                 panel.stateChanger.style.left = panel.size;
-                                setTimeout(function () {
-                                    panel.element.style.width = panel.size;
-                                }, 200);
-
+                                panel.element.style.width = panel.size;
                             } else {
                                 panel.element.style.width = panel.size;
                             }
+                            toggleUIState(panel);
+                            
                         } else {
                             panel.size = `${size}px`;
                         }
                     } else if (panel.type === 'Top' || panel.type === 'Bottom') {
                         size = parseFloat(panel.element.style.height);
                         if (size < 100 || size > window.RrPage[pageId].bounds.height - 20) {
-                            toggleUIState(panel);
                             if (panel.type === 'Top') {
+                                panel.container.style.transition = 'none';
                                 panel.stateChanger.style.top = panel.size;
-                                setTimeout(function () {
-                                    panel.element.style.height = panel.size;
-                                }, 200);
+                                panel.element.style.height = panel.size;
                             } else {
                                 panel.element.style.height = panel.size;
                             }
+                            toggleUIState(panel);
                         } else {
                             panel.size = `${size}px`;
                         }
                     }
                     panel.enableTransitions();
                     justlatched = false;
+                    setTimeout(function () {
+                        panel.container.style.transition = '';
+                    }, 1);
                 }
             };
             document.addEventListener('mousemove', onMouseMove);
