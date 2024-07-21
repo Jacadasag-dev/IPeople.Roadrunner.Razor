@@ -1,17 +1,20 @@
 ﻿
+using IPeople.Roadrunner.Razor.Components;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
 namespace IPeople.Roadrunner.Razor.Models
 {
-    public class PageBodyBounds
+    public class RrPanelDto
     {
-        public int TopPosition { get; set; }
-        public int LeftPosition { get; set; }
-        public int RightPosition { get; set; }
-        public int BottomPosition { get; set; }
-        public int Height { get; set; }
-        public int Width { get; set; }
+        public string? Id { get; set; }
+        public string? Size { get; set; }
+        public string? PType { get; set; }
+        public bool Latching { get; set; }
+        public string? LatchingType { get; set; }
+        public int MinLatchingWidth { get; set; }
+        public string? State { get; set; }
+        public DotNetObjectReference<RrPanel>? DotNetObjectReference { get; set; }
     }
 
     #region RrComponent Instance Models

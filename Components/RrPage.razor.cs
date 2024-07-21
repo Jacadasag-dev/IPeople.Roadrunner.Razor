@@ -50,40 +50,13 @@ namespace IPeople.Roadrunner.Razor.Components
         public LatchingTypes LatchingType { get; set; }
         #endregion
 
-        private class RrPanelDto
-        {
-            public string? Id { get; set; }
-            public string? Size { get; set; }
-            public string? PType { get; set; }
-            public bool Latching { get; set; }
-            public string? LatchingType { get; set; }
-            public int MinLatchingWidth { get; set; }
-            public string? State { get; set; }
-            public DotNetObjectReference<RrPanel>? DotNetObjectReference { get; set; }
-        }
-
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
             {
-                List<RrPanel>? panels = RrStateService.GetComponentsByTag<RrPanel>("Panel");
-                        if (panels is null)
-                            return;
+                if (Id is not null)
+                    await RrStateService.RegisterContainingDivAndPanels(Id, "Panel", LatchingType, LatchingPanelsMininmumAdjustmentSize);
 
-                var panelDtos = panels.Select(panel => new RrPanelDto
-                {
-                    Id = panel.Id,
-                    Size = panel.Size,
-                    PType = panel.PType.ToString(),
-                    Latching = (LatchingType == LatchingTypes.Vertical && (panel.PType == PanelTypes.Left || panel.PType == PanelTypes.Right)
-                    || (LatchingType == LatchingTypes.Horizontal && (panel.PType == PanelTypes.Top || panel.PType == PanelTypes.Bottom))),
-                    LatchingType = panel.LatchingType.ToString(),
-                    MinLatchingWidth = LatchingPanelsMininmumAdjustmentSize,
-                    State = panel.State.ToString(),
-                    DotNetObjectReference = panel.dotNetReference
-                }).ToList();
-
-                await JS.InvokeVoidAsync("registerPageAndPanels", Id, panelDtos);
             }
         }
 

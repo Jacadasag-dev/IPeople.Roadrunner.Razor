@@ -87,7 +87,7 @@ namespace IPeople.Roadrunner.Razor.Components
             State = RrStateService.GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue(this, p => p.State, State);
             if (State == UIStates.Neutral)
                 State = InitialState;
-
+            
             await SetPannelState();
             // Set DotNetReference
             dotNetReference = DotNetObjectReference.Create(this);
@@ -112,7 +112,7 @@ namespace IPeople.Roadrunner.Razor.Components
             if (afterFirstRender)
                 await JS.InvokeVoidAsync("setPanelUIState", PageId, Id, State.ToString());
         }
-
+        
         [JSInvokable]
         public void UpdateStateServicePanelState(string state)
         {
@@ -126,14 +126,6 @@ namespace IPeople.Roadrunner.Razor.Components
                 RrStateService.SetComponentPropertyById<RrPanel, UIStates>(Id, p => p.State, UIStates.Collapsed);
                 State = UIStates.Collapsed;
             }
-        }
-
-        [JSInvokable]
-        public void UpdatePanelLatching(bool latching)
-        {
-            RrStateService.SetComponentPropertyById<RrPanel, bool>(PageId, p => p.PanelLatching, latching);
-            PanelLatching = latching;
-            StateHasChanged();
         }
 
         private string GetBodySizeOffset()

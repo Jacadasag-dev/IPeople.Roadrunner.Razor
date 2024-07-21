@@ -18,6 +18,11 @@ namespace IPeople.Roadrunner.Razor.Services
         public event Action<string, RrLoadingBase>? LoadingStateChangeRequestById;
         public event Action<string, RrLoadingBase>? LoadingStateChangeRequestByTag;
         public event Action? StopAllLoading;
+        private readonly IJSRuntime? _jsRuntime;
+        public RrStateService(IJSRuntime jsRuntime)
+        {
+            _jsRuntime = jsRuntime;
+        }
 
         #region Register/Remove Component
         public void RegisterComponent<T>(T component) where T : IRrComponentBase
@@ -293,6 +298,28 @@ namespace IPeople.Roadrunner.Razor.Services
         #endregion
 
         #region Helpers Methods
+        public async Task RegisterContainingDivAndPanels(string containingDivId, string panelTag, LatchingTypes latchingType, int latchingPanelsMinimumAdjustmentSize)
+        {
+            List<RrPanel>? panels = GetComponentsByTag<RrPanel>(panelTag);
+            if (panels is null)
+                return;
+
+            var panelDtos = panels.Select(panel => new RrPanelDto
+            {
+                Id = panel.Id,
+                Size = panel.Size,
+                PType = panel.PType.ToString(),
+                Latching = (latchingType == LatchingTypes.Vertical && (panel.PType == PanelTypes.Left || panel.PType == PanelTypes.Right)
+                            || (latchingType == LatchingTypes.Horizontal && (panel.PType == PanelTypes.Top || panel.PType == PanelTypes.Bottom))),
+                LatchingType = panel.LatchingType.ToString(),
+                MinLatchingWidth = latchingPanelsMinimumAdjustmentSize,
+                State = panel.State.ToString(),
+                DotNetObjectReference = panel.dotNetReference
+            }).ToList();
+
+            if (_jsRuntime is not null)
+                await _jsRuntime.InvokeVoidAsync("registerContainingDivAndPanels", containingDivId, panelDtos);
+        }
         public string? GetDisplayValue(object? item)
         {
             if (item is null)

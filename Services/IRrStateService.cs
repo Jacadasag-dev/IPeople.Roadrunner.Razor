@@ -31,5 +31,6 @@ namespace IPeople.Roadrunner.Razor.Services
         void SetComponentsPropertiesByTag<T, TProperty>(string? tag, Expression<Func<T, TProperty?>> propertySelector, TProperty? newValue, bool refresh = false) where T : class, IRrComponentBase;
         TProperty? GetPropertyIfIsNotNullElseIfNullSetToNewValueAndReturnNewValue<T, TProperty>(T? rrComponent, Expression<Func<T, TProperty?>> propertySelector, TProperty? newValue) where T : class, IRrComponentBase;
         string? GetDisplayValue(object? item);
+        Task RegisterContainingDivAndPanels(string containingDivId, string panelTag, LatchingTypes latchingType, int latchingPanelsMinimumAdjustmentSize);
     }
 }
