@@ -179,33 +179,25 @@ window.registerContainingDivAndPanels = function (panelDtos, containingDivId = '
     // Register Panels
     var panels = [];
     panelDtos.forEach(function (dto) {
-        const panelElement = document.getElementById(`${dto.id}-panel`);
-        if (!panelElement) throw new Error(`Element with id ${dto.id}-panel not found.`);
-
-        const container = document.getElementById(`${dto.id}-panel-container`);
-        if (!container) throw new Error(`Element with id ${dto.id}-panel-container not found.`);
-
-        const stateChanger = document.getElementById(`${dto.id}-panel-statechanger`);
-        if (!stateChanger) throw new Error(`Element with id ${dto.id}-panel-statechanger not found.`);
-
-        const centerElementContainer = document.getElementById(`${dto.id}-panel-container-center`);
-        if (!centerElementContainer) throw new Error(`Element with id ${dto.id}-panel-container-center not found.`);
-
-        const centerElement = document.getElementById(`${dto.id}-panel-center`);
-        if (!centerElement) throw new Error(`Element with id ${dto.id}-panel-center not found.`);
-
-        const sElementContainer1 = document.getElementById(`${dto.id}-Selement-container-1`);
-        if (!sElementContainer1) throw new Error(`Element with id ${dto.id}-Selement-container-1 not found.`);
-
-        const sElementContainer2 = document.getElementById(`${dto.id}-Selement-container-2`);
-        if (!sElementContainer2) throw new Error(`Element with id ${dto.id}-Selement-container-2 not found.`);
-
-        const sElement1 = document.getElementById(`${dto.id}-Selement-1`);
-        if (!sElement1) throw new Error(`Element with id ${dto.id}-Selement-1 not found.`);
-
-        const sElement2 = document.getElementById(`${dto.id}-Selement-2`);
-        if (!sElement2) throw new Error(`Element with id ${dto.id}-Selement-2 not found.`);
         // throw an error if any of the elements are not found
+        const panelElement = document.getElementById(`${dto.id}-panel`);
+        const container = document.getElementById(`${dto.id}-panel-container`);
+        const stateChanger = document.getElementById(`${dto.id}-panel-statechanger`);
+        const centerElementContainer = document.getElementById(`${dto.id}-panel-container-center`);
+        const centerElement = document.getElementById(`${dto.id}-panel-center`);
+        const sElementContainer1 = document.getElementById(`${dto.id}-Selement-container-1`);
+        const sElementContainer2 = document.getElementById(`${dto.id}-Selement-container-2`);
+        const sElement1 = document.getElementById(`${dto.id}-Selement-1`);
+        const sElement2 = document.getElementById(`${dto.id}-Selement-2`);
+        if (!panelElement) throw new Error(`Element with id ${dto.id}-panel not found.`);
+        if (!container) throw new Error(`Element with id ${dto.id}-panel-container not found.`);
+        if (!stateChanger) throw new Error(`Element with id ${dto.id}-panel-statechanger not found.`);
+        if (!centerElementContainer) throw new Error(`Element with id ${dto.id}-panel-container-center not found.`);
+        if (!centerElement) throw new Error(`Element with id ${dto.id}-panel-center not found.`);
+        if (!sElementContainer1) throw new Error(`Element with id ${dto.id}-Selement-container-1 not found.`);
+        if (!sElementContainer2) throw new Error(`Element with id ${dto.id}-Selement-container-2 not found.`);
+        if (!sElement1) throw new Error(`Element with id ${dto.id}-Selement-1 not found.`);
+        if (!sElement2) throw new Error(`Element with id ${dto.id}-Selement-2 not found.`);
 
         const panel = new RrPanel({
             id: dto.id,
@@ -235,8 +227,8 @@ window.registerContainingDivAndPanels = function (panelDtos, containingDivId = '
             const initialWidth = panel.element.offsetWidth
             const initialStateChangerLeft = panel.stateChanger.offsetLeft;
             const initialStateChangerTop = panel.stateChanger.offsetTop;
-            const leftPanel = window.ContainingDivs[containingDivId].panels.find(p => p.type === 'Left');
-            const leftPanelInitialWidth = leftPanel?.element.offsetWidth;
+            const myLeftPanel = window.ContainingDivs[containingDivId].panels.find(p => p.type === 'Left');
+            const leftPanelInitialWidth = myLeftPanel?.element.offsetWidth;
             let mouseMoved = false;
             panel.disableTransitions();
 
@@ -249,8 +241,8 @@ window.registerContainingDivAndPanels = function (panelDtos, containingDivId = '
                 const diffY = event.clientY - startY;
                 if (panel.latching) {
                     if (panel.latchingType === 'Vertical') {
-                        leftPanel = window.ContainingDivs[containingDivId].panels.find(p => p.type === 'Left');
-                        rightPanel = window.ContainingDivs[containingDivId].panels.find(p => p.type === 'Right');
+                        let leftPanel = window.ContainingDivs[containingDivId].panels.find(p => p.type === 'Left');
+                        let rightPanel = window.ContainingDivs[containingDivId].panels.find(p => p.type === 'Right');
                         if (leftPanel && rightPanel) {
                             // Calculate the new width while respecting the minimum latching width
                             let newLeftPanelWidth = leftPanelInitialWidth + diffX;
@@ -296,12 +288,11 @@ window.registerContainingDivAndPanels = function (panelDtos, containingDivId = '
                 panel.enableTransitions();
                 if (panel.latching) {
                     if (panel.latchingType === 'Vertical') {
-                        leftPanel = window.ContainingDivs[containingDivId].panels.find(p => p.type === 'Left');
-                        rightPanel = window.ContainingDivs[containingDivId].panels.find(p => p.type === 'Right');
+                        let leftPanel = window.ContainingDivs[containingDivId].panels.find(p => p.type === 'Left');
+                        let rightPanel = window.ContainingDivs[containingDivId].panels.find(p => p.type === 'Right');
                         if (leftPanel && rightPanel) {
                             leftPanel.size = `${leftPanel.element.offsetWidth}px`;
                             rightPanel.size = `${rightPanel.element.offsetWidth}px`;
-                            
                         }
                     }
                 } else {
@@ -316,9 +307,9 @@ window.registerContainingDivAndPanels = function (panelDtos, containingDivId = '
                     }
                     let size = -1;
                     if (panel.type === 'Left' || panel.type === 'Right') {
-                        if (!justlatched && panel.latching) {
-                            leftPanel = window.ContainingDivs[containingDivId].panels.find(p => p.type === 'Left');
-                            rightPanel = window.ContainingDivs[containingDivId].panels.find(p => p.type === 'Right');
+                        if (!justlatched && panel.latchingType === 'Vertical') {
+                            let leftPanel = window.ContainingDivs[containingDivId].panels.find(p => p.type === 'Left');
+                            let rightPanel = window.ContainingDivs[containingDivId].panels.find(p => p.type === 'Right');
                             const leftRect = leftPanel.stateChanger.getBoundingClientRect();
                             const rightRect = rightPanel.stateChanger.getBoundingClientRect();
                             // Check if the left panel intersects with the right panel
@@ -455,6 +446,7 @@ window.registerContainingDivAndPanels = function (panelDtos, containingDivId = '
         if (bottomPanel && bottomPanel.state === 'Expanded' && topPanel && topPanel.state === 'Collapsed') 
             offset = -10;
 
+        // adjust for possible border widths
         const computedStyle = window.getComputedStyle(document.getElementById(window.ContainingDivs[containingDivId].id));
         const containingDivBorderBottomWidth = computedStyle.borderBottomWidth;
         const containingDivBorderTopWidth = computedStyle.borderTopWidth;
