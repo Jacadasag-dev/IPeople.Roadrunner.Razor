@@ -298,7 +298,7 @@ namespace IPeople.Roadrunner.Razor.Services
         #endregion
 
         #region Helpers Methods
-        public async Task RegisterContainingDivAndPanels(string containingDivId, string panelTag, LatchingTypes latchingType, int latchingPanelsMinimumAdjustmentSize)
+        public async Task RegisterContainingDivAndPanels(string panelTag, string containingDivId = "", LatchingTypes latchingType = LatchingTypes.None, int latchingPanelsMinimumAdjustmentSize = 200)
         {
             List<RrPanel>? panels = GetComponentsByTag<RrPanel>(panelTag);
             if (panels is null)
@@ -318,7 +318,7 @@ namespace IPeople.Roadrunner.Razor.Services
             }).ToList();
 
             if (_jsRuntime is not null)
-                await _jsRuntime.InvokeVoidAsync("registerContainingDivAndPanels", containingDivId, panelDtos);
+                await _jsRuntime.InvokeVoidAsync("registerContainingDivAndPanels", panelDtos, containingDivId);
         }
         public string? GetDisplayValue(object? item)
         {

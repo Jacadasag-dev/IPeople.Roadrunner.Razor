@@ -67,8 +67,8 @@ namespace IPeople.Roadrunner.Razor.Components
         [CascadingParameter]
         public bool PanelLatching { get; set; }
 
-        [CascadingParameter(Name = "PageId")]
-        public string? PageId { get; set; }
+        [CascadingParameter(Name = "ContainingDivId")]
+        public string? ContainingDivId { get; set; }
         #endregion
 
         public DotNetObjectReference<RrPanel>? dotNetReference;
@@ -110,7 +110,13 @@ namespace IPeople.Roadrunner.Razor.Components
         private async Task SetPannelState()
         {
             if (afterFirstRender)
-                await JS.InvokeVoidAsync("setPanelUIState", PageId, Id, State.ToString());
+            {
+                if (string.IsNullOrEmpty(ContainingDivId))
+                {
+                    ContainingDivId = await JS.InvokeAsync<string>("getPanelContainingDivId", Id);
+                }
+                await JS.InvokeVoidAsync("setPanelUIState", ContainingDivId, Id, State.ToString());
+            }
         }
         
         [JSInvokable]

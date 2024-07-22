@@ -55,7 +55,7 @@ namespace IPeople.Roadrunner.Razor.Components
             if (firstRender)
             {
                 if (Id is not null)
-                    await RrStateService.RegisterContainingDivAndPanels(Id, "Panel", LatchingType, LatchingPanelsMininmumAdjustmentSize);
+                    await RrStateService.RegisterContainingDivAndPanels("Panel", Id, LatchingType, LatchingPanelsMininmumAdjustmentSize);
 
             }
         }

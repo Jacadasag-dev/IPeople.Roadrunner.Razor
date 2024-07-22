@@ -28,7 +28,7 @@ class ContainingDiv {
     }
 }
 class RrPanel {
-    constructor(id, panelElement, dotNetHelper, type, latchingType, container, stateChanger, minLatchingWidth, latching, size, state, sElement1, sElement2, centerElementContainer, sElementContainer1, sElementContainer2, centerElement) {
+    constructor({ id, panelElement, dotNetHelper, type, latchingType, container, stateChanger, minLatchingWidth, latching, size, state, sElement1, sElement2, centerElementContainer, sElementContainer1, sElementContainer2, centerElement }) {
         this.id = id;
         this.element = panelElement;
         this.container = container;
@@ -105,19 +105,17 @@ class RrPanel {
                 }
             }
             else {
-                if (this.latchingType === 'Vertical') {
-                    if (this.container.classList.contains('latching')) this.container.classList.remove('latching');
-                    if (this.stateChanger.classList.contains('latching')) this.stateChanger.classList.remove('latching');
-                    if (this.stateChanger.classList.contains('vertical')) this.stateChanger.classList.remove('vertical');
-                    if (!this.centerElement.classList.contains('arrow')) this.centerElement.classList.add('arrow');
-                    if (!this.centerElementContainer.classList.contains('arrow')) this.centerElementContainer.classList.add('arrow');
-                    if (!this.sElement1.classList.contains('dots')) this.sElement1.classList.add('dots');
-                    if (!this.sElement2.classList.contains('dots')) this.sElement2.classList.add('dots');
-                    if (this.centerElementContainer.classList.contains('dots')) this.centerElementContainer.classList.remove('dots');
-                    if (this.centerElement.classList.contains('dots')) this.centerElement.classList.remove('dots');
-                    if (this.sElement1.classList.contains('detacher')) this.sElement1.classList.remove('detacher');
-                    if (this.sElement2.classList.contains('detacher')) this.sElement2.classList.remove('detacher');
-                }
+                if (this.container.classList.contains('latching')) this.container.classList.remove('latching');
+                if (this.stateChanger.classList.contains('latching')) this.stateChanger.classList.remove('latching');
+                if (this.stateChanger.classList.contains('vertical')) this.stateChanger.classList.remove('vertical');
+                if (!this.centerElement.classList.contains('arrow')) this.centerElement.classList.add('arrow');
+                if (!this.centerElementContainer.classList.contains('arrow')) this.centerElementContainer.classList.add('arrow');
+                if (!this.sElement1.classList.contains('dots')) this.sElement1.classList.add('dots');
+                if (!this.sElement2.classList.contains('dots')) this.sElement2.classList.add('dots');
+                if (this.centerElementContainer.classList.contains('dots')) this.centerElementContainer.classList.remove('dots');
+                if (this.centerElement.classList.contains('dots')) this.centerElement.classList.remove('dots');
+                if (this.sElement1.classList.contains('detacher')) this.sElement1.classList.remove('detacher');
+                if (this.sElement2.classList.contains('detacher')) this.sElement2.classList.remove('detacher');
             }
         }
     }
@@ -137,28 +135,98 @@ class RrPanel {
 
 window.ContainingDivs = {};
 
-window.registerContainingDivAndPanels = function (containingDivId, panelDtos) {
+window.getPanelContainingDivId = function (panelId) {
+    const container = document.getElementById(`${panelId}-panel-container`);
+    if (!container) {
+        throw new Error(`Container with id ${panelId}-panel-container not found.`);
+    }
+
+    const panelContainingDiv = container.parentElement;
+    if (!panelContainingDiv) {
+        throw new Error(`Parent element of container with id ${panelId}-panel-container not found.\nThe containing div of a RrPanel component bust have an id.`);
+    }
+
+    const panelContainingDivId = panelContainingDiv.id;
+    if (!panelContainingDivId) {
+        throw new Error(`Parent element of container with id ${panelId}-panel-container does not have an id.\nThe containing div of a RrPanel component bust have an id.`);
+    }
+    return panelContainingDivId;
+};
+
+window.registerContainingDivAndPanels = function (panelDtos, containingDivId = '') {
+    if (!panelDtos || panelDtos.length === 0) {
+        throw new Error(`Panels could not be registered because no panel objects were passed to registerContainingDivAndPanels.`);
+    }
+    if (!containingDivId) {
+        const firstDto = panelDtos[0];
+        containingDivId = window.getPanelContainingDivId(firstDto.id);
+    }
+
     // Register ContainingDiv
     if (!window.ContainingDivs[containingDivId]) {
         window.ContainingDivs[containingDivId] = new ContainingDiv(containingDivId, null, []);
-        window.ContainingDivs[containingDivId].bounds = getPageElementBounds(containingDivId);
+        window.ContainingDivs[containingDivId].bounds = getContainingDivElementBounds(containingDivId);
+        if (!window.ContainingDivs[containingDivId].bounds) {
+            let containingDiv = document.getElementById(containingDivId);
+            if (!containingDiv) {
+                throw new Error(`ContainingDiv with id: "${containingDivId}" not found.`);
+            } else {
+                throw new Error(`ContainingDiv with id: "${containingDivId}" does not have bounds.`);
+            }
+        }
     }
     let justlatched = false;
     // Register Panels
     var panels = [];
     panelDtos.forEach(function (dto) {
         const panelElement = document.getElementById(`${dto.id}-panel`);
-        const container = document.getElementById(`${dto.id}-panel-container`);
-        const stateChanger = document.getElementById(`${dto.id}-panel-statechanger`);
-        const centerElementContainer = document.getElementById(`${dto.id}-panel-container-center`);
-        const centerElement = document.getElementById(`${dto.id}-panel-center`);
-        let sElementContainer1 = document.getElementById(`${dto.id}-Selement-container-1`);
-        let sElementContainer2 = document.getElementById(`${dto.id}-Selement-container-2`);
-        let sElement1 = document.getElementById(`${dto.id}-Selement-1`);
-        let sElement2 = document.getElementById(`${dto.id}-Selement-2`);
-        const panel = new RrPanel(dto.id, panelElement, dto.dotNetObjectReference, dto.pType, dto.latchingType, container, stateChanger, dto.minLatchingWidth, dto.latching, dto.size, dto.state, sElement1, sElement2, centerElementContainer, sElementContainer1, sElementContainer2, centerElement);
-        panels.push(panel);
+        if (!panelElement) throw new Error(`Element with id ${dto.id}-panel not found.`);
 
+        const container = document.getElementById(`${dto.id}-panel-container`);
+        if (!container) throw new Error(`Element with id ${dto.id}-panel-container not found.`);
+
+        const stateChanger = document.getElementById(`${dto.id}-panel-statechanger`);
+        if (!stateChanger) throw new Error(`Element with id ${dto.id}-panel-statechanger not found.`);
+
+        const centerElementContainer = document.getElementById(`${dto.id}-panel-container-center`);
+        if (!centerElementContainer) throw new Error(`Element with id ${dto.id}-panel-container-center not found.`);
+
+        const centerElement = document.getElementById(`${dto.id}-panel-center`);
+        if (!centerElement) throw new Error(`Element with id ${dto.id}-panel-center not found.`);
+
+        const sElementContainer1 = document.getElementById(`${dto.id}-Selement-container-1`);
+        if (!sElementContainer1) throw new Error(`Element with id ${dto.id}-Selement-container-1 not found.`);
+
+        const sElementContainer2 = document.getElementById(`${dto.id}-Selement-container-2`);
+        if (!sElementContainer2) throw new Error(`Element with id ${dto.id}-Selement-container-2 not found.`);
+
+        const sElement1 = document.getElementById(`${dto.id}-Selement-1`);
+        if (!sElement1) throw new Error(`Element with id ${dto.id}-Selement-1 not found.`);
+
+        const sElement2 = document.getElementById(`${dto.id}-Selement-2`);
+        if (!sElement2) throw new Error(`Element with id ${dto.id}-Selement-2 not found.`);
+        // throw an error if any of the elements are not found
+
+        const panel = new RrPanel({
+            id: dto.id,
+            panelElement: panelElement,
+            dotNetHelper: dto.dotNetObjectReference,
+            type: dto.pType,
+            latchingType: dto.latchingType,
+            container: container,
+            stateChanger: stateChanger,
+            minLatchingWidth: dto.minLatchingWidth,
+            latching: dto.latching,
+            size: dto.size,
+            state: dto.state,
+            sElement1: sElement1,
+            sElement2: sElement2,
+            centerElementContainer: centerElementContainer,
+            sElementContainer1: sElementContainer1,
+            sElementContainer2: sElementContainer2,
+            centerElement: centerElement
+        });
+        panels.push(panel);
 
         const onMouseDown = (event) => {
             let startY = event.clientY;
@@ -167,7 +235,8 @@ window.registerContainingDivAndPanels = function (containingDivId, panelDtos) {
             const initialWidth = panel.element.offsetWidth
             const initialStateChangerLeft = panel.stateChanger.offsetLeft;
             const initialStateChangerTop = panel.stateChanger.offsetTop;
-            const leftPanelInitialWidth = window.ContainingDivs[containingDivId].panels.find(p => p.type === 'Left').element.offsetWidth
+            const leftPanel = window.ContainingDivs[containingDivId].panels.find(p => p.type === 'Left');
+            const leftPanelInitialWidth = leftPanel?.element.offsetWidth;
             let mouseMoved = false;
             panel.disableTransitions();
 
@@ -247,7 +316,7 @@ window.registerContainingDivAndPanels = function (containingDivId, panelDtos) {
                     }
                     let size = -1;
                     if (panel.type === 'Left' || panel.type === 'Right') {
-                        if (!justlatched) {
+                        if (!justlatched && panel.latching) {
                             leftPanel = window.ContainingDivs[containingDivId].panels.find(p => p.type === 'Left');
                             rightPanel = window.ContainingDivs[containingDivId].panels.find(p => p.type === 'Right');
                             const leftRect = leftPanel.stateChanger.getBoundingClientRect();
@@ -278,7 +347,7 @@ window.registerContainingDivAndPanels = function (containingDivId, panelDtos) {
                             }
                         }
                         size = parseFloat(panel.element.style.width);
-                        if (size < 100 || size > window.ContainingDivs[containingDivId].bounds.width - 20) {
+                        if (size < 50 || size > window.ContainingDivs[containingDivId].bounds.width - 20) {
                             if (panel.type === 'Left') {
                                 panel.container.style.transition = 'none';
                                 panel.stateChanger.style.left = panel.size;
@@ -293,7 +362,7 @@ window.registerContainingDivAndPanels = function (containingDivId, panelDtos) {
                         }
                     } else if (panel.type === 'Top' || panel.type === 'Bottom') {
                         size = parseFloat(panel.element.style.height);
-                        if (size < 100 || size > window.ContainingDivs[containingDivId].bounds.height - 20) {
+                        if (size < 50 || size > window.ContainingDivs[containingDivId].bounds.height - 20) {
                             if (panel.type === 'Top') {
                                 panel.container.style.transition = 'none';
                                 panel.stateChanger.style.top = panel.size;
@@ -354,7 +423,7 @@ window.registerContainingDivAndPanels = function (containingDivId, panelDtos) {
         }
         setFocusPanelOrder(panel);
     }
-    function getPageElementBounds(elementId) {
+    function getContainingDivElementBounds(elementId) {
         const element = document.getElementById(elementId);
         if (!element) return null;
         const rect = element.getBoundingClientRect();
@@ -385,6 +454,16 @@ window.registerContainingDivAndPanels = function (containingDivId, panelDtos) {
         
         if (bottomPanel && bottomPanel.state === 'Expanded' && topPanel && topPanel.state === 'Collapsed') 
             offset = -10;
+
+        const computedStyle = window.getComputedStyle(document.getElementById(window.ContainingDivs[containingDivId].id));
+        const containingDivBorderBottomWidth = computedStyle.borderBottomWidth;
+        const containingDivBorderTopWidth = computedStyle.borderTopWidth;
+        if (containingDivBorderBottomWidth) {
+            offset -= parseFloat(containingDivBorderBottomWidth);
+        }
+        if (containingDivBorderTopWidth) {
+            offset -= parseFloat(containingDivBorderTopWidth);
+        }
 
         return offset;
     }
@@ -509,11 +588,11 @@ window.registerContainingDivAndPanels = function (containingDivId, panelDtos) {
             panel.setPanelStatechangerElementClasses();
             if (panel.type === 'Top') {
                 if (panel.state === 'Expanded') {
-                    panel.container.style.top = `0px`;
+                    panel.container.style.top = `${getHorizontalPanelLeftOffsets(panel)}px`;
                 } else {
                     panel.container.style.top = `-${panel.size}`;
                 }
-                panel.container.style.left = `${window.ContainingDivs[containingDivId].bounds.left + getHorizontalPanelLeftOffsets(panel)}px`;
+                panel.container.style.left = `0px`;
                 panel.element.style.width = `${window.ContainingDivs[containingDivId].bounds.width + getHorizontalPanelWidthOffsets(panel)}px`;
                 panel.element.style.height = panel.size;
                 panel.stateChanger.style.width = `${window.ContainingDivs[containingDivId].bounds.width + getHorizontalPanelWidthOffsets(panel)}px`;
@@ -525,7 +604,7 @@ window.registerContainingDivAndPanels = function (containingDivId, panelDtos) {
                 } else {
                     panel.container.style.bottom = `0px`;
                 }
-                panel.container.style.left = `${window.ContainingDivs[containingDivId].bounds.left + getHorizontalPanelLeftOffsets(panel)}px`;
+                panel.container.style.left = `${getHorizontalPanelLeftOffsets(panel)}px`;
                 panel.element.style.width = `${window.ContainingDivs[containingDivId].bounds.width + getHorizontalPanelWidthOffsets(panel)}px`;
                 panel.element.style.height = panel.size;
                 panel.stateChanger.style.width = `${window.ContainingDivs[containingDivId].bounds.width + getHorizontalPanelWidthOffsets(panel)}px`;
@@ -560,8 +639,11 @@ window.registerContainingDivAndPanels = function (containingDivId, panelDtos) {
     }
 
     const updateBounds = () => {
-        window.ContainingDivs[containingDivId].bounds = getPageElementBounds(containingDivId);
+        window.ContainingDivs[containingDivId].bounds = getContainingDivElementBounds(containingDivId);
         window.ContainingDivs[containingDivId].panels.forEach(panel => {
+            if (panel.state !== 'Expanded' && panel.state !== 'Collapsed')
+                panel.makeMinimized();
+
             setPanelBounds(panel);
             if (panel.latching)
                 justlatched = true;
