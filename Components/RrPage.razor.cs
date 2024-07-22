@@ -48,14 +48,17 @@ namespace IPeople.Roadrunner.Razor.Components
 
         [Parameter]
         public LatchingTypes LatchingType { get; set; }
+
+        [Parameter]
+        public string? PanelsTag { get; set; }
         #endregion
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
             {
-                if (Id is not null)
-                    await RrStateService.RegisterContainingDivAndPanels("Panel", Id, LatchingType, LatchingPanelsMininmumAdjustmentSize);
+                if (!string.IsNullOrEmpty(Id) && !string.IsNullOrEmpty(PanelsTag))
+                    await RrStateService.RegisterContainingDivAndPanels(PanelsTag, Id, LatchingType, LatchingPanelsMininmumAdjustmentSize);
 
             }
         }
