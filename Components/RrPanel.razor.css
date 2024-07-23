@@ -1,4 +1,9 @@
 ﻿
+/* Add this class to the interactive elements within the panels container */
+.Rr-page-panels-container .interactive {
+    pointer-events: auto; /* Re-enable interaction for specific elements */
+}
+
 .Rr-panel-container {
     position: absolute;
     padding: 0px;

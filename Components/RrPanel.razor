@@ -2,7 +2,7 @@
 @if (Visible)
 {
     InitializePanel();
-    <div id="@($"{Id}-panel-container")" class="Rr-panel-container @PType.ToString().ToLower()">
+    <div id="@($"{Id}-panel-container")" class="Rr-panel-container @PType.ToString().ToLower() interactive">
         <div id="@($"{Id}-panel")" class="Rr-panel @PType.ToString().ToLower()"
              style="@Style">
             @if (Header is not null)
