@@ -298,9 +298,11 @@ window.registerContainingDivAndPanels = function (panelDtos, containingDivId = '
                 } else {
                     if (!mouseMoved) {
                         if (!justlatched) {
+                            console.log(`${containingDivId}: FROM MOUSEUP (MOUSE NOT MOVED AND NOT JUST LATCHED): ${panel.type}`);
                             toggleUIState(panel);
                         } else {
                             if (panel.latchingType === 'Vertical' && (panel.type === 'Top' || panel.type === 'Bottom')) {
+                                console.log(`${containingDivId}: FROM MOUSEUP (MOUSE NOT MOVED): ${panel.type}`);
                                 toggleUIState(panel);
                             }
                         }
@@ -355,6 +357,7 @@ window.registerContainingDivAndPanels = function (panelDtos, containingDivId = '
                         size = parseFloat(panel.element.style.height);
                         if (size < 50 || size > window.ContainingDivs[containingDivId].bounds.height - 20) {
                             if (panel.type === 'Top') {
+                                console.log(`${containingDivId}: FROM MOUSEUP: ${panel.type}`);
                                 panel.container.style.transition = 'none';
                                 panel.stateChanger.style.top = panel.size;
                                 panel.element.style.height = panel.size;
@@ -397,6 +400,7 @@ window.registerContainingDivAndPanels = function (panelDtos, containingDivId = '
         if (panel.latching)
             return;
 
+        console.log(`${containingDivId}: FROM TOGGLEUISTATE: ${panel.type}, ${desiredState}`);
         if (desiredState) {
             if (desiredState === 'Expanded') {
                 panel.makeExpanded();
@@ -517,6 +521,7 @@ window.registerContainingDivAndPanels = function (panelDtos, containingDivId = '
                     p.container.style.zIndex = `${20 + (panels.length - i)}`;
                 }
                 setPanelBounds(p);
+                console.log(`${containingDivId}: FROM SETFOCUSPANELORDER: ${panel.type}`);
             });
         }
     };
@@ -590,6 +595,8 @@ window.registerContainingDivAndPanels = function (panelDtos, containingDivId = '
                 panel.stateChanger.style.width = `${window.ContainingDivs[containingDivId].bounds.width + getHorizontalPanelWidthOffsets(panel)}px`;
                 panel.stateChanger.style.height = "10px";
                 panel.stateChanger.style.top = panel.size;
+
+                console.log(`${containingDivId}: ${window.ContainingDivs[containingDivId].bounds.width}`);
             } else if (panel.type === 'Bottom') {
                 if (panel.state === 'Expanded') {
                     panel.container.style.bottom = panel.size;
@@ -649,56 +656,5 @@ window.registerContainingDivAndPanels = function (panelDtos, containingDivId = '
     }
 };
 
-
-window.tables = {};
-
-window.registerTables = function (id, dotNetHelper) {
-
-    const tableId = `${id}-table`;
-    const table = document.getElementById(tableId);
-
-    window.tables[tableId] = {
-        dotNetHelper: dotNetHelper
-    };
-
-    if (!table) {
-        console.error(`Table with ID '${tableId}' not found.`);
-        return;
-    } else {
-        console.log(`Table with ID '${tableId}' found.`);
-    }
-
-    const headers = table.querySelectorAll("th");
-
-    headers.forEach((header) => {
-        const resizer = document.createElement("div");
-        resizer.className = "resizer";
-        resizer.addEventListener("mousedown", (e) => startDrag(e, header, tableId));
-        header.appendChild(resizer);
-    });
-
-    function startDrag(e, header, tableId) {
-        const onDrag = (e) => onDragHandler(e, header);
-        const stopDrag = () => stopDragHandler(onDrag, stopDrag);
-
-        document.addEventListener("mousemove", onDrag);
-        document.addEventListener("mouseup", stopDrag);
-
-        let startX = e.clientX;
-        let startWidth = header.offsetWidth;
-
-        function onDragHandler(e) {
-            let newWidth = startWidth + (e.clientX - startX);
-            header.style.width = `${newWidth}px`;
-        }
-
-        function stopDragHandler(onDrag, stopDrag) {
-            document.removeEventListener("mousemove", onDrag);
-            document.removeEventListener("mouseup", stopDrag);
-            // Invoke a method on the Blazor component (if needed)
-            window.tables[tableId].dotNetHelper.invokeMethodAsync('OnColumnResized', header.innerText, newWidth);
-        }
-    }
-};
 
 
