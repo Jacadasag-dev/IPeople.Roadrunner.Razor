@@ -10,6 +10,8 @@
         margin: 0;
         border: 1px solid #ddd;
         text-align: left;
+        white-space: nowrap; /* Prevents text from wrapping */
+        text-overflow: ellipsis; /* Adds ellipsis at the end of the overflowed text */
     }
 
     .compact-table thead tr {
