@@ -2,9 +2,9 @@
 
 @if (Visible)
 {
+    InitializeInput();
     if (!MultiLine)
     {
-        InitializeInput();
         <input
             id="@Id"
             type="text"
@@ -31,7 +31,8 @@
                 @oninput="OnTextChanged"
                 @onclick="@OnInputClick"
                 @onkeydown="HandleOnKeyDown"
-                spellcheck="false">@instantInputText
+                spellcheck="false"
+                value="@instantInputText">
             </textarea>
         </div>
     }

@@ -25,6 +25,7 @@ class ContainingDiv {
         this.id = id;
         this.bounds = bounds;
         this.panels = panels;
+        this.detachable = false;
     }
 }
 class RrPanel {
@@ -87,7 +88,7 @@ class RrPanel {
         this.dotNetHelper.invokeMethodAsync('UpdateStateServicePanelState', this.state).catch(err => console.error(err));
     }
 
-    setPanelStatechangerElementClasses() {
+    setPanelStatechangerElementClasses(containingDivId) {
         if (this) {
             if (this.latching) {
                 if (this.latchingType === 'Vertical') {
@@ -102,6 +103,13 @@ class RrPanel {
                     if (this.centerElementContainer.classList.contains('arrow')) this.centerElementContainer.classList.remove('arrow');
                     if (this.sElement1.classList.contains('dots')) this.sElement1.classList.remove('dots');
                     if (this.sElement2.classList.contains('dots')) this.sElement2.classList.remove('dots');
+                    if (window.ContainingDivs[containingDivId].detachable) {
+                        this.sElement1.style.display = "block";
+                        this.sElement2.style.display = "block";
+                    } else {
+                        this.sElement1.style.display = "none";
+                        this.sElement2.style.display = "none";
+                    }
                 }
             }
             else {
@@ -151,6 +159,13 @@ window.getPanelContainingDivId = function (panelId) {
         throw new Error(`Parent element of container with id ${panelId}-panel-container does not have an id.\nThe containing div of a RrPanel component bust have an id.`);
     }
     return panelContainingDivId;
+};
+
+window.setContainingDivDetachable = function (containingDivId, detachable) {
+    let containingDiv = window.ContainingDivs[containingDivId];
+    if (containingDiv) {
+        containingDiv.detachable = detachable;
+    }
 };
 
 window.registerContainingDivAndPanels = function (panelDtos, containingDivId = '') {
@@ -298,11 +313,9 @@ window.registerContainingDivAndPanels = function (panelDtos, containingDivId = '
                 } else {
                     if (!mouseMoved) {
                         if (!justlatched) {
-                            console.log(`${containingDivId}: FROM MOUSEUP (MOUSE NOT MOVED AND NOT JUST LATCHED): ${panel.type}`);
                             toggleUIState(panel);
                         } else {
                             if (panel.latchingType === 'Vertical' && (panel.type === 'Top' || panel.type === 'Bottom')) {
-                                console.log(`${containingDivId}: FROM MOUSEUP (MOUSE NOT MOVED): ${panel.type}`);
                                 toggleUIState(panel);
                             }
                         }
@@ -357,7 +370,6 @@ window.registerContainingDivAndPanels = function (panelDtos, containingDivId = '
                         size = parseFloat(panel.element.style.height);
                         if (size < 50 || size > window.ContainingDivs[containingDivId].bounds.height - 20) {
                             if (panel.type === 'Top') {
-                                console.log(`${containingDivId}: FROM MOUSEUP: ${panel.type}`);
                                 panel.container.style.transition = 'none';
                                 panel.stateChanger.style.top = panel.size;
                                 panel.element.style.height = panel.size;
@@ -400,7 +412,6 @@ window.registerContainingDivAndPanels = function (panelDtos, containingDivId = '
         if (panel.latching)
             return;
 
-        console.log(`${containingDivId}: FROM TOGGLEUISTATE: ${panel.type}, ${desiredState}`);
         if (desiredState) {
             if (desiredState === 'Expanded') {
                 panel.makeExpanded();
@@ -521,7 +532,6 @@ window.registerContainingDivAndPanels = function (panelDtos, containingDivId = '
                     p.container.style.zIndex = `${20 + (panels.length - i)}`;
                 }
                 setPanelBounds(p);
-                console.log(`${containingDivId}: FROM SETFOCUSPANELORDER: ${panel.type}`);
             });
         }
     };
@@ -539,7 +549,7 @@ window.registerContainingDivAndPanels = function (panelDtos, containingDivId = '
         }
     }
     function setNotLatching(panel) {
-        if (panel.latching && panel.latchingType === 'Vertical') {
+        if (window.ContainingDivs[containingDivId].detachable && panel.latching && panel.latchingType === 'Vertical') {
             leftPanel = window.ContainingDivs[containingDivId].panels.find(p => p.type === 'Left');
             rightPanel = window.ContainingDivs[containingDivId].panels.find(p => p.type === 'Right');
             if (leftPanel && rightPanel) {
@@ -577,12 +587,12 @@ window.registerContainingDivAndPanels = function (panelDtos, containingDivId = '
                     rightPanel.container.style.zIndex = 18;
                     leftPanel.size = `${leftPanel.element.offsetWidth}px`;
                     rightPanel.size = `${rightPanel.element.offsetWidth}px`;
-                    rightPanel.setPanelStatechangerElementClasses();
-                    leftPanel.setPanelStatechangerElementClasses();
+                    rightPanel.setPanelStatechangerElementClasses(containingDivId);
+                    leftPanel.setPanelStatechangerElementClasses(containingDivId);
                 }
             }
         } else {
-            panel.setPanelStatechangerElementClasses();
+            panel.setPanelStatechangerElementClasses(containingDivId);
             if (panel.type === 'Top') {
                 if (panel.state === 'Expanded') {
                     panel.container.style.top = `${getHorizontalPanelLeftOffsets(panel)}px`;
@@ -595,8 +605,6 @@ window.registerContainingDivAndPanels = function (panelDtos, containingDivId = '
                 panel.stateChanger.style.width = `${window.ContainingDivs[containingDivId].bounds.width + getHorizontalPanelWidthOffsets(panel)}px`;
                 panel.stateChanger.style.height = "10px";
                 panel.stateChanger.style.top = panel.size;
-
-                console.log(`${containingDivId}: ${window.ContainingDivs[containingDivId].bounds.width}`);
             } else if (panel.type === 'Bottom') {
                 if (panel.state === 'Expanded') {
                     panel.container.style.bottom = panel.size;

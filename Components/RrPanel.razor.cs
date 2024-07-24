@@ -59,9 +59,6 @@ namespace IPeople.Roadrunner.Razor.Components
         public UIStates InitialState { get; set; }
 
         [CascadingParameter]
-        public bool LatchingDetachable { get; set; }
-
-        [CascadingParameter]
         public LatchingTypes LatchingType { get; set; }
 
         [CascadingParameter]
@@ -71,10 +68,11 @@ namespace IPeople.Roadrunner.Razor.Components
         public string? ContainingDivId { get; set; }
         #endregion
 
+        #region Fields
         public DotNetObjectReference<RrPanel>? dotNetReference;
-
         private bool afterFirstRender = false;
         private RrLoadingBase? loading;
+        #endregion
 
         private async void InitializePanel()
         {
@@ -134,6 +132,7 @@ namespace IPeople.Roadrunner.Razor.Components
             }
         }
 
+        #region Styling Methods
         private string GetBodySizeOffset()
         {
             if (Header is null && Footer is null)
@@ -149,7 +148,6 @@ namespace IPeople.Roadrunner.Razor.Components
                 return "35px";
             }
         }
-        
         private string GetAllowedScrolling()
         {
             if (AllowScrolling)
@@ -177,5 +175,6 @@ namespace IPeople.Roadrunner.Razor.Components
             }
             return "";
         }
+        #endregion
     }
 }

@@ -63,6 +63,11 @@ namespace IPeople.Roadrunner.Razor.Components
             }
         }
 
+        protected override async Task OnParametersSetAsync()
+        {
+            await JS.InvokeVoidAsync("setContainingDivDetachable", Id, LatchingDetachable);
+        }
+
         private string GetBodyHeight()
         {
             if (Header is null && Footer is null)
