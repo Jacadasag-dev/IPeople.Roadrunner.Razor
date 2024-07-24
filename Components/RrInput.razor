@@ -2,9 +2,9 @@
 
 @if (Visible)
 {
+    InitializeInput();
     if (!MultiLine)
     {
-        InitializeInput();
         <input id="@Id" type="text"
                class="Rr-input"
                placeholder="@Placeholder"
@@ -21,14 +21,15 @@
             <div class="Rr-textarea-linenumbers-container">
                 <pre class="Rr-textarea-linenumbers">@lineNumbers</pre>
             </div>
-            <textarea id="@Id"
-                      class="Rr-textarea"
-                      placeholder="@Placeholder"
-                      style="resize: none; @Style; flex-grow: 1; padding-left: 5px;"
-                      @oninput="OnTextChanged"
-                      @onclick="@OnInputClick"
-                      @onkeydown="HandleOnKeyDown"
-                      spellcheck="false">@instantInputText
+            <textarea
+                id="@Id"
+                class="Rr-textarea"
+                placeholder="@Placeholder"
+                style="resize: none; @Style; flex-grow: 1; padding-left: 5px;"
+                @oninput="OnTextChanged"
+                @onclick="@OnInputClick"
+                @onkeydown="HandleOnKeyDown"
+                spellcheck="false">@instantInputText
             </textarea>
         </div>
     }
