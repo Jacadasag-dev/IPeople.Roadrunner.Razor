@@ -2,18 +2,20 @@
 
 @if (Visible)
 {
-    InitializeInput();
     if (!MultiLine)
     {
-        <input id="@Id" type="text"
-               class="Rr-input"
-               placeholder="@Placeholder"
-               style="@($"max-width:{MaxWidth}; min-width:{MinWidth};") @Style"
-               value="@instantInputText"
-               @oninput="OnTextChanged"
-               @onclick="@OnInputClick"
-               @onkeydown="HandleOnKeyDown"
-               spellcheck="false">
+        InitializeInput();
+        <input
+            id="@Id"
+            type="text"
+            class="Rr-input"
+            placeholder="@Placeholder"
+            style="@($"max-width:{MaxWidth}; min-width:{MinWidth};") @Style"
+            value="@instantInputText"
+            @oninput="OnTextChanged"
+            @onclick="@OnInputClick"
+            @onkeydown="HandleOnKeyDown"
+            spellcheck="false">
     }
     else
     {

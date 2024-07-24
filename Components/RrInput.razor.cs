@@ -100,7 +100,7 @@ namespace IPeople.Roadrunner.Razor.Components
         {
             string? newText = e.Value?.ToString();
             if (MultiLine) UpdateLineNumbers(newText);
-            if (string.IsNullOrEmpty(newText)) return;
+            if (newText is null) return;
             if (DeBounce)
             {
                 debounceCts.Cancel();
@@ -114,12 +114,14 @@ namespace IPeople.Roadrunner.Razor.Components
                     return;
                 }
                 inputText = newText;
+                instantInputText = newText;
                 RrStateService.SetComponentPropertyById<RrInput, string>(Id, c => c.Text, inputText);
                 await OnChangedText.InvokeAsync(inputText);
             }
             else
             {
                 inputText = newText;
+                instantInputText = newText;
                 RrStateService.SetComponentPropertyById<RrInput, string>(Id, c => c.Text, inputText);
                 await OnChangedText.InvokeAsync(inputText);
             }
